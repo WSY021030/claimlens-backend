@@ -145,6 +145,7 @@ def create_app(project: Path | str = PROJECT_ROOT):
 
             workflow_id = None
             workflow_status = None
+            answer_status = None
 
             with subprocess.Popen(
                 command,
@@ -171,16 +172,25 @@ def create_app(project: Path | str = PROJECT_ROOT):
                             workflow_status = (
                                 line.partition(":")[2].strip().lower()
                             )
+                        elif line.startswith("Answer status:"):
+                            answer_status = (
+                                line.partition(":")[2].strip().lower()
+                            )
 
                 exit_code = process.wait()
 
             record["exit_code"] = exit_code
+            record["answer_status"] = answer_status
 
             if exit_code != 0:
                 record["state"] = "failed"
                 record["error_code"] = "WORKFLOW_FAILED"
             elif workflow_status == "completed":
-                record["state"] = "completed"
+                if answer_status == "generated":
+                    record["state"] = "completed"
+                else:
+                    record["state"] = "partial"
+                    record["error_code"] = "ANSWER_UNCONFIRMED"
             elif workflow_status == "partial":
                 record["state"] = "partial"
             else:
