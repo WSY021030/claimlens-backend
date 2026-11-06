@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from app.models.document_v2 import Paragraph
 
 from app.models.coordinator_v3 import CoordinatorPlan, CoordinatorTask, TaskScope, required_capabilities
 
@@ -56,6 +57,105 @@ class RetrievalBoundary(BaseModel):
         return self
 
 
+class SelectionReferenceSpan(BaseModel):
+    """An exact canonical paragraph span."""
+    model_config = ConfigDict(extra="forbid")
+
+    element_id: str = Field(min_length=1, max_length=160)
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    exact: str = Field(min_length=1, max_length=1800)
+
+    @model_validator(mode="after")
+    def valid_range(self):
+        if self.end - self.start != len(self.exact):
+            raise ValueError("Selection offsets do not match exact text.")
+        return self
+
+
+class SelectionReference(BaseModel):
+    """Soft reference context, never a hard retrieval boundary."""
+    model_config = ConfigDict(extra="forbid")
+
+    paper_revision: str = Field(min_length=8, max_length=200)
+    segments: list[SelectionReferenceSpan] = Field(
+        min_length=1, max_length=3
+    )
+
+    @model_validator(mode="after")
+    def limit_length(self):
+        if sum(len(s.exact) for s in self.segments) > 2400:
+            raise ValueError("Selection reference is too large.")
+        return self
+
+
+class ConversationMessage(BaseModel):
+    """A bounded conversation hint, not paper Evidence."""
+    model_config = ConfigDict(extra="forbid")
+
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=600)
+
+    @model_validator(mode="after")
+    def clean_content(self):
+        self.content = self.content.strip()
+        if not self.content:
+            raise ValueError("Chat history cannot contain blank messages.")
+        return self
+
+
+def validate_selection_reference(selection, paper):
+    if selection is None:
+        return
+
+    if selection.paper_revision != paper.revision:
+        raise ValueError("The selected paper revision has changed.")
+
+    for span in selection.segments:
+        element = paper.elements.get(span.element_id)
+
+        if not isinstance(element, Paragraph):
+            raise ValueError("Selection must reference a real paragraph.")
+
+        if element.text[span.start:span.end] != span.exact:
+            raise ValueError("Selection does not match canonical text.")
+
+
+def question_context_note(run):
+    """Provide reference hints without changing evidence boundaries."""
+    import json
+
+    request = get_request(run)
+
+    if not request:
+        return None
+
+    if request.selection_context is None and not request.chat_history:
+        return None
+
+    context = {
+        "selection_reference": (
+            request.selection_context.model_dump(mode="json")
+            if request.selection_context is not None else None
+        ),
+        "conversation_history": [
+            message.model_dump(mode="json")
+            for message in request.chat_history
+        ],
+    }
+
+    return (
+        "Context for interpreting the CURRENT user question only. "
+        "The selected paragraph is a soft location hint, NOT a "
+        "mandatory Claim target or Evidence retrieval boundary. "
+        "The Coordinator may examine other sections of the paper. "
+        "Previous conversation messages are NOT scientific Evidence. "
+        "Do not use conversation text as proof of any paper claim. "
+        "Answer the current question using actual source records. "
+        + json.dumps(context, ensure_ascii=False, separators=(",", ":"))
+    )
+
+
 class ReaderRequest(BaseModel):
     """Frontend/CLI input. Operation permissions are owned by the application."""
     model_config = ConfigDict(extra="forbid")
@@ -67,6 +167,10 @@ class ReaderRequest(BaseModel):
     target_claim_ids: list[str] = Field(default_factory=list)
     mapping_ids_by_claim: dict[str, str] = Field(default_factory=dict)
     retrieval_scope: RetrievalBoundary = Field(default_factory=RetrievalBoundary)
+    selection_context: SelectionReference | None = None
+    chat_history: list[ConversationMessage] = Field(
+        default_factory=list, max_length=6
+    )
 
     @model_validator(mode="after")
     def consistent(self):
@@ -93,6 +197,7 @@ def validate_request(request, paper, data):
     unknown = set(request.target_claim_ids) - set(data.claim_pool)
     if unknown:
         raise ValueError(f"Unknown selected Claims: {sorted(unknown)}")
+    validate_selection_reference(request.selection_context, paper)
     boundary = request.retrieval_scope
     if set(boundary.section_ids) - {s.section_id for s in paper.sections}:
         raise ValueError("Unknown user-selected Evidence section.")

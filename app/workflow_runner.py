@@ -34,7 +34,7 @@ from app.core.evidence_retrieval import EvidenceDataManager, scope_element_ids
 from app.core.request_contract import (
     ReaderRequest, REQUEST_POLICY, SAVED_OPERATIONS, FIXED_OPERATIONS,
     resolve_request, deterministic_plan, get_request, locked_targets, saved_only,
-    enforce_plan_targets, evidence_boundary,
+    enforce_plan_targets, evidence_boundary, question_context_note,
 )
 from app.core.mapping_views import bind_saved_task, display_view
 from app.direct_evidence_runner import direct_search_key
@@ -1129,6 +1129,10 @@ def run_workflow(args):
             catalog["language"] = args.language
             catalog["recent_questions"] = [r.get("user_question") for r in data.runs
                                           if r.get("mode") == "full_pipeline" and r.get("run_id") != run["run_id"]][-3:]
+            context_note = question_context_note(run)
+            if context_note:
+                catalog["question_context"] = context_note
+                catalog["recent_questions"] = []
             catalog["explicit_user_scope"] = {"section_ids": args.focus_section, "element_ids": args.focus_element}
             print("\n=== COORDINATOR PLANNING ===", flush=True)
             plan = coordinator.plan(args.question, catalog)

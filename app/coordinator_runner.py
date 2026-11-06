@@ -30,6 +30,7 @@ from app.core.evidence_retrieval import EvidenceDataManager, scope_element_ids
 from app.core.mapping_execution import run_claim_mappings
 from app.core.request_contract import (
     get_request, locked_targets, saved_only, evidence_boundary, enforce_plan_targets,
+    question_context_note,
 )
 from app.core.mapping_views import (
     bind_saved_task, display_view, mapping_bindings, argument_packet, canonical_references,
@@ -818,6 +819,9 @@ def final_answer(*, coordinator, data, store, run, plan, language, paper=None):
             rendering_mode = "source_listing"
         elif argument_states:
             notes = ["Only the bound Mapping results may supply argument judgments. Missing saved analysis must not trigger implicit extraction."]
+            context_note = question_context_note(run)
+            if context_note:
+                notes.append(context_note)
             if unfinished:
                 notes.append("Unfinished requested processing: " + encoded(unfinished))
             # No paid page-notes pipeline for an ordinary saved-Claim explanation.
@@ -850,6 +854,9 @@ def final_answer(*, coordinator, data, store, run, plan, language, paper=None):
             view = material_view(coordinator=coordinator, packet=packet, run=run, data=data,
                                  store=store, purpose="final_answer")
             notes = ["Unfinished processing, not paper omissions: " + encoded(unfinished)] if unfinished else []
+            context_note = question_context_note(run)
+            if context_note:
+                notes.append(context_note)
             result = coordinator.answer(question=run["user_question"], plan=plan, answer_pack=view,
                                         execution_notes=notes, language=language)
             reply = result.model_dump(mode="json")
