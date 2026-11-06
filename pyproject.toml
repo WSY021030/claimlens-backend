@@ -1,0 +1,17 @@
+[project]
+name = "paper-compredending"
+version = "0.1.0"
+description = "Reader-v3 foundation: HTML normalization, source anchors, image assets, API budget"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.13",
+    "lxml>=5.0",
+    "pydantic>=2.10,<3",
+    "pillow>=11.0",
+    "matplotlib>=3.9",
+    "playwright>=1.50",
+    "openai>=1.80"
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]

@@ -1,0 +1,36 @@
+﻿# Runtime data and experimental outputs
+/data/
+/output/
+/tests/
+/input/
+/uploads/
+/*.json
+/.reader_*/
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.db
+*.sqlite*
+
+# Historical patches and archives
+reader_v3_*_update.py
+*.patch
+*.diff
+*.zip
+*.7z
+*.log
+
+# IDE
+.vscode/
+.idea/
