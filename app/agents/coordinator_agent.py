@@ -75,6 +75,13 @@ Routing:
   support', logical relationships, contradictions or conditional inferences.
 Do not route a question merely asking to list numbers into Mapping.
 Closely connected subquestions belong in one task. Separate independent tasks.
+TOKEN_SCOPE_OPT_20261110: One table comparison should be one fact_lookup,
+not a fact_lookup plus independent Mapping tasks for nearby Claims.
+The distinction between pairwise and global ranking is numeric, not
+a separate scientific argument. Mapping is required for scientific
+support, causal explanations, conflicting interpretations and assumptions.
+Do not expand Claim targets solely because a neighboring paragraph exists.
+Reuse source-located Evidence before requesting a new discovery.
 For a new paper select source sections/elements and leave claim_ids empty.
 For a follow-up, distinguish target Claims from supporting source context.
 The catalog may include an application-owned request_contract. Its explicit

@@ -609,6 +609,27 @@ def execute_mappings(*, coordinator, data, store, run, plan, model, language,
             raise ValueError("Mapping targets exceed the application-owned Claim selection.")
         if not cids:
             continue
+
+        # TOKEN_SCOPE_OPT_20261110: prevent empty-context Mapping calls.
+        if (
+            not saved_only(run)
+            and all(
+                state.get("collection_ready") is False
+                and not state.get("selected_evidence_ids")
+                for state in states
+            )
+        ):
+            for state in states:
+                state["mapping_ids"] = []
+                state["mapping_ids_by_claim"] = {}
+                state["deferred_claim_ids"] = list(cids)
+                state["mapping_errors"] = [
+                    "No usable Evidence available for Mapping."
+                ]
+
+            store.save(data)
+            continue
+
         if not saved_only(run) and any(state.get("mapping_blocked_for_incomplete_coverage") for state in states):
             for state in states:
                 state["mapping_ids"] = []
@@ -775,6 +796,81 @@ def final_answer(*, coordinator, data, store, run, plan, language, paper=None):
     else:
         packet = source_packet(data, claim_ids=cids, evidence_ids=unique(direct_eids),
                                paper=paper, question=run["user_question"])
+    # NUMERIC_FACT_ANSWER_CONTEXT_V1:
+    # Keep source-verified numeric facts separate from Claim Mapping.
+    if argument_states and paper is not None and not saved_only(run):
+        from decimal import Decimal
+        from app.table_fact_lookup import verified_numeric_comparison
+
+        boundary = (
+            evidence_boundary(run, paper)
+            if request and request.retrieval_scope.mode == "selection"
+            else None
+        )
+
+        facts = verified_numeric_comparison(
+            paper, data, run["user_question"], boundary
+        )
+
+        if facts is not None:
+            values = [
+                Decimal(item["value"])
+                for item in facts["rows"]
+            ]
+
+            best_value = (
+                min(values)
+                if facts["direction"] == "min"
+                else max(values)
+            )
+
+            packet["verified_numeric_table_facts"] = {
+                "basis": "complete_source_table_crosscheck",
+                "role": "direct_numeric_facts_not_mapping_support",
+                "table_id": facts["table_id"],
+                "table_label": facts["table_label"],
+                "dataset": facts["dataset"],
+                "metric": facts["metric"],
+                "direction": facts["direction"],
+                "rows": facts["rows"],
+                "best_overall_value": str(best_value),
+                "best_overall_methods": [
+                    row["method"]
+                    for row in facts["rows"]
+                    if Decimal(row["value"]) == best_value
+                ],
+                "best_synthetic_value": facts["best_synthetic_value"],
+                "best_synthetic_methods": facts["best_synthetic_methods"],
+                "requested_methods": facts["requested_methods"],
+                "evidence_ids": facts["evidence_ids"],
+            }
+
+            for eid in facts["evidence_ids"]:
+                evidence = data.evidence_pool[eid]
+
+                packet["source_index"].setdefault(
+                    eid,
+                    {
+                        "kind": "evidence",
+                        "source_element_id": evidence.source_element_id,
+                        "source_status": evidence.source_status,
+                        "observed_via": evidence.observed_via,
+                    },
+                )
+
+            packet["source_contract"] += (
+                " verified_numeric_table_facts contains independent "
+                "source-verified numeric facts for the user question. "
+                "Use these facts to answer exact table comparisons and "
+                "global rankings. They are NOT additional Evidence "
+                "adopted by the bound Claim Mapping. Do not alter "
+                "Mapping relations, Claim support judgments, or graph "
+                "highlights using these supplemental facts. "
+                "Do not describe a complete table as unavailable "
+                "when all compared rows are supplied here. "
+                "Cite the listed Evidence IDs for numeric facts."
+            )
+
     run["answer_material_ids"] = list(packet["source_index"])
     run["unfinished_tasks"] = unfinished
     run["material_limitations_by_claim"] = {cid: list(view.get("qualifications") or [])

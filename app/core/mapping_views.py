@@ -21,8 +21,34 @@ def unique(values):
     return list(dict.fromkeys(value for value in values if value))
 
 
-def record_fingerprint(record):
-    value = record.model_dump(mode="json") if hasattr(record, "model_dump") else record
+def record_fingerprint(record, *, legacy=False):
+    """Fingerprint source records without derived structured-table descriptions.
+
+    Legacy mode reproduces the previous full-record fingerprint.
+    Image-reading descriptions and all other source fields remain protected.
+    """
+    value = (
+        record.model_dump(mode="json")
+        if hasattr(record, "model_dump")
+        else dict(record)
+    )
+    content = value.get("source_content") or {}
+
+    structured_table = (
+        bool(value.get("evidence_id"))
+        and value.get("kind") == "table"
+        and value.get("observed_via") == "structured_table"
+        and content.get("representation") == "structured"
+        and bool(content.get("cells"))
+        and not value.get("image_receipt")
+        and not content.get("visual_observation")
+    )
+
+    if structured_table and not legacy:
+        source_value = dict(value)
+        source_value.pop("description", None)
+        return "structured-table-source-v1:" + fingerprint(source_value)
+
     return fingerprint(value)
 
 
@@ -44,6 +70,9 @@ def check_saved_mapping(data, claim_id, mapping_id, *, allowed_element_ids=None)
         errors.append("A readable per-Claim result must contain exactly its own analysis.")
         return {"usable": False, "errors": errors, "warnings": warnings}
     row = rows[0]
+    if record.get("record_policy") in {"per_claim_numeric_grounding_v5", "per_claim_source_bindings_v6"} and (
+            row.get("grounding_validation") or {}).get("status") != "passed":
+        errors.append("Grounding validation is missing or failed.")
     if not str(row.get("explanation") or "").strip():
         errors.append("The saved analysis is empty.")
     used = unique(row.get("evidence_ids_used") or [])
@@ -68,10 +97,20 @@ def check_saved_mapping(data, claim_id, mapping_id, *, allowed_element_ids=None)
             continue
         if source.source_status != "located" or source.source_anchor is None:
             errors.append(f"Adopted Evidence is not source-located: {eid}.")
+        if any(
+            same_claim_source(other_claim, source)
+            for other_claim in data.claim_pool.values()
+        ):
+            errors.append(
+                f"Claim-origin paragraph cannot be adopted as Evidence: {eid}."
+            )
         if allowed_element_ids is not None and source.source_element_id not in allowed_element_ids:
             errors.append(f"Adopted Evidence is outside the requested source boundary: {eid}.")
         expected = expected_sources.get(eid)
-        if expected and expected != record_fingerprint(source):
+        if expected and expected not in (
+            record_fingerprint(source),
+            record_fingerprint(source, legacy=True),
+        ):
             errors.append(f"Adopted Evidence changed after analysis: {eid}.")
     for edge in edges:
         if not isinstance(edge, dict) or edge.get("relation") not in RELATIONS or not str(edge.get("explanation") or "").strip():
@@ -209,10 +248,16 @@ def display_view(data, claim_id, mapping_id):
     for eid in used:
         source, edge = data.evidence_pool[eid], by_evidence[eid]
         parts = list(edge.get("source_parts_used") or [])
+        source_anchor = source.source_anchor.model_dump(mode="json")
+        adopted_cells = edge.get("cell_ids_used") or []
+        if source.kind == "table" and adopted_cells:
+            source_anchor["selector"] = {"type": "table_cells", "cell_ids": adopted_cells}
+        elif source.kind == "table" and (row.get("grounding_validation") or {}).get("policy") == "mapping_readable_v2":
+            source_anchor["selector"] = {"type": "element"}
         # Highlight records intentionally carry no scientific relation label.
         highlights.append({"evidence_id": eid, "kind": source.kind,
                            "source_element_id": source.source_element_id,
-                           "source_anchor": source.source_anchor.model_dump(mode="json"),
+                           "source_anchor": source_anchor,
                            "source_parts_used": parts,
                            "source_asset_id": source.source_asset_id,
                            "image_receipt_available": bool(source.image_receipt)})
@@ -286,6 +331,7 @@ def argument_packet(data, claim_ids, bindings):
     """A compact answer packet built from completed, specifically bound analyses."""
     claims, evidence, mappings, shared, index = {}, {}, {}, {}, {}
     adopted = {}
+    adopted_cells = {}
     warnings = []
     for cid in unique(claim_ids):
         claim = data.claim_pool.get(cid)
@@ -309,6 +355,7 @@ def argument_packet(data, claim_ids, bindings):
         for edge in row.get("evidence_relations") or []:
             edge["explanation"] = canonical_references(edge.get("explanation"), permitted)
             adopted.setdefault(edge["evidence_id"], set()).update(edge.get("source_parts_used") or [])
+            adopted_cells.setdefault(edge["evidence_id"], set()).update(edge.get("cell_ids_used") or [])
         mappings[mid] = {"mapping_id": mid, "claim_id": cid, "status": "completed",
                          "target_claim_ids": [cid], "analysis_focus": record.get("analysis_focus"),
                          "claim_analyses": [row], "read_provenance_warnings": check["warnings"]}
@@ -316,6 +363,9 @@ def argument_packet(data, claim_ids, bindings):
     for eid, parts in adopted.items():
         record = data.evidence_pool[eid]
         view = adopted_evidence_view(record, parts)
+        if adopted_cells.get(eid) and view.get("cells"):
+            index_id = view["cell_fields"].index("cell_id")
+            view["cells"] = [c for c in view["cells"] if c[index_id] in adopted_cells[eid]]
         # Shared caption/text content is transmitted once, while IDs stay citable.
         identity = {k: v for k, v in view.items() if k not in {"evidence_id"}}
         ref = "content_" + fingerprint(identity)

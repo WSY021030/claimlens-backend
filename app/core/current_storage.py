@@ -54,21 +54,63 @@ def encoded(value) -> str:
 
 
 def atomic_text(path: Path, text: str) -> None:
-    """Atomic replacement on the destination filesystem; no rolling backups."""
+    """Atomically replace output, with bounded retries for Windows access errors."""
+    import time
+
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+
     if path.is_symlink():
         raise ValueError(f"Refusing to replace a linked output: {path}")
-    fd, temp = tempfile.mkstemp(prefix=".reader-current-", suffix=".tmp", dir=path.parent)
+
+    fd, temp = tempfile.mkstemp(
+        prefix=".reader-current-",
+        suffix=".tmp",
+        dir=path.parent,
+    )
+    preserve_temp = False
+
     try:
+        # Finish writing and close the handle before replacing the destination.
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(text)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temp, path)
+
+        delays = (0.05, 0.10, 0.20, 0.40, 0.80, 1.00)
+
+        for attempt in range(len(delays) + 1):
+            try:
+                os.replace(temp, path)
+                return
+            except OSError as exc:
+                retryable = (
+                    os.name == "nt"
+                    and getattr(exc, "winerror", None) in {5, 32, 33}
+                )
+
+                if retryable and attempt < len(delays):
+                    time.sleep(delays[attempt])
+                    continue
+
+                # Never delete or directly truncate the original destination.
+                # Preserve completed content when replacement remains blocked.
+                preserve_temp = True
+                exc.add_note(
+                    f"Output replacement failed: {path.resolve()}. "
+                    f"Complete pending content is preserved at: "
+                    f"{Path(temp).resolve()}. "
+                    "Check file access and permissions before resuming. "
+                    "Do not automatically restore this temporary file."
+                )
+                raise
     finally:
-        if os.path.exists(temp):
-            os.unlink(temp)
+        if not preserve_temp:
+            try:
+                os.unlink(temp)
+            except OSError:
+                # Cleanup must not hide the original write/replace exception.
+                pass
 
 
 def atomic_json(path: Path, payload: dict) -> None:

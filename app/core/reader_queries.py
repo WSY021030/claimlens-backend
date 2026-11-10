@@ -414,6 +414,7 @@ class ReadRepository:
             "explanation": row["explanation"], "qualifications": list(row.get("qualifications") or []),
             "material_status": row.get("material_status", "limited"),
             "evidence_ids_used": list(full["evidence_ids"]),
+            "grounding_validation": deepcopy(row.get("grounding_validation")),
             "historical_explanation_requires_review": row["historical_explanation_requires_review"],
             "presentation_review_notes": row["presentation_review_notes"]}
         parts = {e["from"]: e.get("source_parts_used") or [] for e in filtered["edges"]}
@@ -477,7 +478,7 @@ class ReadRepository:
             parts = set(edge.get("source_parts_used") or [])
             binding = {"claim_id": claim_id, "mapping_id": mid,
                        "relation": edge.get("relation"), "relation_status": edge.get("relation_status"),
-                       "source_parts_used": sorted(parts)}
+                       "source_parts_used": sorted(parts), "cell_ids_used": list(edge.get("cell_ids_used") or [])}
         source_content = source.source_content or {}
         content = {}
         for name, value in (("source_text", source.source_quote or source_content.get("passage")),
@@ -492,7 +493,12 @@ class ReadRepository:
         if "equation" in parts and source.kind == "equation":
             content["equation"] = pick(source_content, ("latex", "mathml", "plain_text", "label"))
         if "table_cells" in parts and source.kind == "table":
-            content["table"] = self._table_page(paper, source_content.get("cells") or [], row_offset, row_limit)
+            cells = source_content.get("cells") or []
+            selected = set((binding or {}).get("cell_ids_used") or [])
+            if selected:
+                cells = [c for c in cells if c.get("cell_id") in selected
+                         or c.get("role") == "column_header"]
+            content["table"] = self._table_page(paper, cells, row_offset, row_limit)
             content["table"].update(pick(source_content, ("row_group_context", "row_group_context_note", "representation", "recognition_status")))
             content["table"]["scope"] = "cells_stored_in_this_evidence_not_necessarily_the_entire_table"
         card = self._evidence_card(paper, source, parts=sorted(parts) if binding else None,

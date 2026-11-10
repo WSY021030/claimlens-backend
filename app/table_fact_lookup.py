@@ -243,3 +243,286 @@ def render_exact_table_answer(lookup, evidence_ids, language="en"):
     else:
         output.append(f"Source: {lookup['table_label']} (`{lookup['table_id']}`); original cells: {ids}; Evidence: {sources}.")
     return "\n".join(output)
+
+
+# TOKEN_SCOPE_OPT_20261110: conservative, model-free numeric comparison.
+_COMPARE = re.compile(
+    r"\b(compare|comparison|vs|versus|lowest|highest|best|"
+    r"outperform|better|worse|ranking)\b|"
+    r"比较|对比|相比|最低|最高|最优|优于|低于|高于|并列",
+    re.I,
+)
+
+_REASON = re.compile(
+    r"\b(why|causal|causality|mechanism|hypothesis|assumption|"
+    r"privacy|ablation|theoretical|prove|justify|scientific support)\b|"
+    r"为什么|因果|机制|假设|隐私|消融|理论依据",
+    re.I,
+)
+
+
+def verified_numeric_comparison(
+    paper, data, question, allowed_table_ids=None
+):
+    """Use one completely source-verified table group or return None."""
+    if not _COMPARE.search(question) or _REASON.search(question):
+        return None
+
+    from app.core.table_context import source_table_audit
+
+    results = []
+
+    for table in paper.elements.values():
+        if (
+            table.kind != "table"
+            or table.representation != "structured"
+            or not table.grid
+            or not table.grid.cells
+            or (
+                allowed_table_ids is not None
+                and table.element_id not in allowed_table_ids
+            )
+        ):
+            continue
+
+        selection = _table_lookup(table, question)
+
+        if (
+            selection is None
+            or len(selection["datasets"]) != 1
+            or len(selection["metrics"]) != 1
+            or len(selection["methods"]) != 2
+        ):
+            continue
+
+        audit = source_table_audit(
+            paper, data, table.element_id, question
+        )
+
+        if not audit or audit["status"] != "verified_complete":
+            continue
+
+        metric = next(
+            (
+                item
+                for item in audit["metric_checks"]
+                if (
+                    _normalize(item["metric"])
+                    == _normalize(selection["metrics"][0])
+                    and item["status"] == "verified"
+                    and item["direction"] in {"min", "max"}
+                )
+            ),
+            None,
+        )
+
+        if metric is None:
+            continue
+
+        dataset = selection["datasets"][0]
+
+        group = next(
+            (
+                item
+                for item in metric["datasets"]
+                if (
+                    _normalize(item["dataset"])
+                    == _normalize(dataset["dataset"])
+                )
+            ),
+            None,
+        )
+
+        if group is None:
+            continue
+
+        methods = {
+            _normalize(name)
+            for name in selection["methods"]
+        }
+
+        selected_rows = [
+            row
+            for row in group["rows"]
+            if _normalize(row["method"]) in methods
+        ]
+
+        if len(selected_rows) != 2:
+            continue
+
+        found = {
+            "kind": "numeric_comparison",
+            "table_id": table.element_id,
+            "table_label": table.label or table.element_id,
+            "dataset": group["dataset"],
+            "metric": metric["metric"],
+            "direction": metric["direction"],
+            "rows": group["rows"],
+            "requested_methods": selection["methods"],
+            "best_synthetic_methods": group["best_synthetic_methods"],
+            "best_synthetic_value": group["best_synthetic_value"],
+            "required_cell_ids": [
+                row["cell_id"]
+                for row in group["rows"]
+            ],
+            "datasets": [{
+                "dataset": dataset["dataset"],
+                "rows": dataset["rows"],
+            }],
+        }
+
+        refs = covering_evidence_ids(data, paper, found)
+
+        if refs:
+            found["evidence_ids"] = refs
+            results.append(found)
+
+    return results[0] if len(results) == 1 else None
+
+
+def render_numeric_comparison(lookup, language="zh"):
+    """Distinguish pairwise and global source-table rankings."""
+    from decimal import Decimal
+
+    rows = lookup["rows"]
+    requested = {
+        _normalize(value)
+        for value in lookup["requested_methods"]
+    }
+
+    pair = [
+        row
+        for row in rows
+        if _normalize(row["method"]) in requested
+    ]
+
+    if len(pair) != 2:
+        raise ValueError(
+            "Two distinct compared methods are required."
+        )
+
+    a, b = pair
+    va, vb = Decimal(a["value"]), Decimal(b["value"])
+
+    first_wins = (
+        va < vb
+        if lookup["direction"] == "min"
+        else va > vb
+    )
+
+    if va == vb:
+        pairwise = (
+            f"{a['method']} 与 {b['method']} 在该指标上并列。"
+            if language == "zh"
+            else (
+                f"{a['method']} and {b['method']} "
+                "are tied on this metric."
+            )
+        )
+    else:
+        winner, loser = (
+            (a, b)
+            if first_wins
+            else (b, a)
+        )
+
+        pairwise = (
+            f"两者比较：{winner['method']} "
+            f"({winner['value']}) 优于 "
+            f"{loser['method']} ({loser['value']})。"
+            if language == "zh"
+            else (
+                f"Pairwise: {winner['method']} "
+                f"({winner['value']}) outperforms "
+                f"{loser['method']} ({loser['value']})."
+            )
+        )
+
+    intro = (
+        f"{lookup['table_label']}，{lookup['dataset']} "
+        f"数据集，{lookup['metric']} 原表数值："
+        if language == "zh"
+        else (
+            f"Original {lookup['metric']} values for "
+            f"{lookup['dataset']} in {lookup['table_label']}:"
+        )
+    )
+
+    lines = [
+        intro,
+        "",
+        f"| Method | {lookup['metric']} | Cell ID |",
+        "|---|---:|---|",
+    ]
+
+    lines.extend(
+        f"| {row['method']} | {row['value']} | "
+        f"`{row['cell_id']}` |"
+        for row in rows
+    )
+
+    leaders = ", ".join(
+        lookup["best_synthetic_methods"]
+    )
+
+    values = [
+        Decimal(row["value"])
+        for row in rows
+    ]
+
+    best_overall = (
+        min(values)
+        if lookup["direction"] == "min"
+        else max(values)
+    )
+
+    overall_names = ", ".join(
+        row["method"]
+        for row in rows
+        if Decimal(row["value"]) == best_overall
+    )
+
+    if language == "zh":
+        lines.extend([
+            "",
+            pairwise,
+            (
+                "包括 Original/Real 参考行在内的全部表格行，"
+                f"最优的是 {overall_names}（{best_overall}）。"
+            ),
+            (
+                f"仅比较合成方法时，最优的是 {leaders}"
+                f"（{lookup['best_synthetic_value']}）。"
+            ),
+            (
+                "两种方法的相对比较成立，不代表其中一方"
+                "优于表中所有方法。"
+            ),
+        ])
+    else:
+        lines.extend([
+            "",
+            pairwise,
+            (
+                "Best including Original/Real reference rows: "
+                f"{overall_names} ({best_overall})."
+            ),
+            (
+                "Best among synthetic methods only: "
+                f"{leaders} ({lookup['best_synthetic_value']})."
+            ),
+            (
+                "A pairwise advantage does not establish "
+                "the best result among all methods."
+            ),
+        ])
+
+    lines.append(
+        ("来源" if language == "zh" else "Sources")
+        + ": "
+        + lookup["table_id"]
+        + "; "
+        + ", ".join(lookup["evidence_ids"])
+    )
+
+    return "\n".join(lines)

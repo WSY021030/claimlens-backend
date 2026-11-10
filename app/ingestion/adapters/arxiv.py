@@ -16,7 +16,7 @@ from app.ingestion.loader import HTMLBundle
 from app.models.document_v2 import (
     Asset, ElementSelector, Equation, Figure, Mention, PaperDocument,
     PaperMetadata, PaperQuality, Paragraph, Reference, Section, SourceAnchor,
-    Table, TableCell, TableGrid, TextSpanSelector, InlineFormatSpan,
+    Table, TableCell, TableGrid, TextSpanSelector, InlineFormatSpan, InlineMathSpan,
 )
 
 
@@ -58,91 +58,271 @@ def _prose(tag: Tag) -> str:
 
 
 
-def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan]]:
-    """Extract semantic text + safe formatting ranges from LaTeXML.
+def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[InlineMathSpan]]:
+    """ARXIV_INLINE_MATH_READABILITY_V1: preserve MathML with exact offsets."""
+    cloned = BeautifulSoup(str(tag), "lxml")
+    root = cloned.find(tag.name)
 
-    Explicit <br> and listing/list/quote boundaries survive as newlines;
-    inline styling is represented by offsets rather than copied HTML.
-    Offsets are always measured against the returned (normalized) text.
-    """
-    tokens: list[tuple[str, frozenset[str]]] = []
-    block_tags = {"p", "ul", "ol", "li", "blockquote", "pre"}
-    boundary_classes = {"ltx_listing", "ltx_listingline", "ltx_quote", "ltx_item"}
-    discarded_classes = {"ltx_tag_section", "ltx_tag_subsection", "ltx_tag_subsubsection",
-                         "ltx_tag_paragraph", "ltx_tag_subparagraph"}
+    if root is None:
+        raise ValueError("Unable to reconstruct the source paragraph")
 
-    def add(text: str, marks: frozenset[str]):
-        for char in text.replace("\xa0", " "):
-            # Indentation present in page-source HTML is not a layout break.
-            tokens.append((" " if char.isspace() else char, marks))
+    # Replace broken LaTeXML references without inventing targets.
+    for error in list(root.select(".ltx_ERROR")):
+        command = _clean(error.get_text("", strip=True))
 
-    def walk(node, marks: frozenset[str]):
+        if command not in {
+            r"\cref", r"\Cref", r"\ref", r"\autoref"
+        }:
+            continue
+
+        sibling = error.next_sibling
+
+        if not isinstance(sibling, NavigableString):
+            continue
+
+        remainder = str(sibling)
+        match = re.match(
+            r"((?:[A-Za-z]+:[\w/-]+)(?:,[A-Za-z]+:[\w/-]+)*)",
+            remainder,
+        )
+
+        if match is None:
+            continue
+
+        category = match.group(1).split(":", 1)[0].lower()
+        kind = {
+            "sec": "section",
+            "fig": "figure",
+            "tab": "table",
+            "eq": "equation",
+        }.get(category, "cross")
+
+        error.replace_with(
+            NavigableString(f"[unresolved {kind} reference]")
+        )
+
+        sibling.replace_with(
+            NavigableString(remainder[match.end():])
+        )
+
+    tokens: list[
+        tuple[str, frozenset[str], int | None]
+    ] = []
+
+    mathml_by_key: dict[int, str] = {}
+
+    block_tags = {
+        "p", "ul", "ol", "li", "blockquote", "pre"
+    }
+
+    boundary_classes = {
+        "ltx_listing", "ltx_listingline",
+        "ltx_quote", "ltx_item",
+    }
+
+    discarded_classes = {
+        "ltx_tag_section",
+        "ltx_tag_subsection",
+        "ltx_tag_subsubsection",
+        "ltx_tag_paragraph",
+        "ltx_tag_subparagraph",
+    }
+
+    def add(value, marks, math_key=None):
+        for char in value.replace("\xa0", " "):
+            tokens.append((
+                " " if char.isspace() else char,
+                marks,
+                math_key,
+            ))
+
+    def walk(node, marks):
         if isinstance(node, NavigableString):
             add(str(node), marks)
             return
+
         if not isinstance(node, Tag):
             return
-        if node.name in {"script", "style"} or discarded_classes.intersection(node.get("class", [])):
-            return
-        if node.name == "br":
-            tokens.append(("\n", marks))
-            return
-        if node.name == "math":
-            add(" " + _math_text(node) + " ", marks)
-            return
-        classes = set(node.get("class", []))
-        new = set(marks)
-        if node.name in {"strong", "b"} or "ltx_font_bold" in classes:
-            new.add("bold")
-        if node.name in {"em", "i"} or "ltx_font_italic" in classes:
-            new.add("italic")
-        if node.name in {"code", "tt", "pre"} or "ltx_font_typewriter" in classes:
-            new.add("code")
-        css = node.get("style", "")
-        if re.search(r"(?:^|;)\s*font-weight\s*:\s*(?:bold|[6-9]00)\b", css, re.I):
-            new.add("bold")
-        if re.search(r"(?:^|;)\s*font-style\s*:\s*italic\b", css, re.I):
-            new.add("italic")
-        new_marks = frozenset(new)
-        boundary = node.name in block_tags or bool(classes & boundary_classes)
-        if boundary:
-            tokens.append(("\n", marks))
-        for child in node.children:
-            walk(child, new_marks)
-        if boundary:
-            tokens.append(("\n", marks))
 
-    walk(tag, frozenset())
-    # Collapse source indentation whitespace, but keep intentional <br> breaks.
-    normalized: list[tuple[str, frozenset[str]]] = []
-    for ch, marks in tokens:
-        if ch == "\n":
+        classes = set(node.get("class", []))
+
+        if (
+            node.name in {"script", "style"}
+            or classes & discarded_classes
+        ):
+            return
+
+        if node.name == "br":
+            tokens.append(("\n", marks, None))
+            return
+
+        if node.name == "math":
+            latex = _math_text(node)
+
+            if latex:
+                key = len(mathml_by_key) + 1
+                mathml_by_key[key] = str(node)
+
+                add(" ", marks)
+                add(latex, marks, key)
+                add(" ", marks)
+
+            return
+
+        active = set(marks)
+
+        if (
+            node.name in {"strong", "b"}
+            or "ltx_font_bold" in classes
+        ):
+            active.add("bold")
+
+        if (
+            node.name in {"em", "i"}
+            or "ltx_font_italic" in classes
+        ):
+            active.add("italic")
+
+        if (
+            node.name in {"code", "tt", "pre"}
+            or "ltx_font_typewriter" in classes
+        ):
+            active.add("code")
+
+        css = node.get("style", "")
+
+        if re.search(
+            r"(?:^|;)\s*font-weight\s*:\s*"
+            r"(?:bold|[6-9]00)\b",
+            css,
+            re.I,
+        ):
+            active.add("bold")
+
+        if re.search(
+            r"(?:^|;)\s*font-style\s*:\s*italic\b",
+            css,
+            re.I,
+        ):
+            active.add("italic")
+
+        active_marks = frozenset(active)
+
+        boundary = (
+            node.name in block_tags
+            or bool(classes & boundary_classes)
+        )
+
+        if boundary:
+            tokens.append(("\n", marks, None))
+
+        for child in node.children:
+            walk(child, active_marks)
+
+        if boundary:
+            tokens.append(("\n", marks, None))
+
+    walk(root, frozenset())
+
+    normalized = []
+
+    for char, marks, math_key in tokens:
+        if char == "\n":
             while normalized and normalized[-1][0] == " ":
                 normalized.pop()
-            # Keep at most one empty line between consecutive text lines.
-            if sum(1 for c, _ in normalized[-2:] if c == "\n") < 2:
-                normalized.append((ch, marks))
-        elif ch == " ":
-            if normalized and normalized[-1][0] not in {" ", "\n"}:
-                normalized.append((ch, marks))
+
+            if sum(
+                1
+                for item in normalized[-2:]
+                if item[0] == "\n"
+            ) < 2:
+                normalized.append((char, marks, None))
+
+        elif char == " ":
+            if (
+                normalized
+                and normalized[-1][0] not in {" ", "\n"}
+            ):
+                normalized.append((
+                    char, marks, math_key
+                ))
+
         else:
-            normalized.append((ch, marks))
-    while normalized and normalized[0][0] in {" ", "\n"}:
+            normalized.append((
+                char, marks, math_key
+            ))
+
+    while normalized and normalized[0][0] in {
+        " ", "\n"
+    }:
         normalized.pop(0)
-    while normalized and normalized[-1][0] in {" ", "\n"}:
+
+    while normalized and normalized[-1][0] in {
+        " ", "\n"
+    }:
         normalized.pop()
-    text = "".join(ch for ch, _ in normalized)
-    ranges: list[InlineFormatSpan] = []
+
+    text = "".join(
+        item[0] for item in normalized
+    )
+
+    formatting = []
+
     for mark in ("bold", "italic", "code"):
-        beginning: int | None = None
+        beginning = None
+
         for index in range(len(normalized) + 1):
-            active = index < len(normalized) and mark in normalized[index][1]
+            active = (
+                index < len(normalized)
+                and mark in normalized[index][1]
+            )
+
             if active and beginning is None:
                 beginning = index
+
             elif not active and beginning is not None:
-                ranges.append(InlineFormatSpan(start=beginning, end=index, mark=mark))
+                formatting.append(
+                    InlineFormatSpan(
+                        start=beginning,
+                        end=index,
+                        mark=mark,
+                    )
+                )
                 beginning = None
-    return text, ranges
+
+    inline_math = []
+    current_key = None
+    beginning = 0
+
+    for index in range(len(normalized) + 1):
+        key = (
+            normalized[index][2]
+            if index < len(normalized)
+            else None
+        )
+
+        if key == current_key:
+            continue
+
+        if (
+            current_key is not None
+            and index > beginning
+        ):
+            inline_math.append(
+                InlineMathSpan(
+                    start=beginning,
+                    end=index,
+                    mathml=mathml_by_key[current_key],
+                    plain_text=text[beginning:index],
+                )
+            )
+
+        if key is not None:
+            beginning = index
+
+        current_key = key
+
+    return text, formatting, inline_math
 
 
 def _heading(tag: Tag) -> str:
@@ -231,6 +411,16 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
     raw_link_map: dict[str, tuple[str, str]] = {}
     pending_mentions: list[tuple[str, str, str]] = []
     warnings: list[str] = []
+    unresolved_crossrefs = [
+        error for error in soup.select(".ltx_ERROR")
+        if _clean(error.get_text("", strip=True)) in
+        {r"\\cref", r"\\Cref", r"\\ref", r"\\autoref"}
+    ]
+    if unresolved_crossrefs:
+        warnings.append(
+            f"Source LaTeXML contains {len(unresolved_crossrefs)} "
+            "unresolved cross-references; links cannot be verified."
+        )
     counts = {"sec": 0, "para": 0, "fig": 0, "table": 0, "equation": 0, "asset": 0, "mention": 0}
     image_inventory = {r.src: r for r in bundle.images}
 
@@ -292,12 +482,12 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
         else:
             parts = [tag]
         for part in parts:
-            text, fmt = _formatted_prose(part)
+            text, fmt, maths = _formatted_prose(part)
             if not text:
                 continue
             eid = new_id("para")
             elements[eid] = Paragraph(element_id=eid, section_id=section.section_id,
-                                      text=text, format_spans=fmt,
+                                      text=text, format_spans=fmt, inline_math_spans=maths,
                                       original_html_id=part.get("id") or tag.get("id"))
             section.block_ids.append(eid)
             remember_links(eid, part)

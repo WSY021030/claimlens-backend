@@ -1,6 +1,7 @@
-"""Shared bounded Mapping execution with per-target failure isolation."""
+"""Per-Claim Mapping with bounded repair and source-grounded numeric rendering."""
 from __future__ import annotations
 
+from copy import deepcopy
 from time import perf_counter
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 from app.agents.mapping_agent import MappingAgent
@@ -8,6 +9,7 @@ from app.budget import BudgetStop
 from app.llm import StructuredOutputParseError
 from app.core.evidence_retrieval import EvidenceDataManager
 from app.core.mapping_records import claim_cache_key, find_cached_claim, save_mapping_analyses
+from app.core.mapping_grounding import ANALYSIS_POLICY as POLICY, digest, prepare_tables, validate_and_render
 
 MODEL_ERRORS = (StructuredOutputParseError, APIConnectionError, APIStatusError, APITimeoutError)
 
@@ -15,98 +17,109 @@ MODEL_ERRORS = (StructuredOutputParseError, APIConnectionError, APIStatusError, 
 def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker, budget,
                        paper=None, analysis_focus="general", allowed_element_ids=None,
                        rerun=False, on_saved=None):
-    """At most two calls per target in this attempt; never expand Claim targets.
-
-    An optional expansion failure does not erase a valid first-pass analysis.
-    Required failures remain explicit. Retries/resume retain the caller's budget.
-    """
-    manager = EvidenceDataManager(data, paper)
-    agent = MappingAgent(model=model, tracker=tracker, budget=budget)
-    selected_claims = list(dict.fromkeys(claim_ids))
+    targets = list(dict.fromkeys(claim_ids))
     successful, failures, diagnostics = {}, [], []
-    stop_for_budget = False
+    agent = MappingAgent(model=model, tracker=tracker, budget=budget)
     run.pop("interruption_reason", None)
-    for cid in selected_claims:
+    added = prepare_tables(data, paper, targets, run["run_id"], allowed_element_ids)
+    if added:
+        print("Registered original comparison-table scopes:", ", ".join(added), flush=True)
+        store.save(data)
+    # Reuse saved visual Evidence; no automatic second image-reading call.
+    manager = EvidenceDataManager(data, paper)
+    counts = run.setdefault("mapping_grounding_attempts", {})
+    for cid in targets:
         try:
-            initial, first_receipt = manager.packet(
-                cid, allowed_element_ids=allowed_element_ids, analysis_focus=analysis_focus)
-            expanded, expanded_receipt = manager.packet(
-                cid, expanded=True, allowed_element_ids=allowed_element_ids,
-                analysis_focus=analysis_focus, required_evidence_ids=first_receipt["selected_evidence_ids"])
+            initial, first_receipt = manager.packet(cid, analysis_focus=analysis_focus,
+                                                   allowed_element_ids=allowed_element_ids)
+            expanded, expanded_receipt = manager.packet(cid, expanded=True, analysis_focus=analysis_focus,
+                allowed_element_ids=allowed_element_ids, required_evidence_ids=first_receipt["selected_evidence_ids"])
             packet, receipt = ((expanded, expanded_receipt) if first_receipt["priority_deferred"]
                                else (initial, first_receipt))
         except (ValueError, KeyError) as exc:
             failures.append({"claim_id": cid, "type": "input_packet_error", "message": str(exc)[:500]})
-            store.save(data)
             continue
         for view in (expanded, packet):
             key = claim_cache_key(data, cid, model, language, analysis_focus, input_packet=view)
-            cached = find_cached_claim(data, cid, key)
-            # An explicit refresh is paid once, not again on same-question resume.
-            if cached and (not rerun or data.mappings[cached].get("created_run_id") == run["run_id"]):
-                successful[cid] = cached
-                reused = run.setdefault("reused_mapping_ids", [])
-                if cached not in reused:
-                    reused.append(cached)
-                if on_saved:
-                    on_saved(cid, cached)
-                print("Reusing Claim Mapping:", cid, cached, flush=True)
+            mid = find_cached_claim(data, cid, key)
+            if mid and (not rerun or data.mappings[mid].get("created_run_id") == run["run_id"]):
+                successful[cid] = mid
+                run.setdefault("reused_mapping_ids", []).append(mid)
+                print("Reusing grounded Mapping:", cid, mid, flush=True)
                 break
         if cid in successful:
+            if on_saved:
+                on_saved(cid, successful[cid])
             store.save(data)
             continue
-        for attempt_number in (1, 2):
-            print("Mapping:", cid, "Evidence:", len(packet["evidence_items"]),
-                  "Input bytes:", receipt["packet_bytes"], "Expanded:", receipt["expanded"], flush=True)
-            attempt = {"claim_id": cid, "attempt": attempt_number, "retrieval": receipt,
-                       "purpose": "optional_expansion" if attempt_number == 2 else "required_mapping"}
-            run.setdefault("mapping_input_receipts", []).append(attempt)
+        attempt_key = digest({"policy": POLICY, "claim": cid, "model": model,
+                              "language": language, "focus": analysis_focus,
+                              "initial": packet, "expanded": expanded})
+        checkpoint = counts.setdefault(attempt_key, {"calls": 0, "errors": [], "claim_id": cid})
+        accepted = None
+        while checkpoint["calls"] < 2:
+            sent = deepcopy(packet)
+            if checkpoint["errors"]:
+                sent["correction_feedback"] = checkpoint["errors"][:8]
+            checkpoint["calls"] += 1
             store.save(data)
-            call_start = perf_counter()
+            print("Mapping:", cid, "attempt:", checkpoint["calls"],
+                  "Evidence:", len(packet["evidence_items"]),
+                  "Input bytes:", receipt["packet_bytes"], flush=True)
+            start = perf_counter()
             try:
-                result = agent.analyze(mapping_input=packet, language=language)
-            except (MODEL_ERRORS + (BudgetStop,)) as exc:
-                issue = {"claim_id": cid, "type": "budget_stop" if isinstance(exc, BudgetStop) else type(exc).__name__,
-                         "message": str(exc)[:500], "optional_expansion": cid in successful}
-                attempt.update({"status": "budget_stopped" if isinstance(exc, BudgetStop) else "model_error", "message": str(exc)[:500]})
-                (diagnostics if cid in successful else failures).append(issue)
-                if isinstance(exc, BudgetStop):
-                    run["interruption_reason"] = "BudgetStop"
-                    stop_for_budget = True
-                store.save(data)
+                result = agent.analyze(sent, language=language)
+            except BudgetStop as exc:
+                checkpoint["calls"] -= 1
+                run["interruption_reason"] = "BudgetStop"
+                checkpoint["errors"] = [str(exc)[:500]]
                 break
+            except (MODEL_ERRORS + (RuntimeError,)) as exc:
+                if getattr(exc, "request_not_sent", False):
+                    checkpoint["calls"] -= 1
+                checkpoint["errors"] = [type(exc).__name__ + ": " + str(exc)[:400]]
+                # Do not repeat uncertain network requests or reinitialize a broken client.
+                if not isinstance(exc, StructuredOutputParseError):
+                    break
+                continue
             finally:
-                run["llm_wall_time_seconds"] = run.get("llm_wall_time_seconds", 0.0) + perf_counter() - call_start
-            attempt["status"] = "returned"
-            saved = save_mapping_analyses(
-                data, analyses=result.claim_analyses, target_ids=[cid],
-                available_evidence_ids=[item["evidence_id"] for item in packet["evidence_items"]],
-                model=model, language=language, run_id=run["run_id"], analysis_focus=analysis_focus,
-                context_claim_ids=[cid], input_packets={cid: packet}, retrieval_receipts={cid: receipt})
+                run["llm_wall_time_seconds"] = run.get("llm_wall_time_seconds", 0.0) + perf_counter() - start
+            rows, errors = validate_and_render(result, packet)
+            if errors:
+                checkpoint["errors"] = [e[:350] for e in errors]
+                store.save(data)
+                continue
+            accepted = (rows, packet, receipt)
+            checkpoint["errors"] = []
+            new_ids = set(expanded_receipt["selected_evidence_ids"]) - set(receipt["selected_evidence_ids"])
+            break
+        if accepted is None:
+            failures.append({"claim_id": cid, "type": "mapping_not_validated",
+                             "message": "; ".join(checkpoint["errors"])[:1200] or
+                             "This task used its two Mapping attempts. No unvalidated Mapping was saved."})
+        else:
+            rows, selected_packet, selected_receipt = accepted
+            saved = save_mapping_analyses(data, analyses=rows, target_ids=[cid],
+                available_evidence_ids=selected_receipt["selected_evidence_ids"], model=model,
+                language=language, run_id=run["run_id"], analysis_focus=analysis_focus,
+                context_claim_ids=[cid], input_packets={cid: selected_packet},
+                retrieval_receipts={cid: selected_receipt})
             mid = saved["mapping_ids_by_claim"].get(cid)
-            had_valid_result = cid in successful
-            if mid:
-                run.setdefault("created_mapping_ids", []).append(mid)
-                if data.mappings[mid]["status"] == "completed":
-                    successful[cid] = mid
-                print("Saved Claim Mapping:", mid, cid, data.mappings[mid]["status"], flush=True)
-            if saved["issues"]:
-                (diagnostics if had_valid_result else failures).extend(saved["issues"])
-            store.save(data)
-            rows = [row for row in result.claim_analyses if row.claim_id == cid]
-            current_ids = {item["evidence_id"] for item in packet["evidence_items"]}
-            expanded_ids = {item["evidence_id"] for item in expanded["evidence_items"]}
-            can_expand = (attempt_number == 1 and not receipt["expanded"] and mid is not None
-                          and data.mappings[mid]["status"] == "completed" and len(rows) == 1
-                          and rows[0].material_status == "limited" and current_ids < expanded_ids)
-            if not can_expand:
-                break
-            packet, receipt = expanded, expanded_receipt
-        if cid in successful and on_saved:
-            on_saved(cid, successful[cid])
+            if mid and data.mappings[mid]["status"] == "completed":
+                successful[cid] = mid
+                if mid not in run.setdefault("created_mapping_ids", []):
+                    run["created_mapping_ids"].append(mid)
+                if on_saved:
+                    on_saved(cid, mid)
+                print("Saved grounded Mapping:", cid, mid, flush=True)
+                if checkpoint["errors"]:
+                    diagnostics.append({"claim_id": cid, "type": "optional_refinement_failed",
+                                        "message": "; ".join(checkpoint["errors"])[:800]})
+            else:
+                failures.extend(saved["issues"] or [{"claim_id": cid, "type": "mapping_save_failed"}])
         store.save(data)
-        if stop_for_budget:
+        if run.get("interruption_reason") == "BudgetStop":
             break
     run.setdefault("mapping_diagnostics", []).extend(diagnostics)
     return {"mapping_ids_by_claim": successful, "issues": failures, "diagnostics": diagnostics,
-            "pending_claim_ids": [cid for cid in selected_claims if cid not in successful]}
+            "pending_claim_ids": [cid for cid in targets if cid not in successful]}

@@ -11,6 +11,7 @@ from uuid import uuid4
 from app.budget import PaperBudget
 from app.core.analysis_store import AnalysisStore
 from app.core.evidence_retrieval import EvidenceDataManager, byte_size
+from app.core.mapping_grounding import prepare_tables
 from app.core.mapping_execution import run_claim_mappings
 from app.core.mapping_records import claim_cache_key, find_cached_claim
 from app.core.token_report import task_token_report, print_task_tokens
@@ -60,7 +61,7 @@ def make_mapping_input(data, claim_ids, paper=None):
 def main():
     parser = argparse.ArgumentParser(description="Link-free, bounded per-Claim Mapping")
     parser.add_argument("--analysis", type=Path, required=True)
-    parser.add_argument("--paper", type=Path, help="Read source structure only; never extract new Evidence")
+    parser.add_argument("--paper", type=Path, help="Same-revision table scopes may be copied locally; preview never saves")
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument("--claim-id", action="append")
     selection.add_argument("--all-claims", action="store_true")
@@ -80,7 +81,11 @@ def main():
     data = AnalysisDocument.model_validate_json(args.analysis.read_text(encoding="utf-8-sig"))
     paper = load_mapping_paper(args.analysis, data, args.paper)
     ids = select_claim_ids(args, data)
-    manager = EvidenceDataManager(data, paper)
+    preview_data = data.model_copy(deep=True)
+    additions = prepare_tables(preview_data, paper, ids, "local_preview")
+    manager = EvidenceDataManager(preview_data, paper)
+    print("Local table scopes planned:", len(additions))
+    print("Visual rereading is excluded from preview.")
     print("Paper:", data.paper_id)
     print("Claims:", len(ids), "Evidence pool:", len(data.evidence_pool))
     print("Legacy Links are not read. Mapping input is independent per Claim.")

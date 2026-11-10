@@ -40,6 +40,7 @@ from app.core.mapping_views import bind_saved_task, display_view
 from app.direct_evidence_runner import direct_search_key
 from app.table_fact_lookup import (
     covering_evidence_ids, render_exact_table_answer, resolve_exact_table_lookup,
+    verified_numeric_comparison, render_numeric_comparison,
 )
 from app.models.coordinator_v3 import (CoordinatorPlan, CoordinatorTask, TaskScope, required_capabilities)
 from app.models.document_v2 import PaperDocument, Paragraph
@@ -234,39 +235,49 @@ def evidence_scope(session, task):
     return sections, elements, whole
 
 
-def candidate_evidence(session, task):
-    sections, elements, whole = evidence_scope(session, task)
-    if "mapping" in required_capabilities(task.intent) and task.scope.claim_ids:
-        return EvidenceDataManager(session.data, session.paper).evidence_ids(
-            task.scope.claim_ids,
-            allowed_element_ids=(evidence_boundary(session.run, session.paper) if locked_targets(session.run)
-                                 else scope_element_ids(session.paper, session.data, task)),
-        )
-    scoped = [eid for eid, record in session.data.evidence_pool.items()
-              if in_scope(session.paper, record.source_element_id, sections, elements, whole)]
 
-    # For precise table facts, prefer Evidence discovered for THIS question.
-    # Older table Evidence may have correct cells but the wrong dataset label.
-    # If there is no question-scoped scan from the revised source pack, let the
-    # ordinary Evidence Agent collect one. Never delete old records or block
-    # the fallback: unsuccessful/empty new scans still expose saved material.
-    if task.intent == "fact_lookup" and any(
-        session.paper.elements[eid].kind == "table"
-        for eid in elements if eid in session.paper.elements
+def candidate_evidence(session, task):
+    """Retrieve existing source evidence without requiring a new scan.
+
+    A missing question-specific scan receipt is not evidence that
+    existing source records are unusable. Scientific sufficiency
+    remains a separate decision.
+    """
+    sections, elements, whole = evidence_scope(session, task)
+
+    if (
+        "mapping" in required_capabilities(task.intent)
+        and task.scope.claim_ids
     ):
-        key = direct_search_key(
-            session.paper, question=task.goal, model=session.args.model,
-            image_mode=session.args.image_mode, section_ids=sections,
-            element_ids=elements,
+        return EvidenceDataManager(
+            session.data, session.paper
+        ).evidence_ids(
+            task.scope.claim_ids,
+            allowed_element_ids=(
+                evidence_boundary(session.run, session.paper)
+                if locked_targets(session.run)
+                else scope_element_ids(
+                    session.paper, session.data, task
+                )
+            ),
         )
-        receipt = session.data.direct_evidence_searches.get(key) or {}
-        fresh = [eid for eid in receipt.get("evidence_ids", [])
-                 if eid in session.data.evidence_pool]
-        if fresh:
-            return unique(fresh + (scoped if receipt.get("status") != "completed" else []))
-        if receipt.get("status") != "completed" and not session.args.use_saved_sources:
-            return []
-    return scoped
+
+    scoped = [
+        eid
+        for eid, record in session.data.evidence_pool.items()
+        if record.source_status == "located"
+        and record.source_anchor is not None
+        and in_scope(
+            session.paper,
+            record.source_element_id,
+            sections,
+            elements,
+            whole,
+        )
+    ]
+
+    return unique(scoped)
+
 
 
 def completed_evidence(session, task):
@@ -539,6 +550,31 @@ def reuse_verified_table_cells(session, task):
     extraction requirement. Ambiguous/non-structured tables take the full
     legacy collection and review path without losing any source records.
     """
+    cached = session.run.get("fast_table_lookup")
+
+    if task.intent == "fact_lookup" and cached:
+        ids = cached.get("evidence_ids") or []
+
+        if ids and all(
+            eid in session.data.evidence_pool
+            for eid in ids
+        ):
+            state = session.state(task)
+
+            state.update({
+                "selected_claim_ids": [],
+                "selected_evidence_ids": ids,
+                "collection_ready": True,
+                "missing_information": [],
+                "verified_table_lookup": cached,
+                "coverage": {
+                    "verified_original_table": True,
+                    "new_source_scans": 0,
+                },
+            })
+
+            session.save()
+            return True
     if task.intent != "fact_lookup" or task.scope.mode == "whole_paper":
         return False
     sections, elements, _ = evidence_scope(session, task)
@@ -582,7 +618,11 @@ def deliver_verified_table_answer(session):
     evidence_ids = list(lookup.get("evidence_ids") or [])
     if not evidence_ids or any(eid not in session.data.evidence_pool for eid in evidence_ids):
         return False
-    answer = render_exact_table_answer(lookup, evidence_ids, language=session.args.language)
+    answer = (
+        render_numeric_comparison(lookup, language=session.args.language)
+        if lookup.get("kind") == "numeric_comparison"
+        else render_exact_table_answer(lookup, evidence_ids, language=session.args.language)
+    )
     session.run["answer_material_ids"] = evidence_ids
     session.run["unfinished_tasks"] = []
     session.run["answer"] = {"answer": answer, "used_source_ids": evidence_ids,
@@ -687,41 +727,279 @@ def prepare_mapping_task(session, task):
             selected, pending = explicit, []
             state["claim_selection_policy"] = "explicit_existing_claims"
         else:
-            if not session.args.use_saved_sources:
+            candidates = [
+                cid
+                for cid, claim in session.data.claim_pool.items()
+                if in_scope(
+                    session.paper,
+                    claim.source_element_id,
+                    sections,
+                    elements,
+                    whole,
+                )
+            ]
+
+            narrow_reuse = (
+                not whole
+                and not sections
+                and bool(elements)
+                and any(
+                    session.data.claim_pool[cid].source_element_id
+                    in elements
+                    for cid in candidates
+                )
+                and not re.search(
+                    r"\b(?:all|every|entire)\s+"
+                    r"(?:claims|sections|paragraphs)\b"
+                    r"|所有观点|全部观点",
+                    session.run["user_question"],
+                    re.I,
+                )
+            )
+
+            if (
+                not session.args.use_saved_sources
+                and not narrow_reuse
+            ):
                 collect_claims(session, task)
-            candidates = [cid for cid, claim in session.data.claim_pool.items()
-                          if in_scope(session.paper, claim.source_element_id, sections, elements, whole)]
-            selected = select_task_claims(coordinator=session.coordinator, data=session.data, run=session.run,
-                task=task, candidate_ids=candidates, store=session.store)
-            _, pending = claim_coverage(session, task)
+
+                candidates = [
+                    cid
+                    for cid, claim in session.data.claim_pool.items()
+                    if in_scope(
+                        session.paper,
+                        claim.source_element_id,
+                        sections,
+                        elements,
+                        whole,
+                    )
+                ]
+
+            selected = (
+                select_task_claims(
+                    coordinator=session.coordinator,
+                    data=session.data,
+                    run=session.run,
+                    task=task,
+                    candidate_ids=candidates,
+                    store=session.store,
+                )
+                if candidates
+                else []
+            )
+
+            if (
+                not selected
+                and narrow_reuse
+                and not session.args.use_saved_sources
+            ):
+                collect_claims(session, task)
+
+                candidates = [
+                    cid
+                    for cid, claim in session.data.claim_pool.items()
+                    if in_scope(
+                        session.paper,
+                        claim.source_element_id,
+                        sections,
+                        elements,
+                        whole,
+                    )
+                ]
+
+                selected = (
+                    select_task_claims(
+                        coordinator=session.coordinator,
+                        data=session.data,
+                        run=session.run,
+                        task=task,
+                        candidate_ids=candidates,
+                        store=session.store,
+                    )
+                    if candidates
+                    else []
+                )
+
+                narrow_reuse = False
+
+            _, actual_pending = claim_coverage(
+                session, task
+            )
+
+            if narrow_reuse and selected:
+                state["unprocessed_scope_windows"] = [
+                    item.window_id
+                    for item in actual_pending
+                ]
+                state["claim_selection_policy"] = (
+                    "narrow_existing_claim_reuse"
+                )
+
+            pending = (
+                []
+                if narrow_reuse and selected
+                else actual_pending
+            )
     task.scope.claim_ids = list(selected)
     state = session.state(task)
     state["selected_claim_ids"] = list(selected)
     session.save()
-    if selected and not completed_evidence(session, task) and not session.args.use_saved_sources:
-        session.run.setdefault("execution_decisions", []).append({
-            "stage": "evidence", "action": "collect_missing_coverage", "claim_ids": list(selected),
-            "reason": "The requested analysis lacks a completed Evidence discovery receipt in its permitted source scope."})
-        collect_evidence(session, task)
+
+    from app.core.mapping_grounding import prepare_tables
+
+    # Preserve the existing Evidence source boundary.
+    allowed = (
+        evidence_boundary(session.run, session.paper)
+        if targets
+        else scope_element_ids(session.paper, session.data, task)
+    )
+
+    # Register relevant structured table cells locally, without an LLM call.
+    if selected:
+        added = prepare_tables(
+            session.data,
+            session.paper,
+            selected,
+            session.run_id,
+            allowed,
+        )
+        if added:
+            session.save()
+
+    def saved_sources_usable():
+        """Check each target Claim's actual local Mapping material."""
+        if not selected:
+            return False
+
+        manager = EvidenceDataManager(session.data, session.paper)
+
+        for cid in selected:
+            packet, receipt = manager.packet(
+                cid,
+                allowed_element_ids=allowed,
+                analysis_focus=task.mapping_focus or "general",
+            )
+
+            if not packet["evidence_items"]:
+                return False
+
+            if receipt.get("missing_direct_source_ids"):
+                return False
+
+        return True
+
     complete = completed_evidence(session, task) if selected else False
+    reusable = saved_sources_usable()
+
+    requirements = required_capabilities(task.intent)
+    strict_mode = strict_evidence_required(session, task, requirements)
+    strict_complete = (
+        strict_evidence_complete(session, task, requirements)
+        if strict_mode else True
+    )
+
+    needs_scan = (
+        bool(selected)
+        and not session.args.use_saved_sources
+        and (
+            (not reusable and not complete)
+            or (strict_mode and not strict_complete)
+        )
+    )
+
+    if needs_scan:
+        session.run.setdefault("execution_decisions", []).append({
+            "stage": "evidence",
+            "action": "collect_missing_source_material",
+            "claim_ids": list(selected),
+            "reason": (
+                "Required source material is missing, or strict "
+                "Evidence coverage was explicitly requested."
+            ),
+        })
+
+        collect_evidence(session, task)
+
+        complete = completed_evidence(session, task)
+        reusable = saved_sources_usable()
+
+        if strict_mode:
+            strict_complete = strict_evidence_complete(
+                session, task, requirements
+            )
+
+    elif reusable and not complete:
+        session.run.setdefault("execution_decisions", []).append({
+            "stage": "evidence",
+            "action": "reuse_existing_source_material",
+            "claim_ids": list(selected),
+            "reason": (
+                "Relevant located Evidence is available for each target "
+                "Claim; a new scan is not required merely because the "
+                "previous scan receipt does not cover this task."
+            ),
+            "new_model_calls": 0,
+        })
+
     eids = candidate_evidence(session, task) if selected else []
+
+    ready = bool(selected) and not pending and (complete or reusable)
+
+    if strict_mode:
+        ready = ready and strict_complete
+
     state = session.state(task)
-    state.update({"selected_claim_ids": list(selected), "selected_evidence_ids": list(eids),
+    state.update({
+        "selected_claim_ids": list(selected),
+        "selected_evidence_ids": list(eids),
         "collection_review_mode": "local_evidence_index_no_llm_links",
-        "collection_ready": bool(selected) and not pending and complete,
-        "coverage": {"claim_extraction_complete": not bool(pending),
+        "collection_ready": ready,
+        "coverage": {
+            "claim_extraction_complete": not bool(pending),
             "pending_claim_windows": [w.window_id for w in pending],
             "evidence_scan_complete": complete,
-            "evidence_search_scope": "whole_paper" if evidence_scope(session, task)[2] else "selected_sources",
-            "candidate_count": len(eids), "search_is_not_proof_of_absence": True}})
-    state["missing_information"] = ([] if selected else ["No target Claims were selected."])
+            "existing_mapping_material_available": reusable,
+            "evidence_search_scope": (
+                "whole_paper"
+                if evidence_scope(session, task)[2]
+                else "selected_sources"
+            ),
+            "candidate_count": len(eids),
+            "search_is_not_proof_of_absence": True,
+        },
+    })
+
+    state["missing_information"] = (
+        [] if selected else ["No target Claims were selected."]
+    )
+
     if pending:
-        state["missing_information"].append("Some requested Claim extraction windows remain unprocessed.")
-    if selected and not complete:
-        state["missing_information"].append("Evidence discovery coverage is incomplete; only saved sources are available.")
+        state["missing_information"].append(
+            "Some requested Claim extraction windows remain unprocessed."
+        )
+
+    if selected and not complete and not reusable:
+        state["missing_information"].append(
+            "Required Evidence material is still missing."
+        )
+
+    if strict_mode and not strict_complete:
+        state["missing_information"].append(
+            "Explicit strict Evidence coverage remains incomplete."
+        )
+
     session.save()
-    print("Argument material:", task.task_id, "Targets:", selected,
-          "Local candidates:", len(eids), "Discovery completed:", complete, flush=True)
+
+    print(
+        "Argument material:",
+        task.task_id,
+        "Targets:", selected,
+        "Local candidates:", len(eids),
+        "Saved material reusable:", reusable,
+        "Discovery completed:", complete,
+        flush=True,
+    )
+
 
 
 def prepare_task(session, task):
@@ -1119,6 +1397,80 @@ def run_workflow(args):
     run["answer_available"] = False
     run.pop("interruption_reason", None)
     try:
+        # TOKEN_SCOPE_OPT_20261110: verify existing table facts first.
+        if (
+            plan is None
+            and request.operation == "auto"
+            and not request.target_claim_ids
+            and not getattr(args, "strict_evidence_coverage", False)
+        ):
+            allowed = (
+                evidence_boundary(run, paper)
+                if request.retrieval_scope.mode == "selection"
+                else None
+            )
+
+            if args.focus_section or args.focus_element:
+                sections = section_ids_with_children(
+                    paper, args.focus_section
+                )
+                focused = {
+                    eid
+                    for eid, element in paper.elements.items()
+                    if (
+                        eid in args.focus_element
+                        or element.section_id in sections
+                    )
+                }
+                allowed = (
+                    focused
+                    if allowed is None
+                    else allowed & focused
+                )
+
+            exact = verified_numeric_comparison(
+                paper, data, args.question, allowed
+            )
+
+            if exact is not None:
+                plan = CoordinatorPlan(
+                    paper_id=paper.paper_id,
+                    user_message=args.question,
+                    language=args.language,
+                    tasks=[
+                        CoordinatorTask(
+                            task_id="t1",
+                            intent="fact_lookup",
+                            goal=args.question,
+                            scope=TaskScope(
+                                mode="selection",
+                                element_ids=[exact["table_id"]],
+                            ),
+                            evidence_scope="selection",
+                            output_style="direct",
+                        )
+                    ],
+                )
+
+                run["fast_table_lookup"] = exact
+                run.setdefault(
+                    "execution_decisions", []
+                ).append({
+                    "stage": "planning",
+                    "action": "verified_numeric_comparison",
+                    "new_model_calls": 0,
+                })
+
+                run["task_plan"] = plan.model_dump(
+                    mode="json"
+                )
+                store.save(data)
+
+                print(
+                    "Using verified numeric table comparison; "
+                    "no planning call.",
+                    flush=True,
+                )
         if plan is None:
             catalog = paper_catalog(paper, args.question)
             catalog["existing_claims"] = [claim_view(c) for c in data.claim_pool.values()

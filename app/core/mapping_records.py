@@ -17,7 +17,7 @@ from app.core.evidence_retrieval import (
     EvidenceDataManager, POLICY, available_source_parts, fingerprint, claim_origin_only,
 )
 
-MAPPING_RECORD_POLICY = "per_claim_no_links_relations_v4_origin_guard"
+MAPPING_RECORD_POLICY = "per_claim_source_bindings_v6"
 RELATIONS = {"supports", "contradicts", "qualifies", "context", "insufficient_support"}
 
 
@@ -213,6 +213,8 @@ def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
             available_for_claim = packet_ids
         else:
             available_for_claim = available
+        if not legacy and (row.get("grounding_validation") or {}).get("status") != "passed":
+            errors.append("The new Mapping did not pass source-binding validation.")
         coverage_limited = bool(receipt.get("priority_deferred") or receipt.get("missing_direct_source_ids"))
         if coverage_limited and not legacy:
             row["material_status"] = "limited"
@@ -223,7 +225,10 @@ def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
             row["qualifications"] = notes
         status = "completed" if not errors else "partial"
         cacheable = allow_cache and not errors and not legacy and packet is not None
-        mid = next_mapping_id(data)
+        current = data.mapping_by_claim.get(cid)
+        # Current-state IDs are stable; snapshot_id identifies changed content.
+        mid = (current if status == "completed" and current in data.mappings
+               and data.mappings[current].get("claim_id") == cid else next_mapping_id(data))
         data.mappings[mid] = {
             "mapping_id": mid, "claim_id": cid, "status": status,
             "record_policy": "legacy_preserved" if legacy else MAPPING_RECORD_POLICY,

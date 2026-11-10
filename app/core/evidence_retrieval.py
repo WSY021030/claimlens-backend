@@ -14,8 +14,9 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Any
+from app.core.mapping_grounding import compact_packet, redundant_table_ids
 
-POLICY = "evidence_packet_no_links_v4_origin_guard"
+POLICY = "evidence_packet_grounded_tables_v6"
 WORD = re.compile(r"[^\W_]+(?:[.-][^\W_]+)*", re.UNICODE)
 STOP = frozenset("a an the and or of to for in on at by from with is are was were be been being it its this that these those as we our they their paper study result results model models data dataset datasets".split())
 CONTRAST = re.compile(r"\b(?:however|although|except\w*|limitat\w*|fail\w*|worse|misinterpret\w*|inconsisten\w*|unlike|whereas|uncertain\w*|not|never|no)\b|但|例外|局限|未能|不能", re.I)
@@ -47,13 +48,13 @@ def _limit(name: str, default: int) -> int:
 
 @dataclass(frozen=True)
 class RetrievalLimits:
-    packet_bytes: int = 18000
-    expanded_packet_bytes: int = 30000
+    packet_bytes: int = 24000
+    expanded_packet_bytes: int = 48000
 
     @classmethod
     def from_environment(cls):
-        normal = _limit("READER_V3_MAPPING_PACKET_BYTES", 18000)
-        expanded = _limit("READER_V3_MAPPING_EXPANDED_BYTES", 30000)
+        normal = _limit("READER_V3_MAPPING_PACKET_BYTES", 24000)
+        expanded = _limit("READER_V3_MAPPING_EXPANDED_BYTES", 48000)
         if expanded < normal:
             raise ValueError("Expanded Mapping limit must not be below the initial limit.")
         return cls(normal, expanded)
@@ -115,41 +116,35 @@ def _source_text_key(value) -> str:
 
 
 def same_claim_source(claim, record) -> bool:
-    """Identify an exact, located source repetition for THIS target Claim.
+    """Detect paragraph Evidence overlapping a located Claim source span.
 
-    This is a provenance comparison, not semantic similarity or a scientific
-    judgment. Longer passages, other modalities, and other Claims are unaffected.
+    This is a provenance rule, not a semantic similarity judgment.
+    Both full quotations and partial quotations of a Claim are excluded.
     """
-    if (getattr(record, "kind", None) != "paragraph"
-            or getattr(claim, "source_status", None) != "located"
-            or getattr(record, "source_status", None) != "located"
-            or not getattr(claim, "source_element_id", None)
-            or claim.source_element_id != record.source_element_id):
+    if (
+        getattr(record, "kind", None) != "paragraph"
+        or getattr(claim, "source_status", None) != "located"
+        or getattr(record, "source_status", None) != "located"
+        or not getattr(claim, "source_element_id", None)
+        or claim.source_element_id != record.source_element_id
+    ):
         return False
-    claim_span, record_span = _span(claim), _span(record)
-    if claim_span is None or claim_span != record_span:
+
+    claim_span = _span(claim)
+    evidence_span = _span(record)
+
+    if claim_span is None or evidence_span is None:
         return False
-    claim_text = _source_text_key(getattr(claim, "source_quote", None))
-    return bool(claim_text and claim_text == _source_text_key(_body(record)))
+
+    return (
+        claim_span[0] < evidence_span[1]
+        and evidence_span[0] < claim_span[1]
+    )
 
 
 def claim_origin_only(claim, record, *, source_parts=None, visible_view=None) -> bool:
-    """True only if all actually used components are the target's exact sentence.
-
-    A saved neighboring context is NOT implicitly treated as a used component.
-    Conversely, an explicitly supplied/used longer context prevents this exact
-    duplicate rule from discarding potentially useful additional information.
-    """
-    if not same_claim_source(claim, record):
-        return False
-    parts = list(source_parts) if source_parts is not None else ["source_text"]
-    if not parts or not set(parts) <= {"source_text", "source_context"}:
-        return False
-    view = visible_view if visible_view is not None else evidence_view(
-        record, include_context="source_context" in parts)
-    target = _source_text_key(claim.source_quote)
-    return all(isinstance(view.get(part), str)
-               and _source_text_key(view[part]) == target for part in parts)
+    """Reject any overlapping Claim-origin paragraph as independent Evidence."""
+    return same_claim_source(claim, record)
 
 
 def available_source_parts(view: dict) -> list[str]:
@@ -163,11 +158,14 @@ def available_source_parts(view: dict) -> list[str]:
         value = view.get(name)
         if isinstance(value, str) and value.strip():
             parts.append(name)
+    if view.get("caption_ref") and view.get("table_ref"):
+        parts.append("caption")
     observation = view.get("visual_observation")
     if (view.get("pixels_were_submitted")
             and isinstance(observation, str) and observation.strip()):
         parts.append("visual_observation")
-    if isinstance(view.get("cells"), list) and view["cells"]:
+    if (isinstance(view.get("cells"), list) and view["cells"]) or (
+            view.get("table_ref") and (view.get("cell_positions") or view.get("cell_ids"))):
         parts.append("table_cells")
     if isinstance(view.get("equation"), dict) and any(view["equation"].values()):
         parts.append("equation")
@@ -273,9 +271,19 @@ class EvidenceDataManager:
             raise ValueError("Paper and analysis revisions must match for Evidence retrieval.")
         self.data, self.paper = data, paper
         self.limits = limits or RetrievalLimits.from_environment()
-        self.records = {eid: e for eid, e in data.evidence_pool.items()
-                        if e.source_status == "located" and e.source_anchor is not None
-                        and (e.kind != "paragraph" or bool(_body(e)))}
+        self.records = {
+            eid: record
+            for eid, record in data.evidence_pool.items()
+            if record.source_status == "located"
+            and record.source_anchor is not None
+            and (record.kind != "paragraph" or bool(_body(record)))
+            and not any(
+                same_claim_source(claim, record)
+                for claim in data.claim_pool.values()
+            )
+        }
+        redundant = redundant_table_ids(self.records)
+        self.records = {eid: e for eid, e in self.records.items() if eid not in redundant}
         self.words = {eid: terms(_text(e)) for eid, e in self.records.items()}
         self.frequency = Counter(word for words in self.words.values() for word in words)
         self.by_element = defaultdict(list)
@@ -292,6 +300,9 @@ class EvidenceDataManager:
         claim = self.data.claim_pool[claim_id]
         query = claim.source_quote or claim.model_quote
         wanted = terms(query)
+        origin = self.paper.elements.get(claim.source_element_id) if self.paper else None
+        if origin is not None and getattr(origin, "kind", None) == "paragraph":
+            wanted.update(terms(origin.text))
         # Anaphoric Claims need source context to identify the comparison.
         if ANAPHORA.search(query):
             for eid in self.by_element.get(claim.source_element_id, []):
@@ -416,11 +427,19 @@ class EvidenceDataManager:
                 "image_extraction_note is a model-generated reading note; preserve its "
                 "limitations but never elevate it above source text or original cells. "
                 "The target Claim and its anchor establish what the author said, not "
-                "why it is justified. Exact origin-only duplicates are omitted as "
+                "why it is justified. All Claim-overlapping paragraph Evidence is excluded from Mapping "
                 "arguments; their absence here does not mean the paper lacks evidence. "
-                "A longer excerpt is useful only for its additional premises."
+                "Overlapping excerpts cannot bypass this source-level exclusion."
             ),
         }
+        origin = self.paper.elements.get(claim.source_element_id) if self.paper else None
+        if origin is not None and getattr(origin, "kind", None) == "paragraph":
+            loc = _span(claim)
+            a = max(0, loc[0] - 600) if loc else 0
+            b = min(len(origin.text), loc[1] + 300) if loc else min(len(origin.text), 900)
+            payload["claim_context"] = {"element_id": claim.source_element_id,
+                "start": a, "end": b, "text": origin.text[a:b],
+                "role": "referent_context_only_not_evidence"}
         # Explicit small peer context is optional; never add all paper Claims.
         for cid in dict.fromkeys(context_claim_ids):
             if cid == claim_id or cid not in self.data.claim_pool:
@@ -441,7 +460,7 @@ class EvidenceDataManager:
                 view["source_text_role_for_target"] = "claim_origin_not_additional_support"
             tentative = {**payload, "evidence_items": [*payload["evidence_items"], view]}
             # Leave room for bounded coverage metadata; never truncate an item.
-            if byte_size(tentative) > cap - 1200:
+            if byte_size(compact_packet(tentative)) > cap - 1500:
                 deferred.append(row["id"])
                 continue
             selected.append(record)
@@ -461,6 +480,7 @@ class EvidenceDataManager:
             "expanded_view": expanded,
             "exact_claim_origin_records_omitted": len(origin_only_ids),
         }
+        payload = compact_packet(payload)
         if byte_size(payload) > cap:
             raise ValueError("Claim and required packet metadata exceed the configured Mapping byte limit.")
         receipt = {

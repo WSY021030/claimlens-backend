@@ -223,6 +223,19 @@ class MappingEvidenceRelation(BaseModel):
             "observation. Name only components used, not everything available."
         ),
     )
+    cell_ids_used: list[str] = Field(
+        default_factory=list,
+        description="Exact source cells actually used; empty means no precise cell selection recorded.",
+    )
+
+
+class MappingNumericCheck(BaseModel):
+    evidence_id: str
+    metric: str
+    method: str
+    operation: Literal["min", "max"]
+    exclude_methods: list[str] = Field(default_factory=list)
+    expected_result: Literal["unique_extreme", "tied_extreme", "not_extreme"]
 
 
 class MappingClaimAnalysis(BaseModel):
