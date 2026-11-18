@@ -1,4 +1,3 @@
-
 import argparse
 import hashlib
 import json
@@ -34,7 +33,8 @@ from app.models.document_v2 import (
 from app.tools.image_inputs import ImageInputs
 from app.usage_cost import CostTracker
 
-DISCOVERY_POLICY = "claim_focused_discovery_no_links_v2"
+DISCOVERY_POLICY = "claim_topic_element_coverage_v7"
+SOURCE_SELECTION_POLICY = "claim_source_catalog_v2_context"
 
 
 def digest(value):
@@ -306,9 +306,208 @@ def make_chunks(paper, chunk_chars=6000):
     return chunks
 
 
+
+def _source_preview(item):
+    """Index source content as hints; extraction still reads canonical originals."""
+    kind = item.get("kind")
+    if kind == "paragraph":
+        value = str(item.get("text") or "")
+        if len(value) > 1100:
+            value = value[:700] + " ... " + value[-350:]
+    elif kind == "table":
+        labels = [str(c.get("text") or "")[:80] for c in item.get("cells", [])
+                  if c.get("role") == "column_header" or c.get("row") == 0]
+        rows = [str(c.get("text") or "")[:60] for c in item.get("cells", [])
+                if c.get("col") == 0 and c.get("row") != 0]
+        value = " ".join([str(item.get("caption") or "")[:600],
+                          "Headers: " + " | ".join(labels[:16]),
+                          "Rows: " + " | ".join(rows[:14])])
+    elif kind == "figure":
+        value = " ".join([str(item.get("label") or ""),
+                          str(item.get("caption") or ""),
+                          str(item.get("alt_text") or "")])
+    else:
+        value = " ".join(str(item.get(k) or "") for k in
+                         ("label", "latex", "plain_text"))
+    return value[:1400]
+
+
+def source_catalog(chunks):
+    """One catalog entry per canonical paper element (not per chunk split)."""
+    catalog = {}
+    for chunk in chunks:
+        for item in chunk["elements"]:
+            element_id = item["element_id"]
+            entry = {
+                "element_id": element_id,
+                "kind": item["kind"],
+                "section_title": item.get("section_title") or "",
+                "section_id": item["section_id"],
+                "preview": _source_preview(item),
+            }
+            existing = catalog.get(element_id)
+            if existing is None:
+                catalog[element_id] = entry
+            elif len(existing["preview"]) < 900:
+                # Split long paragraphs and tables can expose new content.
+                previous = existing["preview"]
+                extra = entry["preview"]
+                if extra and extra not in previous:
+                    existing["preview"] = (previous + " ... " + extra)[:1500]
+    return list(catalog.values())
+
+
+def catalog_batches(catalog, max_chars=17000):
+    """Every source enters exactly one selection request, even on long papers."""
+    group = []
+    size = 0
+    for entry in catalog:
+        entry_size = len(json.dumps(entry, ensure_ascii=False))
+        if group and size + entry_size > max_chars:
+            yield group
+            group, size = [], 0
+        group.append(entry)
+        size += entry_size
+    if group:
+        yield group
+
+
+def claim_focus_context(paper, claims):
+    """Give both Evidence operations the Claim's real scientific context.
+
+    Context is drawn only from canonical paper elements. It does not add
+    new Claims or determine support; it disambiguates task-specific wording.
+    """
+    section_by_element = {
+        element_id: section
+        for section in paper.sections
+        for element_id in section.block_ids
+    }
+    context = []
+    for element_id in dict.fromkeys(c.source_element_id for c in claims):
+        element = paper.elements.get(element_id)
+        section = section_by_element.get(element_id)
+        origin_text = element.text if isinstance(element, Paragraph) else ""
+        context.append({
+            "claim_source_element_id": element_id,
+            "source_section_id": section.section_id if section else None,
+            "source_section_title": section.title if section else "",
+            "source_paragraph": origin_text[:3200],
+        })
+    return context
+
+
+def mandatory_context_elements(paper, claims):
+    """Protect context around each Claim to resolve anaphora and nearby figures."""
+    origin_ids = {claim.source_element_id for claim in claims}
+    keep = set(origin_ids)
+    for section in paper.sections:
+        blocks = list(section.block_ids)
+        for index, element_id in enumerate(blocks):
+            if element_id in origin_ids:
+                # Same-section neighbors often omit the subject in the sentence.
+                keep.update(blocks[max(0, index-2):index+3])
+                if len(blocks) <= 8:
+                    keep.update(blocks)
+    for mention in paper.mentions:
+        if (mention.source_anchor.element_id in origin_ids
+                and mention.target_id in paper.elements):
+            keep.add(mention.target_id)
+    return keep
+
+
+def focused_chunks(chunks, selected_element_ids):
+    """Retain chosen canonical source elements and stable scan identities."""
+    selected = set(selected_element_ids)
+    narrowed = []
+    for chunk in chunks:
+        elements = [item for item in chunk["elements"]
+                    if item["element_id"] in selected]
+        if elements:
+            narrowed.append({
+                "section_id": chunk["section_id"],
+                "chunk_id": (chunk["chunk_id"] if len(elements) == len(chunk["elements"])
+                             else digest({"section": chunk["section_id"],
+                                          "elements": elements})),
+                "elements": elements,
+            })
+    return narrowed
+
+
+def isolated_source_chunks(chunks):
+    """One canonical source element/window per extraction call.
+
+    A selected paragraph must not disappear merely because another paragraph
+    in its section dominates a multi-element extraction response. Preserve
+    separate 2,600-character windows and existing table row groups; never
+    truncate their source text or merge different experimental elements.
+    """
+    result = []
+    for chunk in chunks:
+        for item in chunk["elements"]:
+            parts = [item]
+            result.append({
+                "section_id": chunk["section_id"],
+                "chunk_id": digest({
+                    "section_id": chunk["section_id"],
+                    "source_elements": parts,
+                }),
+                "elements": parts,
+            })
+    return result
+
+
+def source_plan(agent, paper, claims, chunks, previous_runs=(), *, rerun=False):
+    """Search full source index; reuse completed per-Claim source plans on resume."""
+    catalog = source_catalog(chunks)
+    valid = {entry["element_id"] for entry in catalog}
+    index_fingerprint = digest(catalog)
+    focus_ids = sorted({claim.claim_id for claim in claims})
+    protected = set(mandatory_context_elements(paper, claims)) & valid
+    if not rerun:
+        for old in reversed(previous_runs):
+            receipt = old.get("source_selection") or {}
+            if (receipt.get("policy") == SOURCE_SELECTION_POLICY
+                    and receipt.get("index_fingerprint") == index_fingerprint
+                    and old.get("paper_revision") == paper.revision
+                    and old.get("model") == agent.model
+                    and sorted(old.get("claim_ids") or []) == focus_ids):
+                reused = set(receipt.get("selected_element_ids") or [])
+                if reused and reused <= valid and protected <= reused:
+                    return reused, {**receipt, "reused_from_run_id": old.get("run_id")}
+    selected = set(protected)
+    proposals = set()
+    batches_scanned = 0
+    for group in catalog_batches(catalog):
+        response = agent.select_sources(
+            claims, group, target_context=claim_focus_context(paper, claims)
+        )
+        allowed = {entry["element_id"] for entry in group}
+        returned = set(response.element_ids)
+        unknown = returned - allowed
+        if unknown:
+            raise ValueError("Source selection returned unknown element IDs: "
+                             + ", ".join(sorted(unknown)[:12]))
+        proposals.update(returned)
+        batches_scanned += 1
+    selected.update(proposals)
+    return selected, {
+        "policy": SOURCE_SELECTION_POLICY,
+        "index_fingerprint": index_fingerprint,
+        "catalog_elements": len(catalog),
+        "catalog_batches_scanned": batches_scanned,
+        "model_selected_elements": len(proposals),
+        "protected_context_elements": sorted(mandatory_context_elements(paper, claims) & valid),
+        "selected_element_ids": sorted(selected),
+        "excluded_catalog_elements": len(valid - selected),
+        "note": "All catalog elements were screened. Extraction used selected originals only; this is not a guarantee of scientific completeness.",
+    }
+
+
 def scan_key(paper, claim_ids, chunk_id, model):
     return digest({
         "stage": "text",
+        "discovery_policy": DISCOVERY_POLICY,
         **scan_hash_compatibility_fields(),
         "paper_revision": paper.revision,
         "claims": sorted(claim_ids),
@@ -322,6 +521,7 @@ def image_key(
 ):
     return digest({
         "stage": "image",
+        "discovery_policy": DISCOVERY_POLICY,
         **scan_hash_compatibility_fields(),
         "paper_revision": paper.revision,
         "claims": sorted(claim_ids),
@@ -347,7 +547,8 @@ def historical_scan_index(paper, data, model, text_chunks, chunk_chars=6000):
     old_batches = []
     for run in [*data.evidence_scan_batches, *data.runs]:
         if (run.get("stage") != "evidence" or run.get("model") != model
-                or scan_policy(run) != SOURCE_SCAN_POLICY):
+                or scan_policy(run) != SOURCE_SCAN_POLICY
+                or run.get("discovery_policy") != DISCOVERY_POLICY):
             continue
         if run.get("paper_revision") not in (None, paper.revision):
             continue
@@ -493,8 +694,7 @@ def select_claims(args, data, paper):
 
         reusable = (
             old.get("status") == "completed"
-            and (old.get("discovery_policy") == DISCOVERY_POLICY
-                 or scan_policy(old) == SOURCE_SCAN_POLICY)
+            and old.get("discovery_policy") == DISCOVERY_POLICY
             and old.get("paper_revision") == paper.revision
             and old.get("model") == args.model
             and saved_search_covers(
@@ -522,21 +722,54 @@ def save_findings(
     run,
     run_id,
     image_receipt=None,
+    *,
+    scan_id,
+    scan_stage,
 ):
-    found_ids = []
+    """Persist admissible findings and expose genuine structural failures.
 
-    for raw in extraction.evidence:
+    A rejected candidate is a retriable scan-integrity failure, not proof that
+    no Evidence exists. A deliberate Claim-source omission is NOT a failure.
+    Saved records remain available during a retry and deduplicate normally.
+    """
+    result = {
+        "evidence_ids": [],
+        "created": 0,
+        "reused": 0,
+        "claim_origin_omitted": 0,
+        "invalid": 0,
+    }
+
+    if not claim_batch:
+        raise ValueError("Evidence findings require at least one target Claim.")
+
+    def reject(raw, index, reason):
+        result["invalid"] += 1
+        run["rejected_findings"] += 1
+        run.setdefault("finding_rejections", []).append({
+            "stage": scan_stage,
+            "scan_id": scan_id,
+            "finding_index": index,
+            "source_element_id": raw.source_element_id,
+            "kind": raw.kind,
+            "reason": reason,
+            "source_quote_preview": str(raw.source_quote or "")[:240],
+            "description_preview": str(raw.description or "")[:240],
+        })
+
+    for index, raw in enumerate(extraction.evidence):
         scanned = next((item for item in source_elements
                         if item.get("element_id") == raw.source_element_id), None)
-        if scanned is None or scanned.get("kind") != raw.kind:
-            run.setdefault("rejected_findings", 0)
-            run["rejected_findings"] += 1
+        if scanned is None:
+            reject(raw, index, "source_element_not_in_scanned_input")
+            continue
+        if scanned.get("kind") != raw.kind:
+            reject(raw, index, "source_kind_mismatch")
             continue
         if raw.kind == "table" and scanned.get("cells") and raw.cell_ids:
             visible = {cell.get("cell_id") for cell in scanned["cells"]}
             if any(cid not in visible for cid in raw.cell_ids):
-                run.setdefault("rejected_findings", 0)
-                run["rejected_findings"] += 1
+                reject(raw, index, "table_cell_not_in_scanned_input")
                 continue
         record = locate_evidence(
             paper=paper,
@@ -546,14 +779,22 @@ def save_findings(
             image_receipt=image_receipt,
         )
 
-        # Attach optional row-level provenance. Mixed dataset groups are
-        # surfaced as distinct groups, not silently treated as one dataset.
-        # A missing grouping pattern never removes or rejects Evidence.
+        if record.source_status != "located":
+            reject(raw, index, "source_location_unverified")
+            continue
+
+        # A paragraph quotation supplied by the model must really align to the
+        # original paper. The locator's fallback passage is not verification of
+        # that quote; do not persist it as a successfully checked finding.
+        if raw.kind == "paragraph" and raw.source_quote and not record.source_quote:
+            reject(raw, index, "paragraph_quote_not_aligned")
+            continue
+
+        # Keep per-table row provenance; never widen the source to unrelated
+        # dataset rows when the model selected a narrower row group.
         if record.kind == "table" and record.source_element_id in paper.elements:
             table = paper.elements[record.source_element_id]
             if isinstance(table, Table):
-                scanned = next((item for item in source_elements
-                                if item.get("element_id") == raw.source_element_id), {})
                 ref_ids = list(raw.cell_ids or [])
                 if not ref_ids:
                     ref_ids = [c.get("cell_id") for c in scanned.get("cells", [])
@@ -568,30 +809,36 @@ def save_findings(
                 group = scanned.get("row_group_context") or {}
                 if group and table.grid:
                     by_id = {cell.cell_id: cell for cell in table.grid.cells}
-                    outside = sorted({by_id[cid].row for cid in ref_ids if cid in by_id
-                                      and by_id[cid].row != 0
-                                      and not (group["row_start"] <= by_id[cid].row <= group["row_end"])})
+                    outside = sorted({
+                        by_id[cid].row for cid in ref_ids
+                        if cid in by_id and by_id[cid].row != 0
+                        and not (group["row_start"] <= by_id[cid].row <= group["row_end"])
+                    })
                     if outside:
                         record.source_content["referenced_rows_outside_scanned_group"] = outside
+
+        # A Claim quotation is not independent Evidence about itself.
+        if record.kind == "paragraph" and record.source_anchor is not None:
+            from app.core.evidence_retrieval import same_claim_source
+            if any(same_claim_source(claim, record) for claim in claim_batch):
+                result["claim_origin_omitted"] += 1
+                run["claim_origin_omitted"] += 1
+                continue
 
         if record.kind == "table" and record.observed_via == "structured_table":
             factual_description = _table_facts(paper, record)
             if factual_description:
                 record.description = factual_description
 
-        # Source location and the actual scanned text must agree.
         if record.kind == "paragraph" and record.source_quote:
             selector = record.source_anchor.selector if record.source_anchor else None
             if (getattr(selector, "start", -1) < int(scanned.get("source_start", 0))
                     or getattr(selector, "end", 10**15) > int(
                         scanned.get("source_end", 10**15))):
-                run.setdefault("rejected_findings", 0)
-                run["rejected_findings"] += 1
+                reject(raw, index, "paragraph_quote_outside_scanned_window")
                 continue
 
-        evidence_id, created = store.add_evidence(
-            data, record
-        )
+        evidence_id, created = store.add_evidence(data, record)
         if not created and record.kind == "table":
             existing = data.evidence_pool[evidence_id]
             for field in ("row_group_context", "row_group_context_note",
@@ -599,14 +846,15 @@ def save_findings(
                 if field in record.source_content:
                     existing.source_content.setdefault(field, record.source_content[field])
 
-        found_ids.append(evidence_id)
+        result["evidence_ids"].append(evidence_id)
         if created:
             run["new_evidence"] += 1
+            result["created"] += 1
+        else:
+            result["reused"] += 1
 
-    return list(dict.fromkeys(found_ids))
-
-
-
+    result["evidence_ids"] = list(dict.fromkeys(result["evidence_ids"]))
+    return result
 
 
 
@@ -617,7 +865,13 @@ def suggested_images(
     text_keys,
     image_mode,
     images,
+    selected_source_ids=None,
 ):
+    """Pixels need an admitted visual candidate or a direct Claim-source cite.
+
+    Source selection is intentionally high recall; it is not permission to
+    submit every selected figure to the visual model.
+    """
     if image_mode == "none":
         return []
 
@@ -626,37 +880,18 @@ def suggested_images(
         for element_id in paper.elements
         if images.asset_refs(element_id)
     }
-
-    if image_mode == "all":
-        return sorted(available)
-
     candidates = set()
-
-    # Suggestions saved during text discovery.
     for key in text_keys:
-        candidates.update(
-            data.evidence_image_candidates.get(key, [])
-        )
+        candidates.update(data.evidence_image_candidates.get(key, []))
 
-    # Figures or tables directly referenced in
-    # the paragraphs containing target Claims.
-    target_paragraphs = {
-        c.source_element_id for c in batch
-    }
-
+    origin_ids = {claim.source_element_id for claim in batch}
     for mention in paper.mentions:
-        if (
-            mention.source_anchor.element_id
-            in target_paragraphs
-            and mention.target_kind in {"figure", "table"}
-            and mention.target_id
-        ):
+        if (mention.source_anchor.element_id in origin_ids
+                and mention.target_kind in {"figure", "table"}
+                and mention.target_id):
             candidates.add(mention.target_id)
 
-    # Text-discovery suggestions and explicit source mentions determine image
-    # candidates. Historical Claim-Evidence Links are not a retrieval gate.
-
-    return sorted(candidates & available)
+    return sorted(candidates & available & set(selected_source_ids or ()))
 
 
 def main():
@@ -794,10 +1029,10 @@ def main():
     print("Source sections:", sorted(args.source_sections))
     print("Source elements:", sorted(args.source_elements))
     print(
-        "Planned text matches:",
+        "Maximum text matches before source selection:",
         len(chunks) * len(claim_batches),
     )
-    print("Potential text calls before Evidence Pool matching:", new_text_calls)
+    print("Potential calls before source selection:", new_text_calls)
     print("Historical cache savings:", len(chunks) * len(claim_batches) - new_text_calls)
 
     if args.preview:
@@ -847,6 +1082,17 @@ def main():
         "reused_source_chunks": 0,
         "reused_image_assets": 0,
         "rejected_findings": 0,
+        "finding_rejections": [],
+        "source_processing": [],
+        "claim_origin_omitted": 0,
+        "topic_review": {
+            "calls": 0,
+            "candidate_findings": 0,
+            "accepted_findings": 0,
+            "excluded_findings": 0,
+            "excluded_source_element_ids": [],
+            "reviewed_image_candidates": 0,
+        },
         "paper_revision": paper.revision,
         "claim_batch_size": args.claim_batch_size,
         "chunk_chars": args.chunk_chars,
@@ -879,6 +1125,8 @@ def main():
     stopped = False
     newly_seen_evidence = set()
     planned_text_keys = []
+    planned_targeted_text_keys = []
+    planned_targeted_text_windows = []
     planned_image_keys = []
 
     def call_agent(batch, elements, stage, image=None):
@@ -889,6 +1137,7 @@ def main():
                 claims=batch,
                 source_elements=elements,
                 image=image,
+                target_context=claim_focus_context(paper, batch),
             )
         finally:
             elapsed = round(
@@ -903,11 +1152,84 @@ def main():
                 "claim_count": len(batch),
             })
 
-    try:
-        # Reuse saved source Evidence without a separate model-matching pass.
-        store.save(data)
+    def review_extraction(batch, elements, extraction, stage):
+        start = perf_counter()
+        try:
+            approved, receipt = agent.review_topic(
+                claims=batch,
+                source_elements=elements,
+                extraction=extraction,
+                target_context=claim_focus_context(paper, batch),
+            )
+        finally:
+            elapsed = round(perf_counter() - start, 3)
+            run["llm_wall_time_seconds"] += elapsed
+            run["call_timings"].append({
+                "stage": f"topic_review_{stage}",
+                "duration_seconds": elapsed,
+                "claim_count": len(batch),
+            })
+        summary = run["topic_review"]
+        summary["calls"] += int(receipt["model_call"])
+        summary["candidate_findings"] += receipt["candidate_findings"]
+        summary["accepted_findings"] += receipt["accepted_findings"]
+        summary["excluded_findings"] += (
+            receipt["candidate_findings"] - receipt["accepted_findings"]
+        )
+        summary["reviewed_image_candidates"] += receipt["reviewed_image_candidates"]
+        summary["excluded_source_element_ids"] = sorted(set(
+            summary["excluded_source_element_ids"]
+        ) | set(receipt["excluded_source_elements"]))
+        return approved
 
-        for claim_batch in claim_batches:
+    try:
+        # First screen the full canonical source catalog against the Claims.
+        # Only the SAME Evidence Agent is used; there is no second Agent and
+        # no persistent Claim/Evidence pairing or relevance-score record.
+        selection_started = perf_counter()
+        try:
+            focused_ids, selection_receipt = source_plan(
+                agent, paper, selected, chunks,
+                previous_runs=data.runs[:-1], rerun=args.rerun,
+            )
+            run["source_selection"] = selection_receipt
+            chunks = isolated_source_chunks(focused_chunks(chunks, focused_ids))
+            text_coverage, cached_candidates, image_batches = historical_scan_index(
+                paper, data, args.model, chunks, args.chunk_chars,
+            )
+            planned_targeted_text_windows = [
+                {
+                    "scan_id": scan_key(paper, [c.claim_id for c in batch],
+                                        chunk["chunk_id"], args.model),
+                    "element_id": chunk["elements"][0]["element_id"],
+                    "source_start": chunk["elements"][0].get("source_start"),
+                    "source_end": chunk["elements"][0].get("source_end"),
+                    "claim_ids": [c.claim_id for c in batch],
+                }
+                for batch in claim_batches for chunk in chunks
+            ]
+            planned_targeted_text_keys = [x["scan_id"] for x in planned_targeted_text_windows]
+            run["planned_targeted_text_scans"] = len(planned_targeted_text_keys)
+            print("Targeted source elements:", len(focused_ids), flush=True)
+            print("Targeted text chunks:", len(chunks), flush=True)
+            store.save(data)
+        except (StructuredOutputParseError, BudgetStop, ValueError, RuntimeError) as exc:
+            run["issues"].append({
+                "stage": "claim_source_selection", "error": str(exc),
+                "status": "requires_resume",
+            })
+            stopped = True
+            # Never write source-coverage receipts when source selection failed.
+        finally:
+            selection_elapsed = round(perf_counter() - selection_started, 3)
+            run["llm_wall_time_seconds"] += selection_elapsed
+            run["call_timings"].append({
+                "stage": "source_selection",
+                "duration_seconds": selection_elapsed,
+                "claim_count": len(selected),
+            })
+
+        for claim_batch in ([] if stopped else claim_batches):
             if stopped:
                 break
 
@@ -917,8 +1239,7 @@ def main():
 
             text_keys = []
 
-            # PASS 1: Scan all paper text and metadata
-            # for this group of Claims.
+            # PASS 1: Scan only source elements selected for these Claims.
             for chunk in chunks:
                 key = scan_key(
                     paper,
@@ -931,6 +1252,14 @@ def main():
                 text_keys.append(key)
 
                 chunk_id = chunk["chunk_id"]
+                if args.rerun:
+                    data.completed_evidence_scans.pop(key, None)
+                    data.evidence_image_candidates.pop(key, None)
+                    for cid in batch_ids:
+                        old_key = scan_key(paper, [cid], chunk_id, args.model)
+                        data.completed_evidence_scans.pop(old_key, None)
+                        data.evidence_image_candidates.pop(old_key, None)
+                    cached_candidates[chunk_id].clear()
                 batch_missing = (
                     list(claim_batch) if args.rerun else [
                         claim for claim in claim_batch
@@ -946,6 +1275,11 @@ def main():
                     mark_text_covered(
                         data, paper, args.model, chunk_id, batch_ids, candidates,
                     )
+                    run["source_processing"].append({
+                        "stage": "text_scan", "scan_id": chunk_id,
+                        "element_id": chunk["elements"][0]["element_id"],
+                        "status": "reused_completed_scan",
+                    })
                     continue
 
                 try:
@@ -954,8 +1288,17 @@ def main():
                         chunk["elements"],
                         "text_scan",
                     )
+                    raw_count = len(extraction.evidence)
+                    extraction = review_extraction(
+                        batch_missing, chunk["elements"], extraction, "text_scan"
+                    )
 
                 except StructuredOutputParseError as exc:
+                    run["source_processing"].append({
+                        "stage": "text_scan", "scan_id": chunk_id,
+                        "element_id": chunk["elements"][0]["element_id"],
+                        "status": "pending_parse_retry",
+                    })
                     run["issues"].append({
                         "stage": "text_scan", "chunk_id": chunk["chunk_id"],
                         "error": str(exc), "status": "pending_parse_retry",
@@ -963,14 +1306,31 @@ def main():
                     store.save(data)
                     continue
                 except BudgetStop as exc:
+                    run["source_processing"].append({
+                        "stage": "text_scan", "scan_id": chunk_id,
+                        "element_id": chunk["elements"][0]["element_id"],
+                        "status": "pending_budget_retry",
+                    })
                     run["issues"].append({
                         "stage": "text_scan", "chunk_id": chunk["chunk_id"],
                         "error": str(exc),
                     })
                     stopped = True
                     break
+                except (ValueError, RuntimeError) as exc:
+                    run["source_processing"].append({
+                        "stage": "text_scan", "scan_id": chunk_id,
+                        "element_id": chunk["elements"][0]["element_id"],
+                        "status": "pending_review_retry",
+                    })
+                    run["issues"].append({
+                        "stage": "text_topic_review", "chunk_id": chunk["chunk_id"],
+                        "error": str(exc), "status": "pending_review_retry",
+                    })
+                    store.save(data)
+                    continue
 
-                newly_seen_evidence.update(save_findings(
+                saved = save_findings(
                     extraction=extraction,
                     source_elements=chunk["elements"],
                     claim_batch=batch_missing,
@@ -979,7 +1339,45 @@ def main():
                     data=data,
                     run=run,
                     run_id=run_id,
-                ))
+                    scan_id=chunk_id,
+                    scan_stage="text_scan",
+                )
+                newly_seen_evidence.update(saved["evidence_ids"])
+                element = chunk["elements"][0]
+                source_status = (
+                    "pending_source_retry" if saved["invalid"] else
+                    "evidence_saved_or_reused" if saved["evidence_ids"] else
+                    "claim_origin_only" if saved["claim_origin_omitted"] else
+                    "all_candidates_excluded_by_topic" if raw_count else
+                    "no_related_findings_returned"
+                )
+                run["source_processing"].append({
+                    "stage": "text_scan", "scan_id": chunk_id,
+                    "element_id": element["element_id"],
+                    "source_start": element.get("source_start"),
+                    "source_end": element.get("source_end"),
+                    "raw_candidates": raw_count,
+                    "topic_admitted": len(extraction.evidence),
+                    "evidence_ids": saved["evidence_ids"],
+                    "new_evidence": saved["created"],
+                    "reused_evidence": saved["reused"],
+                    "claim_origin_omitted": saved["claim_origin_omitted"],
+                    "structural_rejections": saved["invalid"],
+                    "status": source_status,
+                })
+                if saved["invalid"]:
+                    run["issues"].append({
+                        "stage": "text_source_validation",
+                        "chunk_id": chunk_id,
+                        "element_id": element["element_id"],
+                        "invalid_findings": saved["invalid"],
+                        "status": "pending_source_retry",
+                    })
+                    # A failed candidate validation cannot certify source
+                    # coverage. Valid findings are retained and deduplicated
+                    # on the next attempt; this chunk remains retriable.
+                    store.save(data)
+                    continue
 
                 # Preserve old candidates plus the new source findings.
                 candidates = sorted(set(extraction.image_candidates)
@@ -1006,6 +1404,7 @@ def main():
                 text_keys,
                 args.image_mode,
                 images,
+                selected_source_ids=focused_ids,
             )
             if args.source_sections or args.source_elements:
                 image_elements = [
@@ -1038,6 +1437,11 @@ def main():
                         OSError,
                         ImportError,
                     ) as exc:
+                        run["source_processing"].append({
+                            "stage": "image_prepare", "element_id": element_id,
+                            "asset_id": asset_id, "cell_id": cell_id,
+                            "status": "pending_image_preparation_retry",
+                        })
                         run["unavailable_images"].append({
                             "element_id": element_id,
                             "asset_id": asset_id,
@@ -1053,6 +1457,12 @@ def main():
                     )
 
                     planned_image_keys.append(key)
+                    if args.rerun:
+                        data.completed_evidence_scans.pop(key, None)
+                        for cid in batch_ids:
+                            data.completed_evidence_scans.pop(
+                                image_key(paper, [cid], prepared, args.model), None
+                            )
 
                     image_missing = (
                         list(claim_batch) if args.rerun else [
@@ -1071,6 +1481,11 @@ def main():
                         mark_image_covered(
                             data, paper, args.model, prepared, batch_ids,
                         )
+                        run["source_processing"].append({
+                            "stage": "image_scan", "scan_id": key,
+                            "element_id": element_id, "asset_id": asset_id,
+                            "status": "reused_completed_scan",
+                        })
                         continue
 
                     source_item = {
@@ -1080,6 +1495,11 @@ def main():
                         "cell_id": cell_id,
                         "caption": element.caption,
                         "label": element.label,
+                        "section_id": element.section_id,
+                        "section_title": next(
+                            (section.title for section in paper.sections
+                             if section.section_id == element.section_id), ""
+                        ),
                     }
 
                     try:
@@ -1089,8 +1509,20 @@ def main():
                             "image_scan",
                             image=prepared,
                         )
+                        raw_image_count = len(extraction.evidence)
+                        # Record a submitted image even if the later topic
+                        # admission check fails and this scan needs a retry.
+                        images.record_submission([prepared], args.model, response)
+                        extraction = review_extraction(
+                            image_missing, [source_item], extraction, "image_scan"
+                        )
 
                     except StructuredOutputParseError as exc:
+                        run["source_processing"].append({
+                            "stage": "image_scan", "scan_id": key,
+                            "element_id": element_id, "asset_id": asset_id,
+                            "status": "pending_parse_retry",
+                        })
                         run["issues"].append({
                             "stage": "image_scan", "element_id": element_id,
                             "asset_id": asset_id, "error": str(exc),
@@ -1099,18 +1531,30 @@ def main():
                         store.save(data)
                         continue
                     except BudgetStop as exc:
+                        run["source_processing"].append({
+                            "stage": "image_scan", "scan_id": key,
+                            "element_id": element_id, "asset_id": asset_id,
+                            "status": "pending_budget_retry",
+                        })
                         run["issues"].append({
                             "stage": "image_scan", "element_id": element_id,
                             "asset_id": asset_id, "error": str(exc),
                         })
                         stopped = True
                         break
-
-                    images.record_submission(
-                        [prepared],
-                        args.model,
-                        response,
-                    )
+                    except (ValueError, RuntimeError) as exc:
+                        run["source_processing"].append({
+                            "stage": "image_scan", "scan_id": key,
+                            "element_id": element_id, "asset_id": asset_id,
+                            "status": "pending_review_retry",
+                        })
+                        run["issues"].append({
+                            "stage": "image_topic_review", "element_id": element_id,
+                            "asset_id": asset_id, "error": str(exc),
+                            "status": "pending_review_retry",
+                        })
+                        store.save(data)
+                        continue
 
                     receipt = {
                         **prepared.receipt(),
@@ -1122,7 +1566,7 @@ def main():
                         ),
                     }
 
-                    newly_seen_evidence.update(save_findings(
+                    saved = save_findings(
                         extraction=extraction,
                         source_elements=[source_item],
                         claim_batch=image_missing,
@@ -1132,7 +1576,35 @@ def main():
                         run=run,
                         run_id=run_id,
                         image_receipt=receipt,
-                    ))
+                        scan_id=key,
+                        scan_stage="image_scan",
+                    )
+                    newly_seen_evidence.update(saved["evidence_ids"])
+                    run["source_processing"].append({
+                        "stage": "image_scan", "scan_id": key,
+                        "element_id": element_id, "asset_id": asset_id,
+                        "cell_id": cell_id,
+                        "raw_candidates": raw_image_count,
+                        "topic_admitted": len(extraction.evidence),
+                        "evidence_ids": saved["evidence_ids"],
+                        "new_evidence": saved["created"],
+                        "reused_evidence": saved["reused"],
+                        "structural_rejections": saved["invalid"],
+                        "status": (
+                            "pending_source_retry" if saved["invalid"] else
+                            "evidence_saved_or_reused" if saved["evidence_ids"] else
+                            "no_related_findings_returned"
+                        ),
+                    })
+                    if saved["invalid"]:
+                        run["issues"].append({
+                            "stage": "image_source_validation",
+                            "element_id": element_id, "asset_id": asset_id,
+                            "invalid_findings": saved["invalid"],
+                            "status": "pending_source_retry",
+                        })
+                        store.save(data)
+                        continue
 
                     data.completed_evidence_scans[key] = "completed"
                     mark_image_covered(
@@ -1142,14 +1614,15 @@ def main():
                     run["image_scans_completed"] += 1
                     store.save(data)
 
-        # Discovered sources remain in the pool. Data Manager selects bounded
-        # candidates at Mapping time; no relevance-only LLM pass follows.
+        # Only topic-admitted discoveries remain in the Evidence Pool.
+        # Evidence admission checks subject alignment, not Claim support;
+        # Mapping independently evaluates scientific relations.
 
         text_complete = (
             not stopped
             and all(
-                key in data.completed_evidence_scans
-                for key in planned_text_keys
+                data.completed_evidence_scans.get(key) == "completed"
+                for key in planned_targeted_text_keys
             )
         )
 
@@ -1157,12 +1630,30 @@ def main():
             not stopped
             and not run["unavailable_images"]
             and all(
-                key in data.completed_evidence_scans
+                data.completed_evidence_scans.get(key) == "completed"
                 for key in planned_image_keys
             )
         )
 
         completed = text_complete and image_complete
+        run["pending_text_source_windows"] = [
+            item for item in planned_targeted_text_windows
+            if data.completed_evidence_scans.get(item["scan_id"]) != "completed"
+        ]
+        run["pending_text_scan_keys"] = [
+            item["scan_id"] for item in run["pending_text_source_windows"]
+        ]
+        run["pending_image_scan_keys"] = sorted(
+            {key for key in planned_image_keys
+             if data.completed_evidence_scans.get(key) != "completed"}
+        )
+        run["source_processing_summary"] = {
+            "attempted_or_reused_source_windows": len(run["source_processing"]),
+            "pending_text_scans": len(run["pending_text_scan_keys"]),
+            "pending_image_scans": len(run["pending_image_scan_keys"]),
+            "structural_rejections": run["rejected_findings"],
+            "source_selection_completed": bool(run.get("source_selection")),
+        }
 
         run["status"] = (
             "completed" if completed else "partial"
@@ -1174,9 +1665,16 @@ def main():
             "image_scope": {
                 "none": "pixels_not_requested",
                 "relevant": "selected_candidates_only",
-                "all": "all_available_image_assets",
+                "all": "all_claim_relevant_image_assets",
             }[args.image_mode],
-            "planned_text_scans": len(planned_text_keys),
+            "planned_text_scans": len(planned_targeted_text_keys),
+            "source_index_screened": bool(run.get("source_selection")),
+            "all_paper_chunks_extracted": False,
+            "source_selection_complete": not any(
+                issue.get("stage") == "claim_source_selection"
+                for issue in run["issues"]
+            ),
+            "topic_review_policy": "candidate_subject_admission_v1",
             "planned_image_scans": len(planned_image_keys),
         }
 

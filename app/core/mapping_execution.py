@@ -1,14 +1,20 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """Per-Claim Mapping with bounded repair and source-grounded numeric rendering."""
 from __future__ import annotations
 
 from copy import deepcopy
 from time import perf_counter
 from openai import APIConnectionError, APIStatusError, APITimeoutError
-from app.agents.mapping_agent import MappingAgent
+from app.agents.mapping_agent import (
+    MappingAgent, resolve_mapping_model, MAPPING_REASONING_EFFORT,
+)
 from app.budget import BudgetStop
 from app.llm import StructuredOutputParseError
 from app.core.evidence_retrieval import EvidenceDataManager
-from app.core.mapping_records import claim_cache_key, find_cached_claim, save_mapping_analyses
+from app.core.mapping_records import (
+    claim_cache_key, find_cached_claim, save_mapping_analysis,
+    mapping_policy_signature,
+)
 from app.core.mapping_grounding import ANALYSIS_POLICY as POLICY, digest, prepare_tables, validate_and_render
 
 MODEL_ERRORS = (StructuredOutputParseError, APIConnectionError, APIStatusError, APITimeoutError)
@@ -17,6 +23,12 @@ MODEL_ERRORS = (StructuredOutputParseError, APIConnectionError, APIStatusError, 
 def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker, budget,
                        paper=None, analysis_focus="general", allowed_element_ids=None,
                        rerun=False, on_saved=None):
+    model = resolve_mapping_model(model)
+    saved_model = run.get("mapping_model")
+    if saved_model is not None and resolve_mapping_model(saved_model) != model:
+        raise ValueError("Mapping execution model differs from the saved run.")
+    run["mapping_model"] = model
+    run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
     targets = list(dict.fromkeys(claim_ids))
     successful, failures, diagnostics = {}, [], []
     agent = MappingAgent(model=model, tracker=tracker, budget=budget)
@@ -53,11 +65,12 @@ def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker,
             store.save(data)
             continue
         attempt_key = digest({"policy": POLICY, "claim": cid, "model": model,
+                              "mapping_policy_signature": mapping_policy_signature(),
                               "language": language, "focus": analysis_focus,
                               "initial": packet, "expanded": expanded})
         checkpoint = counts.setdefault(attempt_key, {"calls": 0, "errors": [], "claim_id": cid})
         accepted = None
-        while checkpoint["calls"] < 2:
+        while checkpoint["calls"] < 2 and not checkpoint.get("terminal_error"):
             sent = deepcopy(packet)
             if checkpoint["errors"]:
                 sent["correction_feedback"] = checkpoint["errors"][:8]
@@ -78,13 +91,32 @@ def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker,
                 if getattr(exc, "request_not_sent", False):
                     checkpoint["calls"] -= 1
                 checkpoint["errors"] = [type(exc).__name__ + ": " + str(exc)[:400]]
-                # Do not repeat uncertain network requests or reinitialize a broken client.
-                if not isinstance(exc, StructuredOutputParseError):
+                receipt = getattr(exc, "response_receipt", None) or {}
+                if (isinstance(exc, StructuredOutputParseError)
+                        and receipt.get("status") == "incomplete"):
+                    checkpoint["terminal_error"] = "MappingOutputIncomplete"
+                    checkpoint["response_id"] = receipt.get("id")
+                    run["interruption_reason"] = "MappingOutputIncomplete"
                     break
-                continue
+                # Only a completed response with a reconciled usage receipt may
+                # use the existing one-repair allowance. Never retry a timeout,
+                # connection failure, incomplete output, or unknown charge.
+                if (isinstance(exc, StructuredOutputParseError)
+                        and receipt.get("status") == "completed"
+                        and receipt.get("usage") is not None
+                        and not budget.report()["blocked"]):
+                    continue
+                run["interruption_reason"] = "MappingRequestError"
+                break
             finally:
                 run["llm_wall_time_seconds"] = run.get("llm_wall_time_seconds", 0.0) + perf_counter() - start
             rows, errors = validate_and_render(result, packet)
+
+            if len(rows) != 1 or rows[0].get("claim_id") != cid:
+                errors.append(
+                    "Mapping must return exactly one analysis for its target Claim."
+                )
+
             if errors:
                 checkpoint["errors"] = [e[:350] for e in errors]
                 store.save(data)
@@ -94,16 +126,25 @@ def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker,
             new_ids = set(expanded_receipt["selected_evidence_ids"]) - set(receipt["selected_evidence_ids"])
             break
         if accepted is None:
+            if checkpoint.get("terminal_error"):
+                run["interruption_reason"] = checkpoint["terminal_error"]
             failures.append({"claim_id": cid, "type": "mapping_not_validated",
                              "message": "; ".join(checkpoint["errors"])[:1200] or
                              "This task used its two Mapping attempts. No unvalidated Mapping was saved."})
         else:
             rows, selected_packet, selected_receipt = accepted
-            saved = save_mapping_analyses(data, analyses=rows, target_ids=[cid],
-                available_evidence_ids=selected_receipt["selected_evidence_ids"], model=model,
-                language=language, run_id=run["run_id"], analysis_focus=analysis_focus,
-                context_claim_ids=[cid], input_packets={cid: selected_packet},
-                retrieval_receipts={cid: selected_receipt})
+            saved = save_mapping_analysis(
+                data,
+                analysis=rows[0],
+                target_claim_id=cid,
+                available_evidence_ids=selected_receipt["selected_evidence_ids"],
+                model=model,
+                language=language,
+                run_id=run["run_id"],
+                analysis_focus=analysis_focus,
+                input_packet=selected_packet,
+                retrieval_receipt=selected_receipt,
+            )
             mid = saved["mapping_ids_by_claim"].get(cid)
             if mid and data.mappings[mid]["status"] == "completed":
                 successful[cid] = mid
@@ -118,7 +159,7 @@ def run_claim_mappings(*, data, store, run, claim_ids, model, language, tracker,
             else:
                 failures.extend(saved["issues"] or [{"claim_id": cid, "type": "mapping_save_failed"}])
         store.save(data)
-        if run.get("interruption_reason") == "BudgetStop":
+        if run.get("interruption_reason"):
             break
     run.setdefault("mapping_diagnostics", []).extend(diagnostics)
     return {"mapping_ids_by_claim": successful, "issues": failures, "diagnostics": diagnostics,

@@ -1,3 +1,4 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """Best-effort USD cost estimates from actual OpenAI Responses API usage.
 
 Prices below are standard online input/output rates per 1M tokens, checked 2026-10-21:
@@ -18,8 +19,12 @@ import re
 
 USD_MILLION = Decimal("1000000")
 PRICE_CHECKED_ON = "2026-10-24"
+MODEL_PRICE_CHECKED_ON = {"gpt-5.4": "2026-11-12"}
 # (normal input, cached input, output), in US dollars per million tokens.
 MODEL_PRICES = {
+    # Standard short-context prices; checked against the official model page.
+    # https://developers.openai.com/api/docs/models/gpt-5.4
+    "gpt-5.4": (Decimal("2.50"), Decimal("0.25"), Decimal("15.00")),
     "gpt-4o-mini": (Decimal("0.15"), Decimal("0.075"), Decimal("0.60")),
     "gpt-5-mini": (Decimal("0.25"), Decimal("0.025"), Decimal("2.00")),
     "gpt-4.1-mini": (Decimal("0.40"), Decimal("0.10"), Decimal("1.60")),
@@ -57,6 +62,13 @@ def _prices_for(model: str) -> tuple[Decimal, Decimal, Decimal] | None:
     return None
 
 
+def _price_date_for(model: str) -> str:
+    for name, checked in MODEL_PRICE_CHECKED_ON.items():
+        if model == name or re.fullmatch(re.escape(name) + r"-\d{4}-\d{2}-\d{2}", model):
+            return checked
+    return PRICE_CHECKED_ON
+
+
 @dataclass
 class CostTracker:
     """One tracker per analysis invocation; never shared across user runs."""
@@ -76,6 +88,9 @@ class CostTracker:
         output_details = _get(usage, "output_tokens_details")
         reasoning_tokens = _nonnegative_int(_get(output_details, "reasoning_tokens")) if has_usage else None
         rates = _prices_for(actual_model)
+        if (has_usage and input_tokens > 272000
+                and re.fullmatch(r"gpt-5\.4(?:-\d{4}-\d{2}-\d{2})?", actual_model)):
+            rates = None
         service_tier = _get(response, "service_tier")
         if service_tier not in {None, "default", "auto"}:
             rates = None  # Do not price Flex/Priority responses at standard rates.
@@ -89,6 +104,7 @@ class CostTracker:
             ) / USD_MILLION
         self.calls.append({
             "agent": agent, "model": actual_model,
+            "price_checked_on": _price_date_for(actual_model),
             "response_id": _get(response, "id"), "call_status": call_status,
             "input_images": input_images, "reasoning_tokens": reasoning_tokens,
             "service_tier": service_tier,
@@ -128,7 +144,12 @@ class CostTracker:
         unpriced = sorted({call["model"] for call in self.calls if call["pricing_status"] != "priced"})
         return {
             "currency": "USD", "estimate_only": True,
-            "price_checked_on": PRICE_CHECKED_ON,
+            "price_checked_on": min(
+                (c.get("price_checked_on", PRICE_CHECKED_ON) for c in self.calls),
+                default=PRICE_CHECKED_ON),
+            "price_checked_on_by_model": {
+                c["model"]: c.get("price_checked_on", PRICE_CHECKED_ON)
+                for c in self.calls},
             "pricing_basis": "OpenAI standard online rates applied to API-reported tokens (including image input/reasoning output, not billing data)",
             "accounting_note": "Image input is already included in reported input tokens. Reasoning is already included in output tokens. Neither is charged a second time. Hidden SDK retries/requests without usage receipts cannot be reconciled with the invoice.",
             "input_images": sum(c["input_images"] for c in self.calls),

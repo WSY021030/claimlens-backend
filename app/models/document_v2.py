@@ -120,6 +120,7 @@ class Paragraph(BaseModel):
     text: str
     format_spans: list[InlineFormatSpan] = Field(default_factory=list)
     inline_math_spans: list[InlineMathSpan] = Field(default_factory=list)
+    unresolved_crossrefs: list[str] = Field(default_factory=list)
     original_html_id: str | None = None
 
     @model_validator(mode="after")

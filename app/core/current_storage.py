@@ -17,7 +17,7 @@ import tempfile
 from typing import Any
 from app.core.retired_associations import clean_analysis_payload, scan_policy
 
-STORAGE_POLICY = "current_state_v2"
+STORAGE_POLICY = "current_state_v3_single_claim"
 REPORT_COUNTS = (
     "llm_calls_recorded", "input_tokens", "cached_input_tokens", "output_tokens",
     "reasoning_tokens", "failed_attempts", "input_images",
@@ -42,7 +42,7 @@ MAPPING_DROP = {
     "cache_dependency_claim_ids", "migrated_from_mapping_id",
 }
 FINISHED = {"completed", "cancelled", "abandoned"}
-STAGE_NAMES = {"claim", "evidence", "mapping", "direct_evidence"}
+STAGE_NAMES = {"claim", "evidence", "mapping"}
 
 
 def unique(values):
@@ -320,12 +320,13 @@ def current_document(payload: dict) -> dict:
     retained_ids = _retained_run_ids(runs)
     retained = [_compact_run(r) for r in runs if r.get("run_id") in retained_ids]
     mappings = payload.get("mappings") or {}
-    archives = payload.get("mapping_batch_archive") or {}
     counters = dict(payload.get("id_counters") or {})
-    counters["mapping"] = max(int(counters.get("mapping") or 0),
-        _highwater([*mappings, *archives], "mapping"))
-    counters["relation"] = max(int(counters.get("relation") or 0),
-        _highwater(payload.get("mapping_relations") or {}, "relation"))
+
+    # Preserve the high-water Mapping counter.
+    counters["mapping"] = max(
+        int(counters.get("mapping") or 0),
+        _highwater(mappings, "mapping"),
+    )
     pointers = dict(payload.get("mapping_by_claim") or {})
     for cid, mid in pointers.items():
         if cid not in payload["claim_pool"] or mid not in mappings:
@@ -344,12 +345,7 @@ def current_document(payload: dict) -> dict:
     for run in retained:
         required.update(_mapping_references(run))
     out["mappings"] = {mid: _compact_mapping(row) for mid, row in mappings.items() if mid in required}
-    out["mapping_batch_archive"] = {mid: deepcopy(row) for mid, row in archives.items() if mid in required}
-    existing = set(out["mappings"]) | set(out["mapping_batch_archive"])
-    out["mapping_relations"] = {rid: deepcopy(row)
-        for rid, row in (payload.get("mapping_relations") or {}).items()
-        if set(row.get("mapping_ids") or []) <= existing
-        and row.get("paper_revision") == payload["paper_revision"]}
+    existing = set(out["mappings"])
     for run in retained:
         for key in ("created_mapping_ids", "reused_mapping_ids", "used_mapping_ids"):
             if key in run:
@@ -407,6 +403,42 @@ def response_payload(payload):
         "analysis_file": "analysis.json", "display_file": "display.json"}
     if run.get("selection"):
         result["selection"] = deepcopy(run["selection"])
+    if run.get("mode") == "ask_ai":
+        proposal = run.get("scope_proposal") or {}
+        sources = run.get("answer") or {}
+        request = (run.get("request_contract") or {}).get("request") or {}
+        result["qa"] = {
+            "entry_mode": "ask_ai",
+            "outcome": run.get("qa_outcome"),
+            "scope_used": run.get("scope_used", "selection"),
+            "selection": deepcopy(request.get("selection_context")),
+            "selected_source_layers": list(run.get("selected_source_layers") or []),
+            "source_provenance": deepcopy(run.get("answer_source_provenance"))
+            if run.get("qa_outcome") == "answered" else None,
+            "material_collection": {
+                "actions": deepcopy(run.get("qa_material_actions") or [])[-20:],
+                "inventory": deepcopy(run.get("qa_material_inventory")),
+                "gap": deepcopy(run.get("qa_material_gap")),
+            },
+            "answer_mode": run.get("qa_answer_mode"),
+            "answer_mode_fallback_reason": run.get("qa_answer_mode_fallback_reason"),
+            "mapping_trace": deepcopy(run.get("answer_mapping_trace"))
+            if run.get("qa_outcome") == "answered" else None,
+            "used_sources": {
+                "claim_ids": list(sources.get("used_claim_ids") or []),
+                "evidence_ids": list(sources.get("used_evidence_ids") or []),
+                "mapping_ids": list(sources.get("used_mapping_ids") or []),
+                "source_element_ids": list(sources.get("used_source_element_ids") or []),
+            },
+            "scope_proposal": {
+                key: deepcopy(proposal[key])
+                for key in ("mode", "section_ids", "section_titles", "approved", "reason")
+                if key in proposal
+            } if proposal else None,
+            "scope_approval": deepcopy(run.get("scope_approval")),
+            "scope_decision": run.get("scope_decision"),
+            "missing_information": list(run.get("missing_information") or []),
+        }
     return result
 
 
@@ -463,7 +495,7 @@ def write_current_outputs(data, payload, base: Path) -> None:
 
 def describe_change(before, after):
     counts = {}
-    for name in ("claim_pool", "evidence_pool", "mappings", "runs", "mapping_batch_archive"):
+    for name in ("claim_pool", "evidence_pool", "mappings", "runs"):
         counts[name] = {"before": len(before.get(name) or []), "after": len(after.get(name) or [])}
     counts["old_format_bytes"] = len(json.dumps(before, ensure_ascii=False, indent=2).encode("utf-8"))
     counts["current_format_bytes"] = len(json.dumps(after, ensure_ascii=False, indent=2).encode("utf-8"))

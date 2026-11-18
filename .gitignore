@@ -34,3 +34,33 @@ reader_v3_*_update.py
 # IDE
 .vscode/
 .idea/
+
+# BEGIN CLAIMLENS LOCAL-ONLY FILES
+# Generated source backups: never publish historical copies.
+*.bak_before_*
+*.bak_*
+*.backup
+*.orig
+.reader_code_backups/
+
+# Root-level one-time migration/install scripts; application code in app/ stays trackable.
+/install_*.py
+/apply_*.py
+/upgrade_*.py
+/improve_*.py
+/prepare_*.py
+/preview_*.py
+/fix_*.py
+/clean_*.py
+/experiment_*.py
+/ask_ai_*.py
+/deduplicate_existing_*.py
+/analysis_store_LOCAL_ACTUAL.py
+
+# Temporary QA requests, model logs, and copied source snapshots in root.
+/qa_*
+/evidence_pipeline_current.txt
+/mapping_source_review_*.txt
+/ask_ai_three_mode_source.txt
+/sync_claimlens_github_v3_safe_publish.ps1
+# END CLAIMLENS LOCAL-ONLY FILES

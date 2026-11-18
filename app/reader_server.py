@@ -47,6 +47,14 @@ class QuestionRequest(BaseModel):
     )
 
 
+class ScopeDecisionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    client_request_id: str = Field(pattern=REQUEST_ID_RE)
+    decision: Literal["approve", "reject"]
+    confirm_spend: bool = False
+
+
 def write_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
@@ -341,6 +349,166 @@ def create_app(project: Path | str = PROJECT_ROOT):
                 lock_path.unlink(missing_ok=True)
                 raise
 
+        return {"status": "accepted", "data": record}
+
+    def run_scope_decision(
+        record: dict,
+        paper_path: Path,
+        workflow_id: str,
+        decision: str,
+        lock_path: Path,
+    ) -> None:
+        """Resume a saved Ask AI request; never create a new budget ID."""
+        task_id = record["task_id"]
+        command = [
+            sys.executable, "-m", "app.workflow_runner",
+            "--paper", str(paper_path),
+            "--resume-workflow", workflow_id,
+            "--approve-scope" if decision == "approve" else "--reject-scope",
+        ]
+        try:
+            record["state"] = "running"
+            write_json(task_file(task_id), record)
+            observed_id = None
+            workflow_status = None
+            answer_status = None
+            with subprocess.Popen(
+                command, cwd=root, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                errors="replace", shell=False,
+            ) as process:
+                if process.stdout:
+                    for line in process.stdout:
+                        line = line.strip()
+                        if line.startswith("Workflow ID:"):
+                            observed_id = line.partition(":")[2].strip()
+                        elif line.startswith("Status:"):
+                            workflow_status = line.partition(":")[2].strip().lower()
+                        elif line.startswith("Answer status:"):
+                            answer_status = line.partition(":")[2].strip().lower()
+                exit_code = process.wait()
+
+            record["exit_code"] = exit_code
+            record["answer_status"] = answer_status
+            if exit_code != 0 or observed_id != workflow_id:
+                record["state"] = "failed"
+                record["error_code"] = "SCOPE_RESUME_FAILED"
+            elif workflow_status == "completed" and answer_status == "generated":
+                record["state"] = "completed"
+            elif workflow_status == "partial":
+                record["state"] = "partial"
+            else:
+                record["state"] = "failed"
+                record["error_code"] = "STATUS_UNCONFIRMED"
+        except Exception:
+            record["state"] = "failed"
+            record["error_code"] = "SCOPE_WORKER_ERROR"
+        finally:
+            write_json(task_file(task_id), record)
+            try:
+                if lock_path.read_text(encoding="utf-8") == task_id:
+                    lock_path.unlink()
+            except OSError:
+                pass
+            with mutex:
+                active_tasks.discard(task_id)
+
+    @app.post(
+        "/api/papers/{paper_id}/questions/{workflow_id}/scope-decision",
+        status_code=202,
+    )
+    def decide_scope(
+        paper_id: str,
+        workflow_id: str,
+        request: ScopeDecisionRequest,
+    ):
+        """Approve exactly the saved proposal or decline without model spending."""
+        from app.core.reader_queries import ReadRepository, ReadError
+
+        if not PAPER_ID_RE.fullmatch(paper_id) or not WORKFLOW_ID_RE.fullmatch(workflow_id):
+            raise HTTPException(422, "Invalid paper or workflow ID.")
+        if request.decision == "approve":
+            if not request.confirm_spend:
+                raise HTTPException(409, "Spending confirmation is required to approve scope.")
+            if not os.environ.get("OPENAI_API_KEY"):
+                raise HTTPException(409, "Backend OPENAI_API_KEY is not configured.")
+
+        identity = f"{paper_id}:{request.client_request_id}"
+        task_id = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
+        fingerprint = hashlib.sha256(
+            json.dumps({
+                "paper_id": paper_id, "workflow_id": workflow_id,
+                "decision": request.decision,
+            }, sort_keys=True).encode("utf-8")
+        ).hexdigest()
+
+        with mutex:
+            if task_file(task_id).exists():
+                prior = load_task(task_id)
+                if prior.get("fingerprint") != fingerprint:
+                    raise HTTPException(409, "Request ID already used for another operation.")
+                return {"status": "accepted", "data": prior}
+
+            paper_path = root / "data" / "standardized" / paper_id / "paper.json"
+            if not paper_path.is_file() or paper_path.is_symlink():
+                raise HTTPException(404, "Standardized paper not found.")
+            try:
+                paper, data, _ = ReadRepository(root).snapshot(paper_id)
+            except ReadError as exc:
+                raise HTTPException(exc.status, exc.message) from exc
+
+            run = next((
+                item for item in data.runs
+                if item.get("stage") == "coordinator"
+                and item.get("run_id") == workflow_id
+            ), None)
+            proposal = (run or {}).get("scope_proposal") or {}
+            if (
+                run is None
+                or run.get("mode") != "ask_ai"
+                or run.get("paper_revision") != paper.revision
+                or run.get("status") != "partial"
+                or run.get("qa_outcome") != "needs_scope_approval"
+                or proposal.get("mode") not in {"sections", "whole_paper"}
+                or proposal.get("approved") not in {False, True}
+                or (proposal.get("approved") is True and not (
+                    run.get("scope_approval") or {}
+                ).get("approved"))
+                or (request.decision == "reject" and proposal.get("approved") is True)
+            ):
+                raise HTTPException(409, "No resumable scope proposal for this workflow.")
+
+            lock_path = lock_dir / f"{paper_id}.lock"
+            try:
+                with lock_path.open("x", encoding="utf-8") as handle:
+                    handle.write(task_id)
+            except FileExistsError:
+                raise HTTPException(409, "Another task is using this paper.")
+
+            record = {
+                "task_id": task_id, "paper_id": paper_id,
+                "workflow_id": workflow_id,
+                "client_request_id": request.client_request_id,
+                "fingerprint": fingerprint,
+                "scope_decision": request.decision,
+                "state": "queued", "exit_code": None, "error_code": None,
+                "response_url": (
+                    f"/api/papers/{paper_id}/response?workflow_id={workflow_id}"
+                ),
+                "status_url": f"/api/tasks/{task_id}",
+            }
+            try:
+                write_json(task_file(task_id), record)
+                active_tasks.add(task_id)
+                threading.Thread(
+                    target=run_scope_decision,
+                    args=(record, paper_path, workflow_id, request.decision, lock_path),
+                    daemon=True,
+                ).start()
+            except Exception:
+                active_tasks.discard(task_id)
+                lock_path.unlink(missing_ok=True)
+                raise
         return {"status": "accepted", "data": record}
 
     @app.get("/api/tasks/{task_id}")

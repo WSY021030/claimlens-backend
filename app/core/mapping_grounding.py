@@ -356,9 +356,13 @@ def validate_and_render(result, packet):
         if hasattr(result, "model_dump")
         else deepcopy(result)
     )
-    rows = raw.get("claim_analyses", [])
-    if [r.get("claim_id") for r in rows] != packet["target_claim_ids"]:
-        return [], ["Return exactly one analysis for the requested Claim."]
+    row = raw.get("claim_analysis")
+    targets = packet.get("target_claim_ids") or []
+    if not isinstance(row, dict) or len(targets) != 1:
+        return [], ["Return exactly one claim_analysis for the requested Claim."]
+    if row.get("claim_id") != targets[0]:
+        return [], ["The returned analysis does not match the requested Claim."]
+    rows = [row]
     catalog, ownership = table_catalog(packet)
     visible = {x["evidence_id"]: x for x in packet["evidence_items"]}
     relations = {

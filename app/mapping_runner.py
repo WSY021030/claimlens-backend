@@ -1,3 +1,4 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """Standalone per-Claim Mapping using the same Data Manager as workflows."""
 from __future__ import annotations
 
@@ -9,6 +10,7 @@ from time import perf_counter
 from uuid import uuid4
 
 from app.budget import PaperBudget
+from app.agents.mapping_agent import resolve_mapping_model, MAPPING_REASONING_EFFORT
 from app.core.analysis_store import AnalysisStore
 from app.core.evidence_retrieval import EvidenceDataManager, byte_size
 from app.core.mapping_grounding import prepare_tables
@@ -65,7 +67,8 @@ def main():
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument("--claim-id", action="append")
     selection.add_argument("--all-claims", action="store_true")
-    parser.add_argument("--model", default="gpt-5.4-mini")
+    parser.add_argument("--model", "--mapping-model", dest="model", default=None,
+                        help="Mapping model only; default: gpt-5.4-2026-03-05")
     parser.add_argument("--language", choices=["zh", "en"], default="en")
     parser.add_argument("--focus", default="claim_support",
                         choices=["general", "claim_support", "data_consistency",
@@ -76,6 +79,7 @@ def main():
     parser.add_argument("--preview", action="store_true")
     parser.add_argument("--rerun", action="store_true")
     args = parser.parse_args()
+    args.model = resolve_mapping_model(args.model)
     if args.batch_size < 1 or not args.analysis.is_file():
         parser.error("A valid analysis.json and positive batch size are required.")
     data = AnalysisDocument.model_validate_json(args.analysis.read_text(encoding="utf-8-sig"))
@@ -87,6 +91,7 @@ def main():
     print("Local table scopes planned:", len(additions))
     print("Visual rereading is excluded from preview.")
     print("Paper:", data.paper_id)
+    print("Mapping model:", args.model, "reasoning:", MAPPING_REASONING_EFFORT)
     print("Claims:", len(ids), "Evidence pool:", len(data.evidence_pool))
     print("Legacy Links are not read. Mapping input is independent per Claim.")
     print("Real document structure available:", paper is not None)
@@ -123,6 +128,8 @@ def main():
            "execution_policy": "bounded_no_links_v2", "planned_batches": len(ids),
            "created_mapping_ids": [], "reused_mapping_ids": [], "issues": [],
            "started_at": datetime.now(timezone.utc).isoformat()}
+    run["mapping_model"] = args.model
+    run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
     data.runs.append(run)
     store.save(data)
     try:

@@ -21,6 +21,28 @@ def unique(values):
     return list(dict.fromkeys(value for value in values if value))
 
 
+def mapping_row(record, claim_id):
+    """Read one independent Mapping or a historical single-Claim record."""
+    if not isinstance(record, dict):
+        return None
+
+    row = record.get("claim_analysis")
+
+    if isinstance(row, dict):
+        return row if row.get("claim_id") == claim_id else None
+
+    historical = record.get("claim_analyses") or []
+
+    if (
+        len(historical) == 1
+        and isinstance(historical[0], dict)
+        and historical[0].get("claim_id") == claim_id
+    ):
+        return historical[0]
+
+    return None
+
+
 def record_fingerprint(record, *, legacy=False):
     """Fingerprint source records without derived structured-table descriptions.
 
@@ -65,12 +87,14 @@ def check_saved_mapping(data, claim_id, mapping_id, *, allowed_element_ids=None)
         errors.append("The Mapping belongs to another paper revision.")
     if record.get("validation_issues") or record.get("unresolved_evidence_ids"):
         errors.append("The Mapping has unresolved source validation errors.")
-    rows = record.get("claim_analyses") or []
-    if len(rows) != 1 or rows[0].get("claim_id") != claim_id:
-        errors.append("A readable per-Claim result must contain exactly its own analysis.")
+    row = mapping_row(record, claim_id)
+
+    if row is None:
+        errors.append(
+            "A readable per-Claim result must contain exactly its own analysis."
+        )
         return {"usable": False, "errors": errors, "warnings": warnings}
-    row = rows[0]
-    if record.get("record_policy") in {"per_claim_numeric_grounding_v5", "per_claim_source_bindings_v6"} and (
+    if record.get("record_policy") in {"per_claim_numeric_grounding_v5", "per_claim_source_bindings_v6", "per_claim_single_v7"} and (
             row.get("grounding_validation") or {}).get("status") != "passed":
         errors.append("Grounding validation is missing or failed.")
     if not str(row.get("explanation") or "").strip():
@@ -97,12 +121,9 @@ def check_saved_mapping(data, claim_id, mapping_id, *, allowed_element_ids=None)
             continue
         if source.source_status != "located" or source.source_anchor is None:
             errors.append(f"Adopted Evidence is not source-located: {eid}.")
-        if any(
-            same_claim_source(other_claim, source)
-            for other_claim in data.claim_pool.values()
-        ):
+        if same_claim_source(claim, source):
             errors.append(
-                f"Claim-origin paragraph cannot be adopted as Evidence: {eid}."
+                f"Target Claim-origin paragraph cannot be adopted as Evidence: {eid}."
             )
         if allowed_element_ids is not None and source.source_element_id not in allowed_element_ids:
             errors.append(f"Adopted Evidence is outside the requested source boundary: {eid}.")
@@ -168,8 +189,13 @@ def bind_saved_task(data, state, claim_ids, pins=None, *, allowed_element_ids=No
                   "collection_review_mode": "saved_mapping_provenance_check",
                   "collection_ready": not missing,
                   "missing_information": [f"No usable saved Mapping for {cid}." for cid in missing],
-                  "selected_evidence_ids": unique(eid for mid in selected.values()
-                      for row in data.mappings[mid]["claim_analyses"] for eid in row.get("evidence_ids_used", [])),
+                  "selected_evidence_ids": unique(
+                      eid
+                      for cid, mid in selected.items()
+                      for eid in (
+                          mapping_row(data.mappings[mid], cid) or {}
+                      ).get("evidence_ids_used", [])
+                  ),
                   "coverage": {"mode": "saved_analysis_only", "new_source_discovery": False,
                                "exhaustive_recall_claimed": False}})
     return selected
@@ -192,9 +218,7 @@ def presentation_analysis(data, claim_id, record):
     was withheld. Original labels, explanations and IDs remain available for
     audit; new scientific judgments still require the Mapping Agent.
     """
-    rows = record.get("claim_analyses") or []
-    source_row = next((r for r in rows if r.get("claim_id") == claim_id), {})
-    row = deepcopy(source_row)
+    row = deepcopy(mapping_row(record, claim_id) or {})
     claim = data.claim_pool.get(claim_id)
     by_id = {edge.get("evidence_id"): edge for edge in row.get("evidence_relations") or []
              if isinstance(edge, dict)}
@@ -358,7 +382,8 @@ def argument_packet(data, claim_ids, bindings):
             adopted_cells.setdefault(edge["evidence_id"], set()).update(edge.get("cell_ids_used") or [])
         mappings[mid] = {"mapping_id": mid, "claim_id": cid, "status": "completed",
                          "target_claim_ids": [cid], "analysis_focus": record.get("analysis_focus"),
-                         "claim_analyses": [row], "read_provenance_warnings": check["warnings"]}
+                         "claim_analysis": row,
+                         "read_provenance_warnings": check["warnings"]}
         index[mid] = {"kind": "mapping", "source_status": "analysis"}
     for eid, parts in adopted.items():
         record = data.evidence_pool[eid]
@@ -375,15 +400,11 @@ def argument_packet(data, claim_ids, bindings):
                          "content_ref": ref, "source_parts_used": sorted(parts)}
         index[eid] = {"kind": "evidence", "source_element_id": record.source_element_id,
                       "source_status": record.source_status}
-    relations = {rid: deepcopy(row) for rid, row in data.mapping_relations.items()
-                 if set(row.get("claim_ids") or []) <= set(claims)
-                 and set(row.get("mapping_ids") or []) <= set(mappings)
-                 and row.get("paper_revision") == data.paper_revision}
-    for rid in relations:
-        index[rid] = {"kind": "mapping_relation", "source_status": "analysis"}
+    # Cross-Claim Mapping relations are retired.
+    # Keep an empty compatibility field in the response packet.
     return {"paper_id": data.paper_id, "paper_revision": data.paper_revision,
             "claims": claims, "evidence": evidence, "mappings": mappings,
-            "mapping_relations": relations, "shared_source_content": shared,
+            "shared_source_content": shared,
             "numeric_table_checks": [], "source_index": index,
             "mapping_bindings": dict(bindings), "view_warnings": unique(warnings),
             "source_contract": "Saved Mapping is the source for each Claim's historical argument. Rephrase, do not add new reasoning. Only adopted Evidence components are supplied. A null relation has NOT been scientifically reclassified. Follow presentation_review_notes: do not count an identical Claim-origin sentence as additional support, even if historical prose did. Missing historical labels must not be filled from evidence_ids_used. Report the historical limitation rather than declaring the Claim true or false. A nonempty review list requires a visible caveat; unlisted source parts are not absent from the paper."}

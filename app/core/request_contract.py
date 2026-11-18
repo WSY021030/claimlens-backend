@@ -64,7 +64,7 @@ class SelectionReferenceSpan(BaseModel):
     element_id: str = Field(min_length=1, max_length=160)
     start: int = Field(ge=0)
     end: int = Field(gt=0)
-    exact: str = Field(min_length=1, max_length=1800)
+    exact: str = Field(min_length=1, max_length=16000)
 
     @model_validator(mode="after")
     def valid_range(self):
@@ -74,17 +74,17 @@ class SelectionReferenceSpan(BaseModel):
 
 
 class SelectionReference(BaseModel):
-    """Soft reference context, never a hard retrieval boundary."""
+    """Canonical text selection used as the initial Ask AI answer scope."""
     model_config = ConfigDict(extra="forbid")
 
     paper_revision: str = Field(min_length=8, max_length=200)
     segments: list[SelectionReferenceSpan] = Field(
-        min_length=1, max_length=3
+        min_length=1, max_length=12
     )
 
     @model_validator(mode="after")
     def limit_length(self):
-        if sum(len(s.exact) for s in self.segments) > 2400:
+        if sum(len(s.exact) for s in self.segments) > 16000:
             raise ValueError("Selection reference is too large.")
         return self
 
@@ -111,6 +111,8 @@ def validate_selection_reference(selection, paper):
     if selection.paper_revision != paper.revision:
         raise ValueError("The selected paper revision has changed.")
 
+    seen_by_element = {}
+
     for span in selection.segments:
         element = paper.elements.get(span.element_id)
 
@@ -119,6 +121,16 @@ def validate_selection_reference(selection, paper):
 
         if element.text[span.start:span.end] != span.exact:
             raise ValueError("Selection does not match canonical text.")
+
+        previous = seen_by_element.setdefault(span.element_id, [])
+
+        if any(
+            span.start < old_end and old_start < span.end
+            for old_start, old_end in previous
+        ):
+            raise ValueError("Selection contains overlapping text spans.")
+
+        previous.append((span.start, span.end))
 
 
 def question_context_note(run):
@@ -163,6 +175,7 @@ class ReaderRequest(BaseModel):
     paper_id: str
     paper_revision: str
     question: str
+    entry_mode: Literal["auto", "chatbot", "ask_ai"] = "auto"
     operation: Literal["auto", "explain_saved", "compare_saved", "analyze_claims", "refresh_claims"] = "auto"
     target_claim_ids: list[str] = Field(default_factory=list)
     mapping_ids_by_claim: dict[str, str] = Field(default_factory=dict)
@@ -186,9 +199,30 @@ class ReaderRequest(BaseModel):
             raise ValueError("compare_saved requires at least two target Claims.")
         if not set(self.mapping_ids_by_claim) <= set(self.target_claim_ids):
             raise ValueError("Pinned Mapping keys must belong to the target Claim set.")
+        if self.entry_mode == "ask_ai":
+            if self.selection_context is None:
+                raise ValueError("Ask AI requires an exact text selection.")
+            if self.operation != "auto" or self.target_claim_ids:
+                raise ValueError("Ask AI question mode cannot request an analysis operation.")
+            if self.retrieval_scope.mode != "whole_paper":
+                raise ValueError("Ask AI controls its own selection and extension scope.")
+
+        if self.entry_mode == "chatbot" and self.selection_context is not None:
+            raise ValueError("Use Ask AI for selection-based questions.")
+
         if self.mapping_ids_by_claim and self.operation not in SAVED_OPERATIONS:
             raise ValueError("Pin Mapping versions only when reading saved analyses.")
         return self
+
+
+    def resolved_entry_mode(self) -> Literal["chatbot", "ask_ai"]:
+        if self.entry_mode != "auto":
+            return self.entry_mode
+
+        if self.selection_context is not None and self.operation == "auto":
+            return "ask_ai"
+
+        return "chatbot"
 
 
 def validate_request(request, paper, data):

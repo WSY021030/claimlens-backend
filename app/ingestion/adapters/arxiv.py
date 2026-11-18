@@ -58,7 +58,7 @@ def _prose(tag: Tag) -> str:
 
 
 
-def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[InlineMathSpan]]:
+def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[InlineMathSpan], list[str], list[tuple[int, int, str]]]:
     """ARXIV_INLINE_MATH_READABILITY_V1: preserve MathML with exact offsets."""
     cloned = BeautifulSoup(str(tag), "lxml")
     root = cloned.find(tag.name)
@@ -66,7 +66,11 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
     if root is None:
         raise ValueError("Unable to reconstruct the source paragraph")
 
-    # Replace broken LaTeXML references without inventing targets.
+    # ARXIV_BROKEN_CROSSREF_METADATA_V2
+    # Preserve broken parenthesized LaTeXML references as metadata.
+    # Do not invent a figure number or target element.
+    broken_refs: list[str] = []
+
     for error in list(root.select(".ltx_ERROR")):
         command = _clean(error.get_text("", strip=True))
 
@@ -75,41 +79,69 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
         }:
             continue
 
-        sibling = error.next_sibling
+        previous = error.previous_sibling
+        following = error.next_sibling
 
-        if not isinstance(sibling, NavigableString):
+        if (
+            not isinstance(previous, NavigableString)
+            or not isinstance(following, NavigableString)
+        ):
             continue
 
-        remainder = str(sibling)
+        before = str(previous)
+        after = str(following)
+
+        if re.search(r"\(\s*$", before) is None:
+            continue
+
         match = re.match(
-            r"((?:[A-Za-z]+:[\w/-]+)(?:,[A-Za-z]+:[\w/-]+)*)",
-            remainder,
+            r"(?P<labels>[A-Za-z]+:[A-Za-z0-9_./:-]+"
+            r"(?:\s*,\s*[A-Za-z]+:[A-Za-z0-9_./:-]+)*)",
+            after,
         )
 
-        if match is None:
+        if match is None or not after[match.end():].startswith(")"):
             continue
 
-        category = match.group(1).split(":", 1)[0].lower()
-        kind = {
-            "sec": "section",
-            "fig": "figure",
-            "tab": "table",
-            "eq": "equation",
-        }.get(category, "cross")
+        labels = [
+            label.strip()
+            for label in match.group("labels").split(",")
+        ]
 
-        error.replace_with(
-            NavigableString(f"[unresolved {kind} reference]")
+        if not labels or any(not label for label in labels):
+            continue
+
+        broken_refs.extend(labels)
+
+        retained_before = re.sub(
+            r"\(\s*$", "", before
+        )
+        retained_after = after[match.end() + 1:]
+
+        # A source may contain ". (broken-reference).".
+        # Preserve one original period rather than producing "..".
+        if (
+            retained_before.rstrip().endswith(".")
+            and retained_after.startswith(".")
+        ):
+            retained_after = retained_after[1:]
+
+        previous.replace_with(
+            NavigableString(retained_before)
+        )
+        following.replace_with(
+            NavigableString(retained_after)
         )
 
-        sibling.replace_with(
-            NavigableString(remainder[match.end():])
-        )
+        error.decompose()
 
     tokens: list[
-        tuple[str, frozenset[str], int | None]
+        tuple[str, frozenset[str], int | None, int | None]
     ] = []
 
     mathml_by_key: dict[int, str] = {}
+    # ARXIV_PRECISE_INLINE_LINKS_V1
+    link_href_by_key: dict[int, str] = {}
 
     block_tags = {
         "p", "ul", "ol", "li", "blockquote", "pre"
@@ -128,23 +160,30 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
         "ltx_tag_subparagraph",
     }
 
-    def add(value, marks, math_key=None):
+    def add(value, marks, math_key=None, link_key=None):
         for char in value.replace("\xa0", " "):
             tokens.append((
                 " " if char.isspace() else char,
                 marks,
                 math_key,
+                link_key,
             ))
 
-    def walk(node, marks):
+    def walk(node, marks, link_key=None):
         if isinstance(node, NavigableString):
-            add(str(node), marks)
+            add(str(node), marks, link_key=link_key)
             return
 
         if not isinstance(node, Tag):
             return
 
         classes = set(node.get("class", []))
+
+        # Assign a distinct identity to each actual source hyperlink.
+        # The final text offsets are derived from its own characters.
+        if node.name == "a" and node.get("href"):
+            link_key = len(link_href_by_key) + 1
+            link_href_by_key[link_key] = str(node["href"])
 
         if (
             node.name in {"script", "style"}
@@ -153,7 +192,7 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
             return
 
         if node.name == "br":
-            tokens.append(("\n", marks, None))
+            tokens.append(("\n", marks, None, link_key))
             return
 
         if node.name == "math":
@@ -163,9 +202,9 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
                 key = len(mathml_by_key) + 1
                 mathml_by_key[key] = str(node)
 
-                add(" ", marks)
-                add(latex, marks, key)
-                add(" ", marks)
+                add(" ", marks, link_key=link_key)
+                add(latex, marks, key, link_key)
+                add(" ", marks, link_key=link_key)
 
             return
 
@@ -214,19 +253,19 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
         )
 
         if boundary:
-            tokens.append(("\n", marks, None))
+            tokens.append(("\n", marks, None, link_key))
 
         for child in node.children:
-            walk(child, active_marks)
+            walk(child, active_marks, link_key)
 
         if boundary:
-            tokens.append(("\n", marks, None))
+            tokens.append(("\n", marks, None, link_key))
 
     walk(root, frozenset())
 
     normalized = []
 
-    for char, marks, math_key in tokens:
+    for char, marks, math_key, link_key in tokens:
         if char == "\n":
             while normalized and normalized[-1][0] == " ":
                 normalized.pop()
@@ -236,7 +275,7 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
                 for item in normalized[-2:]
                 if item[0] == "\n"
             ) < 2:
-                normalized.append((char, marks, None))
+                normalized.append((char, marks, None, link_key))
 
         elif char == " ":
             if (
@@ -244,12 +283,12 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
                 and normalized[-1][0] not in {" ", "\n"}
             ):
                 normalized.append((
-                    char, marks, math_key
+                    char, marks, math_key, link_key
                 ))
 
         else:
             normalized.append((
-                char, marks, math_key
+                char, marks, math_key, link_key
             ))
 
     while normalized and normalized[0][0] in {
@@ -322,7 +361,44 @@ def _formatted_prose(tag: Tag) -> tuple[str, list[InlineFormatSpan], list[Inline
 
         current_key = key
 
-    return text, formatting, inline_math
+    # Recover exact source positions after whitespace normalization.
+    # No substring search or guessed citation position is permitted.
+    link_spans: list[tuple[int, int, str]] = []
+    active_link = None
+    link_start = 0
+
+    for index in range(len(normalized) + 1):
+        current = (
+            normalized[index][3]
+            if index < len(normalized)
+            else None
+        )
+
+        if current == active_link:
+            continue
+
+        if active_link is not None:
+            start, end = link_start, index
+
+            while start < end and text[start].isspace():
+                start += 1
+
+            while end > start and text[end - 1].isspace():
+                end -= 1
+
+            if start < end:
+                link_spans.append((
+                    start,
+                    end,
+                    link_href_by_key[active_link],
+                ))
+
+        if current is not None:
+            link_start = index
+
+        active_link = current
+
+    return text, formatting, inline_math, broken_refs, link_spans
 
 
 def _heading(tag: Tag) -> str:
@@ -409,18 +485,8 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
     assets: dict[str, Asset] = {}
     references: dict[str, Reference] = {}
     raw_link_map: dict[str, tuple[str, str]] = {}
-    pending_mentions: list[tuple[str, str, str]] = []
+    pending_mentions: list[tuple[str, str, int, int, str]] = []
     warnings: list[str] = []
-    unresolved_crossrefs = [
-        error for error in soup.select(".ltx_ERROR")
-        if _clean(error.get_text("", strip=True)) in
-        {r"\\cref", r"\\Cref", r"\\ref", r"\\autoref"}
-    ]
-    if unresolved_crossrefs:
-        warnings.append(
-            f"Source LaTeXML contains {len(unresolved_crossrefs)} "
-            "unresolved cross-references; links cannot be verified."
-        )
     counts = {"sec": 0, "para": 0, "fig": 0, "table": 0, "equation": 0, "asset": 0, "mention": 0}
     image_inventory = {r.src: r for r in bundle.images}
 
@@ -450,24 +516,86 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
         if tag.get("id"):
             raw_link_map[tag["id"]] = (eid, kind)
 
-    def remember_links(owner_id: str, tag: Tag) -> None:
-        """Record same-paper LaTeXML fragment links, not unrelated URLs."""
-        for a in tag.find_all("a", href=True):
-            href = a["href"].strip()
-            parsed = urlparse(href)
+    def remember_links(
+        owner_id: str,
+        source_text: str,
+        spans: list[tuple[int, int, str]],
+    ) -> None:
+        """Register links from exact normalized DOM character offsets."""
+
+        for start, end, href in spans:
+            if not (0 <= start < end <= len(source_text)):
+                continue
+
+            snippet = source_text[start:end]
+
+            if not snippet.strip() or len(snippet) > 120:
+                continue
+
+            parsed = urlparse(href.strip())
             fragment = unquote(parsed.fragment)
+
             if not fragment:
                 continue
+
             if parsed.scheme or parsed.netloc:
-                if (parsed.scheme != "https" or
-                    parsed.hostname not in ("arxiv.org", "www.arxiv.org")):
+                if (
+                    parsed.scheme != "https"
+                    or parsed.hostname not in (
+                        "arxiv.org",
+                        "www.arxiv.org",
+                    )
+                ):
                     continue
-                match = re.search(r"/(?:html|abs)/(\d{4}\.\d{4,5})(?:v\d+)?/?$", parsed.path)
-                if not match or match.group(1).replace(".", "_") != stable_id:
+
+                match = re.search(
+                    r"/(?:html|abs)/(\d{4}\.\d{4,5})"
+                    r"(?:v\d+)?/?$",
+                    parsed.path,
+                )
+
+                if (
+                    match is None
+                    or match.group(1).replace(".", "_") != stable_id
+                ):
                     continue
-            snippet = _clean(a.get_text(" ", strip=True))
-            if snippet:
-                pending_mentions.append((owner_id, fragment, snippet))
+
+            pending_mentions.append((
+                owner_id,
+                fragment,
+                start,
+                end,
+                snippet,
+            ))
+
+    def remember_caption_links(
+        owner_id: str,
+        caption_tag: Tag,
+    ) -> None:
+        """Preserve only caption links whose offsets can be verified.
+
+        Captions may lose a leading Figure/Table label during extraction.
+        An unmatched layout is left unlinked rather than guessed.
+        """
+
+        caption = elements[owner_id].caption
+
+        if not caption:
+            return
+
+        full_text, _, _, _, spans = _formatted_prose(caption_tag)
+
+        if not full_text.endswith(caption):
+            return
+
+        offset = len(full_text) - len(caption)
+        adjusted = [
+            (start - offset, end - offset, href)
+            for start, end, href in spans
+            if start >= offset and end <= len(full_text)
+        ]
+
+        remember_links(owner_id, caption, adjusted)
 
     def add_paragraph(tag: Tag, section: Section) -> None:
         # LaTeXML ltx_para may contain a <p>, a pseudo-code listing, lists,
@@ -482,15 +610,16 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
         else:
             parts = [tag]
         for part in parts:
-            text, fmt, maths = _formatted_prose(part)
+            text, fmt, maths, broken_refs, link_spans = _formatted_prose(part)
             if not text:
                 continue
             eid = new_id("para")
             elements[eid] = Paragraph(element_id=eid, section_id=section.section_id,
                                       text=text, format_spans=fmt, inline_math_spans=maths,
+                                      unresolved_crossrefs=broken_refs,
                                       original_html_id=part.get("id") or tag.get("id"))
             section.block_ids.append(eid)
-            remember_links(eid, part)
+            remember_links(eid, text, link_spans)
 
     def add_equation(node: Tag, section: Section) -> None:
         # LaTeXML numbered equations may use a TABLE.ltx_equation, not a DIV.
@@ -631,7 +760,7 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
             section.block_ids.append(eid)
             register_html_id(node, eid, "table")
             if caption_tag is not None:
-                remember_links(eid, caption_tag)
+                remember_caption_links(eid, caption_tag)
             return eid
         else:
             eid = new_id("fig")
@@ -642,7 +771,7 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
             section.block_ids.append(eid)
             register_html_id(node, eid, "figure")
             if caption_tag is not None:
-                remember_links(eid, caption_tag)
+                remember_caption_links(eid, caption_tag)
             if not aid:
                 warnings.append("Figure has no local image: " + str(node.get("id")))
             return eid
@@ -760,38 +889,68 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
         raw_link_map[rawid] = (ref_id, "reference")
 
     mentions: list[Mention] = []
-    positions: dict[tuple[str, str], int] = {}
-    for para_id, raw_target, snippet in pending_mentions:
-        owner = elements[para_id]
-        source_text = (owner.text if isinstance(owner, Paragraph)
-                       else owner.caption if isinstance(owner, (Figure, Table))
-                       else "")
-        if not snippet or len(snippet) > 120:
+
+    for owner_id, raw_target, start, end, snippet in pending_mentions:
+        owner = elements[owner_id]
+
+        if isinstance(owner, Paragraph):
+            source_text = owner.text
+        elif isinstance(owner, (Figure, Table)):
+            source_text = owner.caption
+        else:
             continue
-        match = raw_link_map.get(unquote(raw_target))
-        if match is None:
-            # Some refs use fragment suffixes (e.g. '#bib.bib1'). Do not invent.
-            match = None
-        kind = match[1] if match else ("reference" if "bib" in raw_target.lower() else None)
-        if kind not in ("figure", "table", "equation", "reference"):
+
+        # Never accept an anchor computed from a different text string.
+        if (
+            not 0 <= start < end <= len(source_text)
+            or source_text[start:end] != snippet
+        ):
             continue
-        pos_key = (para_id, snippet)
-        start = source_text.find(snippet, positions.get(pos_key, 0))
-        if start == -1:
-            start = source_text.find(snippet)
-        if start >= 0:
-            positions[pos_key] = start + len(snippet)
-        selector = TextSpanSelector(start=start, end=start+len(snippet), exact=snippet) if start >= 0 else ElementSelector()
+
+        target = raw_link_map.get(unquote(raw_target))
+
+        kind = (
+            target[1]
+            if target
+            else (
+                "reference"
+                if "bib" in raw_target.lower()
+                else None
+            )
+        )
+
+        if kind not in {
+            "figure", "table", "equation", "reference"
+        }:
+            continue
+
+        selector = TextSpanSelector(
+            start=start,
+            end=end,
+            exact=snippet,
+        )
+
         mid = new_id("mention")
-        mentions.append(Mention(mention_id=mid,
-                                source_anchor=SourceAnchor(element_id=para_id, selector=selector),
-                                mention_text=snippet, target_kind=kind,
-                                target_id=match[0] if match else None,
-                                resolution_status="resolved" if match else "unresolved"))
+
+        mentions.append(
+            Mention(
+                mention_id=mid,
+                source_anchor=SourceAnchor(
+                    element_id=owner_id,
+                    selector=selector,
+                ),
+                mention_text=snippet,
+                target_kind=kind,
+                target_id=target[0] if target else None,
+                resolution_status=(
+                    "resolved" if target else "unresolved"
+                ),
+            )
+        )
 
     # A present bibliography with 0 matched citations must never be labeled
     # complete when the source contains bibliographic links.
-    has_citation_links = any("bib." in raw_target.lower() for _, raw_target, _ in pending_mentions)
+    has_citation_links = any("bib." in raw_target.lower() for _, raw_target, *_ in pending_mentions)
     linked_refs = [m for m in mentions if m.target_kind == "reference"]
     reference_quality = ("missing" if not references else
                          "partial" if (has_citation_links and not linked_refs) or any(
@@ -809,9 +968,20 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
     tbl_quality = ("complete" if all(t.grid is not None and all(
         not cell.image_asset_id or assets[cell.image_asset_id].status == "available"
         for cell in t.grid.cells) for t in tables) else "partial")
-    # Convert source HTML to a stable revision; reference updates trigger new revision.
+    unresolved_count = sum(
+        len(element.unresolved_crossrefs)
+        for element in elements.values()
+        if isinstance(element, Paragraph)
+    )
+    if unresolved_count:
+        warnings.append(
+            f"{unresolved_count} broken LaTeXML reference labels "
+            "were preserved as paragraph metadata."
+        )
+
+    # Include normalized document content in the paper revision.
     revision = "sha256:"+hashlib.sha256(bundle.html.encode("utf-8")).hexdigest()
-    return PaperDocument(
+    paper = PaperDocument(
         paper_id=paper_id, revision=revision, metadata=metadata,
         sections=sections, elements=elements, references=references,
         mentions=mentions, assets=assets,
@@ -820,3 +990,13 @@ def parse_arxiv_bundle(bundle: HTMLBundle) -> PaperDocument:
                              warnings=warnings),
     )
 
+    digest = hashlib.sha256()
+    digest.update(b"arxiv-source-normalization-v2")
+    digest.update(bundle.html.encode("utf-8"))
+    digest.update(
+        paper.model_dump_json(
+            exclude={"revision"}
+        ).encode("utf-8")
+    )
+    paper.revision = "sha256:" + digest.hexdigest()
+    return paper

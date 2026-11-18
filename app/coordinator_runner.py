@@ -1,3 +1,4 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """Task-scoped material selection, Mapping, and ONE final response.
 
 Source collection is owned by workflow_runner. This module never reads the
@@ -19,7 +20,9 @@ from uuid import uuid4
 
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 from app.agents.coordinator_agent import CoordinatorAgent
-from app.agents.mapping_agent import MappingAgent
+from app.agents.mapping_agent import (
+    MappingAgent, resolve_mapping_model, MAPPING_REASONING_EFFORT,
+)
 from app.budget import BudgetStop, PaperBudget, QUESTION_BUDGET_ENV, QUESTION_LIMIT_ENV
 from app.core.analysis_store import AnalysisStore
 from app.core.token_report import task_token_report, print_task_tokens
@@ -34,7 +37,7 @@ from app.core.request_contract import (
 )
 from app.core.mapping_views import (
     bind_saved_task, display_view, mapping_bindings, argument_packet, canonical_references,
-    presentation_analysis,
+    presentation_analysis, mapping_row,
 )
 from app.core.coordinator_tools import check_answer_references, render_source_fallback
 from app.llm import StructuredOutputParseError
@@ -266,18 +269,32 @@ def source_packet(data, *, claim_ids=(), evidence_ids=(), mapping_ids=(),
     selected_mappings = {}
     for mid in mids:
         record = data.mappings.get(mid)
-        if not isinstance(record, dict):
-            # Preserve explicit historical references from older workflow runs.
-            record = data.mapping_batch_archive.get(mid)
-        if (not isinstance(record, dict) or record.get("status") != "completed"
-                or record.get("paper_revision") != data.paper_revision):
+
+        if (
+            not isinstance(record, dict)
+            or record.get("status") != "completed"
+            or record.get("paper_revision") != data.paper_revision
+        ):
             continue
-        selected_mappings[mid] = {key: deepcopy(record.get(key)) for key in (
-            "status", "target_claim_ids", "claim_analyses", "cross_claim_explanation",
-            "missing_claim_ids", "unresolved_evidence_ids", "analysis_focus")}
-        cids.extend(record.get("target_claim_ids") or [])
-        for analysis in record.get("claim_analyses") or []:
-            eids.extend(analysis.get("evidence_ids_used") or [])
+
+        cid = record.get("claim_id")
+        analysis = mapping_row(record, cid)
+
+        if analysis is None or cid not in data.claim_pool:
+            continue
+
+        selected_mappings[mid] = {
+            "status": record.get("status"),
+            "claim_id": cid,
+            "claim_analysis": deepcopy(analysis),
+            "unresolved_evidence_ids": deepcopy(
+                record.get("unresolved_evidence_ids") or []
+            ),
+            "analysis_focus": record.get("analysis_focus"),
+        }
+
+        cids.append(cid)
+        eids.extend(analysis.get("evidence_ids_used") or [])
     cids = unique(cids)
     eids = unique(eids)
     claims = {cid: claim_view(data.claim_pool[cid]) for cid in cids if cid in data.claim_pool}
@@ -338,23 +355,16 @@ def source_packet(data, *, claim_ids=(), evidence_ids=(), mapping_ids=(),
         evidence[eid] = item
         index[eid] = {"kind": "evidence", "source_element_id": record.source_element_id,
                       "source_status": record.source_status, "observed_via": record.observed_via}
-    relations = {
-        rid: deepcopy(rel) for rid, rel in data.mapping_relations.items()
-        if (set(rel.get("claim_ids") or []) <= set(cids)
-            and set(rel.get("mapping_ids") or []) <= set(selected_mappings)
-            and rel.get("paper_revision") == data.paper_revision)
-    }
+    # Cross-Claim Mapping relations are no longer generated or consumed.
     for mid in selected_mappings:
         index[mid] = {"kind": "mapping", "source_status": "analysis"}
-    for rid in relations:
-        index[rid] = {"kind": "mapping_relation", "source_status": "analysis"}
     full_checks = audits_for_packet(paper, data, question, evidence) if paper is not None else []
     # The full audit is derived from the original cells; do not send the same
     # per-row numbers and Evidence IDs twice to the model.
     checks = compact_audits_for_model(full_checks)
     return {"paper_id": data.paper_id, "paper_revision": data.paper_revision,
             "claims": claims, "evidence": evidence,
-            "mappings": selected_mappings, "mapping_relations": relations,
+            "mappings": selected_mappings,
             "shared_source_content": shared,
             "numeric_table_checks": checks,
             "source_index": index,
@@ -365,7 +375,7 @@ def source_packet(data, *, claim_ids=(), evidence_ids=(), mapping_ids=(),
                 "source grid; computed findings never replace original cells. "
                 "Do not silently resolve cell conflicts. Retrieved Evidence is "
                 "a candidate, not a logical support assertion. "
-                "Mapping relations remain separate from each Claim Mapping."}
+                "Each Mapping independently analyzes exactly one Claim."}
 
 
 def packet_pages(packet):
@@ -376,7 +386,7 @@ def packet_pages(packet):
     listed explicitly. Oversized content is partitioned without discarding rows.
     """
     records = []
-    for collection in ("claims", "evidence", "mappings", "mapping_relations"):
+    for collection in ("claims", "evidence", "mappings"):
         for sid, value in packet[collection].items():
             records.append({"source_id": sid, "kind": collection, "record": deepcopy(value)})
     refs = {}
@@ -554,7 +564,6 @@ def material_view(*, coordinator, packet, run, data, store, purpose):
         "source_index": packet["source_index"], "source_notes": notes,
         "numeric_table_checks": packet.get("numeric_table_checks", []),
         "claims": packet["claims"], "mappings": packet["mappings"],
-        "mapping_relations": packet.get("mapping_relations", {}),
         "all_source_pages_processed": True,
         "source_contract": "Source notes are lossy observations, not an indication of "
             "source absence. Exact numeric_table_checks come from source-matched "
@@ -597,6 +606,12 @@ def _mapping_paper_from_disk(data):
 def execute_mappings(*, coordinator, data, store, run, plan, model, language,
                      tracker, budget, paper=None):
     """Execute only requested targets, or read their explicitly saved results."""
+    model = resolve_mapping_model(model)
+    saved_model = run.get("mapping_model")
+    if saved_model is not None and resolve_mapping_model(saved_model) != model:
+        raise ValueError("Mapping dispatch model differs from the saved run.")
+    run["mapping_model"] = model
+    run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
     if paper is None:
         paper = _mapping_paper_from_disk(data)
     targets = locked_targets(run)
@@ -670,6 +685,7 @@ def execute_mappings(*, coordinator, data, store, run, plan, model, language,
                 state["deferred_claim_ids"] = [x for x in cids if x not in state["analyzed_claim_ids"]]
         run.setdefault("execution_decisions", []).append({
             "stage": "mapping", "action": "compute_or_exact_cache", "claim_ids": list(cids),
+            "mapping_model": model, "reasoning_effort": MAPPING_REASONING_EFFORT,
             "reason": "Requested analysis, not a saved-result explanation.", "analysis_focus": focus})
         result = run_claim_mappings(
             data=data, store=store, run=run, claim_ids=cids, model=model,
@@ -683,7 +699,7 @@ def execute_mappings(*, coordinator, data, store, run, plan, model, language,
             state["mapping_input_policy"] = "bounded_no_links_v2"
         run.setdefault("mapping_attempts", []).extend(result["issues"])
         store.save(data)
-        if run.get("interruption_reason") == "BudgetStop":
+        if run.get("interruption_reason"):
             break
     # Current task bindings, not a union carried over from an earlier plan.
     run["used_mapping_ids"] = unique(mid for task in plan.tasks
@@ -703,10 +719,13 @@ def _saved_mapping_answer(data, claim_ids, mapping_ids):
         lines.extend(["", "## " + cid, claim.source_quote or claim.model_quote])
         material.append(cid)
         candidates = [(mid, data.mappings.get(mid) or {}) for mid in mapping_ids if mid in mapping_set]
-        rows = [(mid, record, row) for mid, record in candidates
-                if record.get("status") == "completed"
-                and record.get("paper_revision") == data.paper_revision
-                for row in record.get("claim_analyses") or [] if row.get("claim_id") == cid]
+        rows = [
+            (mid, record, mapping_row(record, cid))
+            for mid, record in candidates
+            if record.get("status") == "completed"
+            and record.get("paper_revision") == data.paper_revision
+            and mapping_row(record, cid) is not None
+        ]
         if not rows:
             lines.append("No completed Mapping is available for this Claim.")
             limitations.append("Mapping incomplete for " + cid)
@@ -1009,6 +1028,8 @@ def main():
     parser.add_argument("--resume-run", required=True)
     parser.add_argument("--paper", type=Path)
     parser.add_argument("--model", default="gpt-5.4-mini", help="Compatibility only; resume retains its saved model")
+    parser.add_argument("--mapping-model", default=None,
+                        help="Optional consistency check; resume cannot change its saved Mapping model")
     parser.add_argument("--language", choices=["en", "zh"], default="en")
     parser.add_argument("--preview", action="store_true")
     args = parser.parse_args()
@@ -1026,6 +1047,7 @@ def main():
         request_file=None, target_claim_id=[], analysis_operation="auto",
         selection_file=None, analyze_selection_file=None, fresh_analysis=False,
         question_limit_usd=None, model=run.get("model", args.model),
+        mapping_model=args.mapping_model,
         language=run.get("language", args.language), image_mode=run.get("image_mode", "relevant"),
         focus_section=[], focus_element=[], collection_rounds=3,
         preview=args.preview, plan_only=False, use_saved_sources=True,

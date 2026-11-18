@@ -10,14 +10,16 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from functools import lru_cache
 
-from app.agents.mapping_agent import MAPPING_INSTRUCTIONS
+from app.agents.mapping_agent import (
+    MAPPING_INSTRUCTIONS, MAPPING_REASONING_EFFORT,
+)
 from app.models.reader_v3 import MappingExtraction
 from app.core.mapping_views import record_fingerprint
 from app.core.evidence_retrieval import (
     EvidenceDataManager, POLICY, available_source_parts, fingerprint, claim_origin_only,
 )
 
-MAPPING_RECORD_POLICY = "per_claim_source_bindings_v6"
+MAPPING_RECORD_POLICY = "per_claim_single_v7"
 RELATIONS = {"supports", "contradicts", "qualifies", "context", "insufficient_support"}
 
 
@@ -34,6 +36,7 @@ def mapping_policy_signature():
     return fingerprint({"record_policy": MAPPING_RECORD_POLICY,
                         "retrieval_policy": POLICY,
                         "instructions": MAPPING_INSTRUCTIONS,
+                        "reasoning_effort": MAPPING_REASONING_EFFORT,
                         "schema": MappingExtraction.model_json_schema()})
 
 
@@ -56,26 +59,13 @@ def claim_source_ids(data, claim_id):
     return {e["evidence_id"] for e in packet["evidence_items"]}
 
 
-def legacy_batch_input_is_current(data, record):
-    # Historical link-filtered inputs cannot certify the new retrieval contract.
-    return False
-
-
 def next_mapping_id(data):
-    occupied = set(data.mappings) | set(data.mapping_batch_archive)
+    occupied = set(data.mappings)
     numbers = [int(mid.rsplit("_", 1)[1]) for mid in occupied
                if mid.startswith("mapping_") and mid.rsplit("_", 1)[1].isdigit()]
     number = max([int(data.id_counters.get("mapping", 0)), *numbers], default=0) + 1
     data.id_counters["mapping"] = number
     return f"mapping_{number:06d}"
-
-
-def next_relation_id(data):
-    numbers = [int(rid.rsplit("_", 1)[1]) for rid in data.mapping_relations
-               if rid.startswith("relation_") and rid.rsplit("_", 1)[1].isdigit()]
-    number = max([int(data.id_counters.get("relation", 0)), *numbers], default=0) + 1
-    data.id_counters["relation"] = number
-    return f"relation_{number:06d}"
 
 
 def find_cached_claim(data, claim_id, cache_key):
@@ -90,53 +80,33 @@ def find_cached_claim(data, claim_id, cache_key):
                 and item.get("record_policy") == MAPPING_RECORD_POLICY
                 and item.get("mapping_policy_signature") == mapping_policy_signature()
                 and item.get("input_signature") == cache_key
-                and len(item.get("claim_analyses") or []) == 1):
+                and isinstance(item.get("claim_analysis"), dict)):
             return mid
     return None
 
 
-def find_cached_claim_with_context(data, claim_id, model, language, focus,
-                                   allowed_evidence_ids, allowed_claim_ids):
-    """Compatibility entry point; new execution supplies exact packet keys."""
-    packet, _ = EvidenceDataManager(data).packet(claim_id, analysis_focus=focus)
-    ids = {item["evidence_id"] for item in packet["evidence_items"]}
-    if not ids <= set(allowed_evidence_ids):
-        return None
-    return find_cached_claim(data, claim_id, claim_cache_key(
-        data, claim_id, model, language, focus, input_packet=packet))
-
-
-def add_relation(data, *, claim_ids, mapping_ids, explanation, run_id,
-                 source_mapping_id=None):
-    text = str(explanation or "").strip()
-    claims, mappings = _unique(claim_ids), _unique(mapping_ids)
-    if len(claims) < 2 or not text:
-        return None
-    key = fingerprint({"claims": claims, "mappings": mappings, "text": text,
-                       "revision": data.paper_revision, "legacy": source_mapping_id})
-    for rid, item in data.mapping_relations.items():
-        if item.get("relation_signature") == key:
-            return rid
-    rid = next_relation_id(data)
-    data.mapping_relations[rid] = {
-        "relation_id": rid, "claim_ids": claims, "mapping_ids": mappings,
-        "explanation": text, "relation_signature": key,
-        "paper_revision": data.paper_revision, "created_run_id": run_id,
-        "source_mapping_id": source_mapping_id, "created_at": _now(),
-    }
-    return rid
-
-
-def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
-                          model, language, run_id, analysis_focus="general",
-                          cross_claim_explanation="", context_claim_ids=None,
-                          inherited_record=None, allow_cache=True,
-                          cache_context_evidence_ids=None, input_packets=None,
-                          retrieval_receipts=None):
-    targets = _unique(target_ids)
+def save_mapping_analysis(data, *, analysis, target_claim_id,
+                          available_evidence_ids, model, language, run_id,
+                          analysis_focus="general", inherited_record=None,
+                          allow_cache=True, input_packet=None,
+                          retrieval_receipt=None):
+    """Persist exactly one Claim Mapping."""
+    targets = [target_claim_id]
     available = set(available_evidence_ids) & set(data.evidence_pool)
-    rows = [r.model_dump(mode="json") if hasattr(r, "model_dump") else deepcopy(r)
-            for r in analyses]
+
+    if not isinstance(analysis, dict) and not hasattr(analysis, "model_dump"):
+        raise TypeError("A single Mapping analysis dictionary is required.")
+
+    rows = [
+        analysis.model_dump(mode="json")
+        if hasattr(analysis, "model_dump")
+        else deepcopy(analysis)
+    ]
+
+    if rows[0].get("claim_id") != target_claim_id:
+        raise ValueError(
+            "Mapping analysis Claim ID does not match the target."
+        )
     by_claim, duplicates, unexpected = {}, set(), []
     for row in rows:
         cid = row.get("claim_id")
@@ -173,8 +143,8 @@ def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
                 errors.append("Invalid or unexplained Evidence relation.")
             if row.get("material_status") not in {"sufficient_for_scoped_analysis", "limited"}:
                 errors.append("Missing material sufficiency status.")
-        packet = (input_packets or {}).get(cid)
-        receipt = deepcopy((retrieval_receipts or {}).get(cid) or {})
+        packet = input_packet
+        receipt = deepcopy(retrieval_receipt or {})
         if not legacy:
             # Validate provenance only. Never infer a relation from keywords,
             # scientific topic, retrieval score, Evidence ID, or legacy Links.
@@ -237,15 +207,16 @@ def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
             "input_signature": claim_cache_key(data, cid, model, language, analysis_focus,
                                                 input_packet=packet) if cacheable else None,
             "mapping_policy_signature": mapping_policy_signature() if not legacy else None,
-            "target_claim_ids": [cid], "context_claim_ids": _unique(context_claim_ids or [cid]),
-            "available_evidence_ids": sorted(available_for_claim), "claim_analyses": [row],
+            "target_claim_ids": [cid],
+            "available_evidence_ids": sorted(available_for_claim),
+            "claim_analysis": row,
             "missing_claim_ids": [], "unexpected_claim_ids": [],
             "unresolved_evidence_ids": invalid, "validation_issues": errors,
             "created_run_id": run_id, "created_at": (inherited_record or {}).get("created_at") or _now(),
             "migrated_from_mapping_id": (inherited_record or {}).get("mapping_id"),
             "cache_scope": "exact_bounded_packet" if cacheable else "not_reusable",
             "cache_dependency_evidence_ids": sorted(available_for_claim),
-            "cache_dependency_claim_ids": [x for x in (context_claim_ids or []) if x != cid],
+            "cache_dependency_claim_ids": [],
             "retrieval_receipt": receipt,
             "claim_snapshot_fingerprint": record_fingerprint(data.claim_pool[cid]),
             "used_evidence_fingerprints": {
@@ -257,32 +228,13 @@ def save_mapping_analyses(data, *, analyses, target_ids, available_evidence_ids,
             data.mapping_by_claim[cid] = mid
         saved[cid] = mid
         issues.extend({"claim_id": cid, "type": "mapping_contract", "message": error} for error in errors)
-    relation_id = add_relation(data, claim_ids=[cid for cid in targets if cid in saved],
-                              mapping_ids=list(saved.values()), explanation=cross_claim_explanation,
-                              run_id=run_id, source_mapping_id=(inherited_record or {}).get("mapping_id"))
     if unexpected:
         issues.append({"type": "unexpected_claims", "claim_ids": unexpected})
-    return {"mapping_ids_by_claim": saved, "relation_id": relation_id, "issues": issues,
-            "missing_claim_ids": [cid for cid in targets if cid not in saved]}
-
-
-def migrate_grouped_mappings(data):
-    """Preserve legacy batches losslessly; never promote them to new caches."""
-    moved = []
-    for old_id, item in list(data.mappings.items()):
-        if not isinstance(item, dict) or len(item.get("target_claim_ids") or []) < 2:
-            continue
-        data.mapping_batch_archive[old_id] = deepcopy(item)
-        del data.mappings[old_id]
-        result = save_mapping_analyses(
-            data, analyses=item.get("claim_analyses") or [],
-            target_ids=[cid for cid in item.get("target_claim_ids", []) if cid in data.claim_pool],
-            available_evidence_ids=item.get("available_evidence_ids") or list(data.evidence_pool),
-            model=item.get("model", "unknown"), language=item.get("language", "en"),
-            run_id=item.get("created_run_id", "legacy"), inherited_record=item, allow_cache=False,
-            cross_claim_explanation=item.get("cross_claim_explanation", ""))
-        moved.append({"batch_mapping_id": old_id, **result})
-    return moved
+    return {
+        "mapping_ids_by_claim": saved,
+        "issues": issues,
+        "missing_claim_ids": [cid for cid in targets if cid not in saved],
+    }
 
 
 def completed_mapping_evidence(data, mapping_ids):
@@ -292,6 +244,15 @@ def completed_mapping_evidence(data, mapping_ids):
         record = data.mappings.get(mid) or {}
         if record.get("status") != "completed" or record.get("paper_revision") != data.paper_revision:
             continue
-        for analysis in record.get("claim_analyses") or []:
-            ids.extend(eid for eid in analysis.get("evidence_ids_used") or [] if eid in data.evidence_pool)
+        analysis = record.get("claim_analysis")
+
+        if not isinstance(analysis, dict):
+            historical = record.get("claim_analyses") or []
+            analysis = historical[0] if len(historical) == 1 else {}
+
+        ids.extend(
+            eid
+            for eid in analysis.get("evidence_ids_used") or []
+            if eid in data.evidence_pool
+        )
     return _unique(ids)

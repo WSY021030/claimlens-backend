@@ -177,9 +177,6 @@ class AnalysisDocument(BaseModel):
         str, dict[str, Any]
     ] = Field(default_factory=dict)
 
-    direct_evidence_searches: dict[str, dict[str, Any]] = Field(
-        default_factory=dict
-    )
 
     runs: list[dict[str, Any]] = Field(
         default_factory=list
@@ -194,11 +191,6 @@ class AnalysisDocument(BaseModel):
     # One current Mapping pointer per Claim. Superseded unbound versions are pruned.
     mapping_by_claim: dict[str, str] = Field(default_factory=dict)
 
-    # Cross-Claim interpretations are not part of a single Claim Mapping.
-    mapping_relations: dict[str, Any] = Field(default_factory=dict)
-
-    # Only an actively referenced legacy batch remains until its request ends.
-    mapping_batch_archive: dict[str, Any] = Field(default_factory=dict)
 
 MappingEvidenceRelationType = Literal[
     "supports", "contradicts", "qualifies", "context", "insufficient_support"
@@ -250,5 +242,6 @@ class MappingClaimAnalysis(BaseModel):
 
 
 class MappingExtraction(BaseModel):
-    claim_analyses: list[MappingClaimAnalysis]
-    cross_claim_explanation: str
+    """Exactly one independent analysis for exactly one Claim."""
+
+    claim_analysis: MappingClaimAnalysis

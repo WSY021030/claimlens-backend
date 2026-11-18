@@ -1,3 +1,4 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """Persistent per-question budget for the Reader-v3 pipeline.
 
 Each user-question workflow has an independent configurable ceiling (default $0.50) with 10% headroom.
@@ -147,6 +148,8 @@ def prepare_request(kwargs: dict[str, Any]) -> tuple[dict[str, Any], Decimal, in
     schema = request.get("text_format")
     schema_bytes = len(json.dumps(schema.model_json_schema(), ensure_ascii=False).encode("utf-8")) if schema is not None else 0
     input_allowance = text_bytes + 2 * schema_bytes + 2048 + image_tokens
+    if family == "gpt-5.4" and input_allowance > 272000:
+        raise BudgetStop("GPT-5.4 request exceeds the checked short-context pricing range; no request sent.")
     rates = _prices_for(model)
     allowance = (Decimal(input_allowance) * rates[0] +
                  Decimal(request["max_output_tokens"]) * rates[2]) / Decimal(1000000)

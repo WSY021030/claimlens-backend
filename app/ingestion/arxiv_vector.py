@@ -146,20 +146,62 @@ def _clean_svg(svg: Tag) -> ET.Element:
     return dst
 
 
-def _size(node: ET.Element) -> tuple[float,float]:
-    def scalar(key):
-        val = node.get(key,'')
-        match = re.match(r'^\s*(\d+(?:\.\d+)?)(?:pt|px)?\s*$',val)
-        return float(match.group(1)) if match else None
-    w,h = scalar('width'),scalar('height')
-    vb = re.split(r'[\s,]+',node.get('viewBox','').strip())
-    if len(vb)==4:
-        try: w=w or float(vb[2]); h=h or float(vb[3])
-        except ValueError: pass
-    w,h = w or 640, h or 360
-    if not 1 <= w <= 5000 or not 1 <= h <= 5000:
-        raise ValueError('Invalid SVG dimensions')
-    return w,h
+def _size(node: ET.Element) -> tuple[float, float]:
+    """Return SVG dimensions in CSS pixels."""
+
+    def scalar(key: str) -> float | None:
+        value = node.get(key, "")
+
+        match = re.fullmatch(
+            r"\\s*(\\d+(?:\\.\\d+)?)(px|pt|in|cm|mm|pc)?\\s*",
+            value,
+            re.I,
+        )
+
+        if match is None:
+            return None
+
+        number = float(match.group(1))
+        unit = (match.group(2) or "px").lower()
+
+        factors = {
+            "px": 1.0,
+            "pt": 96.0 / 72.0,
+            "pc": 16.0,
+            "in": 96.0,
+            "cm": 96.0 / 2.54,
+            "mm": 96.0 / 25.4,
+        }
+
+        return number * factors[unit]
+
+    width = scalar("width")
+    height = scalar("height")
+
+    viewbox = re.split(
+        r"[\\s,]+",
+        node.get("viewBox", "").strip(),
+    )
+
+    if len(viewbox) == 4:
+        try:
+            if width is None:
+                width = float(viewbox[2])
+            if height is None:
+                height = float(viewbox[3])
+        except ValueError:
+            pass
+
+    width = width or 640.0
+    height = height or 360.0
+
+    if not (
+        1 <= width <= 5000
+        and 1 <= height <= 5000
+    ):
+        raise ValueError("Invalid SVG dimensions.")
+
+    return width, height
 
 
 def _raster(img: Tag, bundle: HTMLBundle):
@@ -216,6 +258,7 @@ def _raster(img: Tag, bundle: HTMLBundle):
     return image,float(w),float(h)
 
 
+
 def render_figure_svg(bundle: HTMLBundle, original_html_id: str, *, allow_cell: bool = False):
     """Returns (sanitized SVG bytes, preserved visual panel count).
 
@@ -244,6 +287,34 @@ def render_figure_svg(bundle: HTMLBundle, original_html_id: str, *, allow_cell: 
             failures+=1
     if not panels or len(panels)>24 or failures:
         return None,len(panels)
+
+    # ARXIV_NATIVE_SVG_PRESERVATION_V2
+    # Preserve the original sanitized SVG viewport and its units.
+    # Do not embed a pt-sized SVG inside a px-sized wrapper.
+    if (
+        len(panels) == 1
+        and _lname(panels[0][0].tag) == "svg"
+    ):
+        result = ET.tostring(
+            panels[0][0],
+            encoding="utf8",
+            xml_declaration=True,
+        )
+
+        if any(
+            unsafe in result.lower()
+            for unsafe in (
+                b"<script",
+                b"javascript:",
+                b"<iframe",
+            )
+        ):
+            raise ValueError("Unsafe content in sanitized SVG.")
+
+        return result, 1
+
+
+
     columns=1 if len(panels)==1 else 2
     gap=18
     cell_width=min(1100,max(max(p[1] for p in panels),240))

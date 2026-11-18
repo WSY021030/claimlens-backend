@@ -20,7 +20,7 @@ from app.core.retired_associations import clean_analysis_payload, clean_checkpoi
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXED_OUTPUTS = ("display.json", "response.json", "selected_claims.json")
 PROTECTED = ("claim_pool", "evidence_pool", "mappings", "mapping_by_claim",
-             "mapping_relations", "mapping_batch_archive", "completed_claim_windows",
+             "completed_claim_windows",
              "completed_evidence_scans", "evidence_image_candidates", "id_counters")
 
 

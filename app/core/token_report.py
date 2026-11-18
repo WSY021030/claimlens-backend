@@ -23,7 +23,7 @@ def task_token_report(run, all_runs=None):
             child_ids.add(candidate.get("run_id"))
     for candidate in all_runs or []:
         if candidate.get("run_id") in child_ids and candidate.get("stage") in {
-                "claim", "evidence", "mapping", "direct_evidence"}:
+                "claim", "evidence", "mapping"}:
             report = candidate.get("api_cost_report")
             if report is not None:
                 reports.append(report)

@@ -6,6 +6,7 @@ judgments, budget IDs, or completed scan hashes.
 """
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 SOURCE_SCAN_POLICY = "source_scan_v1"
@@ -14,11 +15,11 @@ _RETIRED_FIELDS = frozenset({
     "links", "claim_evidence_links", "new_links", "unresolved_links",
     "superseded_links", "link_generation_enabled", "existing_pool_matches",
     "link_count", "links_count", "link_ids",
+    "mapping_relations", "mapping_batch_archive", "cross_claim_explanation",
 })
 # These are scientific source/results, not candidate-association checkpoints.
 _PRESERVED_POOLS = frozenset({
-    "claim_pool", "evidence_pool", "mappings", "mapping_batch_archive",
-    "mapping_relations",
+    "claim_pool", "evidence_pool", "mappings",
 })
 
 
@@ -74,4 +75,84 @@ def clean_analysis_payload(payload: dict[str, Any], *,
     """
     if not isinstance(payload, dict):
         raise TypeError("Reader analysis must be a JSON object.")
-    return clean_checkpoint(payload, removed=removed)
+    # Never discard scientific results or historical batches implicitly.
+    for field in ("mapping_relations", "mapping_batch_archive"):
+        if payload.get(field):
+            raise ValueError(
+                f"Nonempty retired Mapping pool: {field}. "
+                "Migrate this file separately before saving."
+            )
+
+    result = clean_checkpoint(payload, removed=removed)
+
+    mappings = result.get("mappings")
+
+    if mappings is None:
+        return result
+
+    if not isinstance(mappings, dict):
+        raise ValueError("Mapping storage must be an object.")
+
+    normalized = {}
+
+    for mid, original in mappings.items():
+        if not isinstance(original, dict):
+            raise ValueError(f"Invalid Mapping record: {mid}")
+
+        record = deepcopy(original)
+        cid = record.get("claim_id")
+        targets = record.get("target_claim_ids") or []
+
+        if len(targets) > 1 or (targets and targets != [cid]):
+            raise ValueError(
+                f"Grouped Mapping requires migration: {mid}"
+            )
+
+        historical = record.pop("claim_analyses", None)
+        singular = record.get("claim_analysis")
+
+        if historical is not None:
+            if (
+                not isinstance(historical, list)
+                or len(historical) != 1
+                or not isinstance(historical[0], dict)
+                or historical[0].get("claim_id") != cid
+                or (
+                    singular is not None
+                    and historical[0] != singular
+                )
+            ):
+                raise ValueError(
+                    f"Unconvertible historical Mapping: {mid}"
+                )
+
+            record["claim_analysis"] = deepcopy(
+                historical[0]
+            )
+
+        analysis = record.get("claim_analysis")
+
+        if analysis is not None and (
+            not isinstance(analysis, dict)
+            or analysis.get("claim_id") != cid
+        ):
+            raise ValueError(
+                f"Invalid single-Claim Mapping: {mid}"
+            )
+
+        if (
+            analysis is None
+            and record.get("status") == "completed"
+        ):
+            raise ValueError(
+                f"Completed Mapping has no analysis: {mid}"
+            )
+
+        record.pop("cross_claim_explanation", None)
+        record.pop("context_claim_ids", None)
+
+        normalized[mid] = record
+
+    result["mappings"] = normalized
+
+    return result

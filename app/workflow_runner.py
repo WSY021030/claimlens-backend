@@ -1,3 +1,4 @@
+# MAPPING_MODEL_INTEGRATION_V1
 """One question lifecycle: plan -> collect/reuse -> review -> Mapping -> answer.
 
 The same lifecycle handles a new paper and later questions. Agent results live
@@ -19,6 +20,7 @@ from time import perf_counter
 from uuid import uuid4
 
 from app.agents.coordinator_agent import CoordinatorAgent
+from app.agents.mapping_agent import mapping_model_for_run, MAPPING_REASONING_EFFORT
 from app.budget import HARD_LIMIT, PaperBudget, QUESTION_BUDGET_ENV, QUESTION_LIMIT_ENV, money
 from app.core.token_report import task_token_report, print_task_tokens
 from app.core.table_context import audits_for_packet
@@ -37,7 +39,6 @@ from app.core.request_contract import (
     enforce_plan_targets, evidence_boundary, question_context_note,
 )
 from app.core.mapping_views import bind_saved_task, display_view
-from app.direct_evidence_runner import direct_search_key
 from app.table_fact_lookup import (
     covering_evidence_ids, render_exact_table_answer, resolve_exact_table_lookup,
     verified_numeric_comparison, render_numeric_comparison,
@@ -304,7 +305,7 @@ def strict_evidence_required(session, task, requirements):
     """Optional safety gate for argument-analysis tasks with selected Claims.
 
     Ordinary runs, including existing ACM/IEEE workflows, are unchanged unless
-    --strict-evidence-coverage is explicitly enabled. Direct Evidence and
+    --strict-evidence-coverage is explicitly enabled. Non-Mapping and
     Claim-only operations do not require a Claim-focused Evidence receipt.
     """
     return bool(
@@ -346,7 +347,14 @@ def strict_evidence_complete(session, task, requirements):
 def collect_evidence(session, task, missing=()):
     sections, elements, whole = evidence_scope(session, task)
     cids = task.scope.claim_ids
-    if cids and not completed_evidence(session, task):
+    if not cids:
+        session.state(task)[
+            "evidence_discovery_skipped"
+        ] = "no_target_claims"
+        session.save()
+        return
+
+    if not completed_evidence(session, task):
         attempts = session.local_attempts.get(task.task_id, 0)
         session.local_attempts[task.task_id] = attempts + 1
         batch_size = max(1, 6 // (2 ** attempts))
@@ -361,26 +369,6 @@ def collect_evidence(session, task, missing=()):
             for eid in sorted(elements):
                 cmd += ["--source-element-id", eid]
         session.child("evidence", cmd)
-    else:
-        # A direct focused lookup supplements saved material without fabricating
-        # new Claims or candidate-association records. The ordinary Evidence Agent runs it.
-        focus = task.goal
-        if missing:
-            focus += "\nLocate the following requested source material: " + "; ".join(missing)
-        key = direct_search_key(session.paper, question=focus, model=session.args.model,
-            image_mode=session.args.image_mode, section_ids=sections, element_ids=elements)
-        if (session.data.direct_evidence_searches.get(key) or {}).get("status") == "completed":
-            return
-        cmd = ["app.direct_evidence_runner", "--paper", str(session.paper_path),
-               "--question", focus, "--model", session.args.model,
-               "--image-mode", session.args.image_mode]
-        if not whole:
-            for sid in sorted(sections):
-                cmd += ["--section", sid]
-            for eid in sorted(elements):
-                cmd += ["--element-id", eid]
-        session.child("direct_evidence", cmd)
-
 
 def expand_requested_scope(session, task, review):
     section_ids, element_ids = review.additional_section_ids, review.additional_element_ids
@@ -1330,6 +1318,8 @@ def run_workflow(args):
     store = AnalysisStore(path)
     data = store.load(paper)
     old_run = find_saved_run(data, args.resume_workflow) if args.resume_workflow else None
+    mapping_model = mapping_model_for_run(old_run, getattr(args, "mapping_model", None))
+    print("Mapping model:", mapping_model, "reasoning:", MAPPING_REASONING_EFFORT, flush=True)
     if old_run and old_run.get("paper_revision") != paper.revision:
         raise ValueError("Saved workflow and open paper revisions differ.")
     if args.preview and not (old_run or args.question or getattr(args, "request_file", None)):
@@ -1342,6 +1332,41 @@ def run_workflow(args):
     request = ReaderRequest.model_validate(contract["request"])
     if not args.resume_workflow:
         args.question = request.question
+
+    # Route selection-based questions before the legacy full-paper planner.
+    # The original Chatbot and explicit analysis operations remain unchanged.
+    if request.resolved_entry_mode() == "ask_ai":
+        if args.preview:
+            print(json.dumps({
+                "entry_mode": "ask_ai",
+                "paper_id": paper.paper_id,
+                "paper_revision": paper.revision,
+                "selection_segments": len(
+                    request.selection_context.segments
+                ),
+                "selection_element_ids": list(dict.fromkeys(
+                    span.element_id
+                    for span in request.selection_context.segments
+                )),
+                "source_policy": "selection_first",
+                "new_extraction_agents": False,
+                "scope_expansion_requires_approval": True,
+                "preview_only": True,
+            }, ensure_ascii=False, indent=2), flush=True)
+            return
+
+        from app.ask_ai_runner import run_ask_ai
+
+        run_ask_ai(
+            args=args,
+            paper=paper,
+            store=store,
+            data=data,
+            contract=contract,
+            old_run=old_run,
+        )
+        return
+
     if args.preview:
         preview_request_contract(args, paper, data, contract, old_run)
         return
@@ -1374,11 +1399,15 @@ def run_workflow(args):
                "issues": [], "created_mapping_ids": [], "used_mapping_ids": [],
                "answer": None, "answer_status": "unavailable"}
         run["question_budget_id"] = run["run_id"]
+        run["mapping_model"] = mapping_model
+        run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
         if args.strict_evidence_coverage:
             run["strict_evidence_coverage"] = True
         data.runs.append(run)
         store.save(data)
         plan = None
+    run["mapping_model"] = mapping_model
+    run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
     plan = adopt_request_contract(run, contract, plan, paper, data, args.language)
     before = {"claims": set(data.claim_pool), "evidence": set(data.evidence_pool),
               "mappings": set(data.mappings), "run_ids": {r.get("run_id") for r in data.runs}}
@@ -1528,7 +1557,7 @@ def run_workflow(args):
         run["current_phase"] = "mapping"
         session.save()
         execute_mappings(coordinator=coordinator, data=data, store=store, run=run, plan=plan,
-                         model=args.model, language=args.language, tracker=tracker, budget=budget,
+                         model=mapping_model, language=args.language, tracker=tracker, budget=budget,
                          paper=paper)
         run["current_phase"] = "answer"
         session.save()
@@ -1600,6 +1629,9 @@ def run_selected_analysis(args, resume_id: str | None = None):
     analysis_path = default_analysis_path(paper.paper_id)
     store = AnalysisStore(analysis_path)
     data = store.load(paper)
+    saved_run = find_saved_run(data, resume_id) if resume_id else None
+    mapping_model = mapping_model_for_run(saved_run, getattr(args, "mapping_model", None))
+    print("Mapping model:", mapping_model, "reasoning:", MAPPING_REASONING_EFFORT, flush=True)
     if resume_id:
         run = find_saved_run(data, resume_id)
         if run.get("mode") != "selected_analysis" or run.get("workflow_policy") != POLICY_VERSION:
@@ -1651,6 +1683,8 @@ def run_selected_analysis(args, resume_id: str | None = None):
             "task_plan": plan.model_dump(mode="json"),
         }
         run["question_budget_id"] = run["run_id"]
+        run["mapping_model"] = mapping_model
+        run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
         if args.preview:
             missing = [item for item in segments if not _is_fully_covered(
                 _completed_ranges(data, item["element_id"]),
@@ -1665,6 +1699,8 @@ def run_selected_analysis(args, resume_id: str | None = None):
         data.runs.append(run)
         store.save(data)
 
+    run["mapping_model"] = mapping_model
+    run["mapping_reasoning_effort"] = MAPPING_REASONING_EFFORT
     original_id = os.environ.get(QUESTION_BUDGET_ENV)
     original_limit = os.environ.get(QUESTION_LIMIT_ENV)
     os.environ[QUESTION_BUDGET_ENV] = run["run_id"]
@@ -1750,7 +1786,7 @@ def run_selected_analysis(args, resume_id: str | None = None):
         session.save()
         execute_mappings(
             coordinator=coordinator, data=session.data, store=store,
-            run=session.run, plan=plan, model=args.model, language=args.language,
+            run=session.run, plan=plan, model=mapping_model, language=args.language,
             tracker=tracker, budget=budget, paper=paper,
         )
         session.run["current_phase"] = "answer"
@@ -1804,6 +1840,16 @@ def main():
     parser.add_argument("--target-claim-id", action="append", default=[], help="Explicit Claim target; repeat for a selected set")
     parser.add_argument("--analysis-operation", choices=["auto", "explain_saved", "compare_saved", "analyze_claims", "refresh_claims"], default="auto")
     operation.add_argument("--resume-workflow")
+    parser.add_argument(
+        "--approve-scope",
+        action="store_true",
+        help="Approve the saved Ask AI scope proposal.",
+    )
+    parser.add_argument(
+        "--reject-scope",
+        action="store_true",
+        help="Decline the saved Ask AI scope proposal.",
+    )
     operation.add_argument("--selection-file", type=Path,
                            help="JSON with exact highlighted Paragraph.text ranges (Claim-only)")
     operation.add_argument("--analyze-selection-file", type=Path,
@@ -1812,6 +1858,8 @@ def main():
                         help="Permanently clear this paper's previous analysis before a new question")
     parser.add_argument("--question-limit-usd", type=float, default=None)
     parser.add_argument("--model", default="gpt-5.4-mini")
+    parser.add_argument("--mapping-model", default=None,
+                        help="Mapping only; new runs default to gpt-5.4-2026-03-05; resume keeps its saved model")
     parser.add_argument("--language", choices=["en", "zh"], default="en")
     parser.add_argument("--image-mode", choices=["none", "relevant", "all"], default="relevant")
     parser.add_argument("--focus-section", action="append", default=[])
@@ -1823,6 +1871,10 @@ def main():
     parser.add_argument("--strict-evidence-coverage", action="store_true",
                         help="Opt-in: require completed scoped Evidence scans before Mapping")
     args = parser.parse_args()
+    if args.approve_scope and args.reject_scope:
+        parser.error("Choose approval or rejection, not both.")
+    if (args.approve_scope or args.reject_scope) and not args.resume_workflow:
+        parser.error("Scope decisions require --resume-workflow.")
     if args.request_file:
         if not args.request_file.is_file():
             parser.error("The request JSON does not exist.")

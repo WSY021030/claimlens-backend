@@ -541,7 +541,18 @@ class ReadRepository:
         targets = (contract.get("target_claim_ids") or unique(cid for s in states.values() for cid in s.get("selected_claim_ids") or [])
                    or run.get("target_claim_ids") or run.get("claim_ids") or [])
         answer = run.get("answer")
-        answer = pick(answer, ("answer", "used_source_ids", "limitations")) if isinstance(answer, dict) else None
+        if isinstance(answer, dict):
+            fields = ("answer", "used_source_ids", "limitations")
+            if run.get("mode") == "ask_ai":
+                fields += (
+                    "used_claim_ids",
+                    "used_evidence_ids",
+                    "used_mapping_ids",
+                    "used_source_element_ids",
+                )
+            answer = pick(answer, fields)
+        else:
+            answer = None
         if run.get("status") in {"running", "queued"}:
             answer = None
         usage = run.get("token_usage_report") or run.get("api_cost_report") or {}
@@ -552,7 +563,7 @@ class ReadRepository:
                 issues.append({**pick(issue, ("type", "stage", "claim_id")), "message": safe_note(issue.get("message") or issue.get("type"))})
             else:
                 issues.append({"message": safe_note(issue)})
-        return {**self.meta(paper, revision), "workflow_id": run.get("run_id"),
+        result = {**self.meta(paper, revision), "workflow_id": run.get("run_id"),
                 "status": run.get("status", "ready"), "stage": run.get("stage"), "mode": run.get("mode"),
                 "question": run.get("user_question") or run.get("source_question"), "target_claim_ids": targets,
                 "answer_status": run.get("answer_status", "unavailable"), "answer": answer, "issues": issues,
@@ -561,6 +572,68 @@ class ReadRepository:
                 "token_usage": pick(usage, ("llm_calls_recorded", "input_tokens", "cached_input_tokens", "output_tokens", "total_tokens", "estimated_total_usd", "token_usage_completeness")),
                 "budget": pick(budget, ("question_budget_id", "limit_usd", "operating_limit_usd", "committed_usd", "remaining_usd", "blocked", "estimate_only")),
                 "note": "A saved result, not a new operation or chat-history listing. No model was invoked."}
+
+        if run.get("mode") == "ask_ai":
+            proposal = run.get("scope_proposal") or {}
+            decision = run.get("selection_decision") or {}
+
+            result["qa"] = {
+                "entry_mode": "ask_ai",
+                "outcome": run.get("qa_outcome"),
+                "scope_policy": run.get("scope_policy"),
+                "scope_used": run.get("scope_used") or "selection",
+                "selection": contract.get("selection_context"),
+                "selection_decision": pick(
+                    decision,
+                    (
+                        "relation",
+                        "answer_kind",
+                        "requested_layers",
+                        "selected_claim_ids",
+                        "reason",
+                    ),
+                ),
+                "selected_source_layers": list(
+                    run.get("selected_source_layers") or []
+                ),
+                "source_provenance": deepcopy(
+                    run.get("answer_source_provenance")
+                ) if answer and run.get("qa_outcome") == "answered" else None,
+                "material_collection": {
+                    "actions": deepcopy(run.get("qa_material_actions") or [])[-20:],
+                    "inventory": deepcopy(run.get("qa_material_inventory")),
+                    "gap": deepcopy(run.get("qa_material_gap")),
+                },
+                "answer_mode": run.get("qa_answer_mode"),
+                "answer_mode_fallback_reason": run.get("qa_answer_mode_fallback_reason"),
+                "mapping_trace": deepcopy(run.get("answer_mapping_trace"))
+                if answer and run.get("qa_outcome") == "answered" else None,
+                "used_sources": {
+                    "claim_ids": list(
+                        run.get("used_claim_ids") or []
+                    ) if answer else [],
+                    "evidence_ids": list(
+                        run.get("used_evidence_ids") or []
+                    ) if answer else [],
+                    "mapping_ids": list(
+                        run.get("used_mapping_ids") or []
+                    ) if answer else [],
+                    "source_element_ids": list(
+                        run.get("used_source_element_ids") or []
+                    ) if answer else [],
+                },
+                "scope_proposal": pick(
+                    proposal,
+                    ("mode", "section_ids", "section_titles", "approved", "reason"),
+                ) if proposal else None,
+                "scope_approval": deepcopy(run.get("scope_approval")),
+                "scope_decision": run.get("scope_decision"),
+                "missing_information": list(
+                    run.get("missing_information") or []
+                ),
+            }
+
+        return result
 
     def asset(self, paper_id, asset_id):
         paper = self.paper(paper_id)

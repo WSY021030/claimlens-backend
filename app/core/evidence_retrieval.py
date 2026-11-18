@@ -277,10 +277,6 @@ class EvidenceDataManager:
             if record.source_status == "located"
             and record.source_anchor is not None
             and (record.kind != "paragraph" or bool(_body(record)))
-            and not any(
-                same_claim_source(claim, record)
-                for claim in data.claim_pool.values()
-            )
         }
         redundant = redundant_table_ids(self.records)
         self.records = {eid: e for eid, e in self.records.items() if eid not in redundant}
@@ -387,6 +383,22 @@ class EvidenceDataManager:
             match = next((r for r in eligible if predicate(r)), None)
             if match:
                 protected.add(match["id"])
+        # Optionally include one previously read, same-section figure.
+        # Keep the existing byte cap and do not force expanded retrieval.
+        if not expanded:
+            section_visual = next(
+                (
+                    row for row in ranked
+                    if row["same_section"]
+                    and row["visual_observation"]
+                    and row["score"] >= peak * 0.16
+                    and self.records[row["id"]].kind == "figure"
+                    and bool(self.records[row["id"]].image_receipt)
+                ),
+                None,
+            )
+            if section_visual is not None and section_visual not in eligible:
+                eligible.append(section_visual)
         # Once a figure/table is a candidate, expose its available companion
         # modality records before deciding which record is actually useful.
         companion_sources = {self.records[r["id"]].source_element_id for r in eligible
@@ -397,6 +409,20 @@ class EvidenceDataManager:
                     eligible.append(r)
                 if r["visual_observation"]:
                     protected.add(r["id"])
+        # A lexical cutoff is a ranking aid, not a verdict that a source has
+        # no semantic value. Restore a small, bounded tail of source records
+        # before the usual packet byte cap is applied. This lets the Mapping
+        # model inspect complementary method facts and brief result statements
+        # that may use different wording than the Claim. Unlike a global
+        # include-all policy, large Evidence pools still have a bounded tail.
+        supplemental_recall_ids = []
+        max_candidate_records = 16
+        for row in ranked:
+            if len(eligible) >= max_candidate_records:
+                break
+            if row not in eligible:
+                eligible.append(row)
+                supplemental_recall_ids.append(row["id"])
         eligible.sort(key=lambda r: (r["id"] not in required, r["id"] not in protected,
                                      -r["score"], r["id"]))
         cap = self.limits.expanded_packet_bytes if expanded else self.limits.packet_bytes
@@ -429,7 +455,12 @@ class EvidenceDataManager:
                 "The target Claim and its anchor establish what the author said, not "
                 "why it is justified. All Claim-overlapping paragraph Evidence is excluded from Mapping "
                 "arguments; their absence here does not mean the paper lacks evidence. "
-                "Overlapping excerpts cannot bypass this source-level exclusion."
+                "Overlapping excerpts cannot bypass this source-level exclusion. "
+                "Distinguish measured observations from authors' summaries of them: "
+                "a written conclusion reports an interpretation, not independent "
+                "numeric confirmation. A falling absolute metric does not by itself "
+                "establish a rising improvement relative to a baseline. "
+                "Assess distinct Claim components separately when evidence permits."
             ),
         }
         origin = self.paper.elements.get(claim.source_element_id) if self.paper else None
@@ -478,6 +509,8 @@ class EvidenceDataManager:
             "direct_reference_sources_without_saved_evidence": missing_refs[:12],
             "additional_missing_reference_count": max(0, len(missing_refs) - 12),
             "expanded_view": expanded,
+            "supplemental_recall_records": len(supplemental_recall_ids),
+            "supplemental_recall_is_not_semantic_validation": True,
             "exact_claim_origin_records_omitted": len(origin_only_ids),
         }
         payload = compact_packet(payload)
@@ -493,6 +526,8 @@ class EvidenceDataManager:
             "exact_containment_duplicates": duplicates,
             "claim_origin_only_evidence_ids": origin_only_ids,
             "below_relevance_floor": [r["id"] for r in ranked if r not in eligible],
+            "supplemental_recall_ids": supplemental_recall_ids,
+            "supplemental_recall_limit": max_candidate_records,
             "missing_direct_source_ids": missing_refs,
             "scope_element_ids": sorted(allowed_element_ids) if allowed_element_ids is not None else None,
             "complete_recall_guaranteed": False,

@@ -129,7 +129,7 @@ def required_capabilities(
     """
 
     if intent == "fact_lookup":
-        # Direct Evidence discovery also handles simple source fact lookups.
+        # Source lookup requires material, not a Claim-guided Evidence scan.
         return ("evidence",)
 
     if intent in {"list_claims", "summarize_claims"}:
