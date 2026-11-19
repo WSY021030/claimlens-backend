@@ -1,0 +1,1874 @@
+{
+  "schema_version": "paper.v2",
+  "paper_id": "arxiv_2507_18022",
+  "revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+  "metadata": {
+    "title": "Does visualization help AI understand data?",
+    "source_platform": "arxiv",
+    "original_url": "https://arxiv.org/html/2507.18022v1?utm_source=chatgpt.com",
+    "authors": [
+      "Victoria R. Li Harvard University",
+      "Johnathan L. Sun 1 1 footnotemark: 1 Harvard University",
+      "Martin Wattenberg Harvard University, Google Research"
+    ],
+    "doi": null,
+    "year": null,
+    "publication": "arXiv:2507.18022"
+  },
+  "sections": [
+    {
+      "section_id": "sec_001",
+      "title": "Abstract",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": [
+        "para_0001"
+      ]
+    },
+    {
+      "section_id": "sec_002",
+      "title": "Introduction",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": [
+        "para_0002",
+        "para_0003",
+        "para_0004",
+        "para_0005",
+        "para_0006",
+        "para_0007",
+        "para_0008"
+      ]
+    },
+    {
+      "section_id": "sec_003",
+      "title": "Related work",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": []
+    },
+    {
+      "section_id": "sec_004",
+      "title": "LVLM Benchmarks",
+      "level": 4,
+      "parent_section_id": "sec_003",
+      "block_ids": [
+        "para_0009",
+        "para_0010"
+      ]
+    },
+    {
+      "section_id": "sec_005",
+      "title": "LVLMS and Visual Design",
+      "level": 4,
+      "parent_section_id": "sec_003",
+      "block_ids": [
+        "para_0011"
+      ]
+    },
+    {
+      "section_id": "sec_006",
+      "title": "Methods",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": []
+    },
+    {
+      "section_id": "sec_007",
+      "title": "Three Synthetic Dataset Settings",
+      "level": 2,
+      "parent_section_id": "sec_006",
+      "block_ids": [
+        "para_0012",
+        "fig_0001"
+      ]
+    },
+    {
+      "section_id": "sec_008",
+      "title": "Clusters",
+      "level": 4,
+      "parent_section_id": "sec_007",
+      "block_ids": [
+        "para_0013",
+        "para_0014"
+      ]
+    },
+    {
+      "section_id": "sec_009",
+      "title": "Parabola",
+      "level": 4,
+      "parent_section_id": "sec_007",
+      "block_ids": [
+        "para_0015",
+        "para_0016"
+      ]
+    },
+    {
+      "section_id": "sec_010",
+      "title": "Outlier",
+      "level": 4,
+      "parent_section_id": "sec_007",
+      "block_ids": [
+        "para_0017",
+        "para_0018"
+      ]
+    },
+    {
+      "section_id": "sec_011",
+      "title": "Five Model Input Conditions",
+      "level": 2,
+      "parent_section_id": "sec_006",
+      "block_ids": [
+        "para_0019",
+        "para_0020",
+        "para_0021",
+        "para_0022",
+        "para_0023",
+        "para_0024",
+        "table_0001"
+      ]
+    },
+    {
+      "section_id": "sec_012",
+      "title": "Response Classification",
+      "level": 4,
+      "parent_section_id": "sec_011",
+      "block_ids": [
+        "para_0025"
+      ]
+    },
+    {
+      "section_id": "sec_013",
+      "title": "Results",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": [
+        "para_0026"
+      ]
+    },
+    {
+      "section_id": "sec_014",
+      "title": "Clustering Pattern",
+      "level": 2,
+      "parent_section_id": "sec_013",
+      "block_ids": [
+        "fig_0002",
+        "para_0027",
+        "para_0028",
+        "para_0029",
+        "para_0030",
+        "para_0031"
+      ]
+    },
+    {
+      "section_id": "sec_015",
+      "title": "Parabolic Trend",
+      "level": 2,
+      "parent_section_id": "sec_013",
+      "block_ids": [
+        "fig_0003",
+        "para_0032",
+        "para_0033",
+        "para_0034",
+        "para_0035"
+      ]
+    },
+    {
+      "section_id": "sec_016",
+      "title": "Outlier Feature",
+      "level": 2,
+      "parent_section_id": "sec_013",
+      "block_ids": [
+        "fig_0004",
+        "para_0036",
+        "para_0037"
+      ]
+    },
+    {
+      "section_id": "sec_017",
+      "title": "General Trends",
+      "level": 2,
+      "parent_section_id": "sec_013",
+      "block_ids": [
+        "fig_0005",
+        "para_0038",
+        "para_0039",
+        "para_0040"
+      ]
+    },
+    {
+      "section_id": "sec_018",
+      "title": "Discussion and Conclusion",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": [
+        "para_0041",
+        "para_0042",
+        "para_0043",
+        "para_0044",
+        "para_0045",
+        "para_0046",
+        "para_0047",
+        "para_0048",
+        "para_0049"
+      ]
+    },
+    {
+      "section_id": "sec_019",
+      "title": "Acknowledgements",
+      "level": 1,
+      "parent_section_id": null,
+      "block_ids": [
+        "para_0050"
+      ]
+    },
+    {
+      "section_id": "sec_020",
+      "title": "Supplementary Materials",
+      "level": 2,
+      "parent_section_id": "sec_019",
+      "block_ids": [
+        "para_0051"
+      ]
+    }
+  ],
+  "elements": {
+    "para_0001": {
+      "kind": "paragraph",
+      "element_id": "para_0001",
+      "section_id": "sec_001",
+      "text": "Charts and graphs help people analyze data, but can they also be useful to AI systems? To investigate this question, we perform a series of experiments with two commercial vision-language models: GPT 4.1 and Claude 3.5. Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity. Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts. Our results are initial evidence that AI systems, like humans, can benefit from visualization.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "abstract1.1"
+    },
+    "para_0002": {
+      "kind": "paragraph",
+      "element_id": "para_0002",
+      "section_id": "sec_002",
+      "text": "For humans, visualization has long been essential for understanding our world’s large and high-dimensional datasets [20]. The recent incorporation of multi-modal artificial intelligence (AI) into question-answering and chat interfaces has created a new medium through which people explore complex data [11]. Widespread adoption of large vision-language models (LVLMs) in these emerging workflows raises the question: does visualization also help LVLMs with dataset analysis?",
+      "format_spans": [
+        {
+          "start": 417,
+          "end": 474,
+          "mark": "italic"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S1.p1.1"
+    },
+    "para_0003": {
+      "kind": "paragraph",
+      "element_id": "para_0003",
+      "section_id": "sec_002",
+      "text": "Although LVLMs excel at many evaluation benchmarks, they often struggle with unfamiliar data distributions and tasks [6]. Nevertheless, as their capabilities and application scaffolding improve, LVLMs are increasingly used for data and visual analysis [1, 11, 21]. AI systems are also increasingly “agentic”—entrusted to complete tasks autonomously. To drive insight generation across diverse application areas, such as scientific discovery, models must identify dataset features that may warrant further investigation [7].",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S1.p2.1"
+    },
+    "para_0004": {
+      "kind": "paragraph",
+      "element_id": "para_0004",
+      "section_id": "sec_002",
+      "text": "Improving data analysis skills would enhance models’ world comprehension abilities, both when deployed autonomously and as partners for human users. Moreover, if visualization proves useful for AI data analysis, researchers could open a new line of study focused on effective chart and graph design for an AI audience.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S1.p3.1"
+    },
+    "para_0005": {
+      "kind": "paragraph",
+      "element_id": "para_0005",
+      "section_id": "sec_002",
+      "text": "This paper presents an initial empirical investigation into the question of whether visualization can aid AI systems. Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions. For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone . Similarities in model behavior indicate that certain settings are well-suited to visualization-aided AI data analysis, while differences emphasize that visual designs could accommodate model idiosyncrasies. We find:",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:vis-abstract"
+      ],
+      "original_html_id": "S1.p4.1"
+    },
+    "para_0006": {
+      "kind": "paragraph",
+      "element_id": "para_0006",
+      "section_id": "sec_002",
+      "text": "•\nProviding a correct visualization, with or without raw data, helps GPT and Claude accurately identify (1) the number of clusters , (2) parabolic trend , and (3) potential outliers in datasets, outperforming conditions with data alone, data and a blank image, or data with an incorrect visualization.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "sec:clustering",
+        "sec:nonlinear",
+        "sec:outlier"
+      ],
+      "original_html_id": "S1.I1.i1"
+    },
+    "para_0007": {
+      "kind": "paragraph",
+      "element_id": "para_0007",
+      "section_id": "sec_002",
+      "text": "•\nModels’ performance gain given a correct plot grows with subtler tasks requiring more precise analysis, while inaccurate visualizations consistently impair model accuracy.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S1.I1.i2"
+    },
+    "para_0008": {
+      "kind": "paragraph",
+      "element_id": "para_0008",
+      "section_id": "sec_002",
+      "text": "•\nWhen shown only the visualization, models generate concise responses focused on salient dataset features; given raw data, models often compute dataset summary statistics .",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "sec:scale"
+      ],
+      "original_html_id": "S1.I1.i3"
+    },
+    "para_0009": {
+      "kind": "paragraph",
+      "element_id": "para_0009",
+      "section_id": "sec_004",
+      "text": "There exist many datasets for assessing LVLM chart understanding. For example, [2, 13, 15, 19] use tens of thousands of graphics to test models’ chart question-answering and summarization abilities. These evaluation tasks are often based on real-world examples where models are vulnerable to hallucination and training data leakage—analyzing an attached image not only based on its visual content but also unrelated domain knowledge. Different LVLMs also exhibit wide-ranging and faulty performances on these benchmarks, indicating that optimizing AI graphical understanding remains an open problem [3, 12, 17].",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S2.SS0.SSS0.Px1.p1.1"
+    },
+    "para_0010": {
+      "kind": "paragraph",
+      "element_id": "para_0010",
+      "section_id": "sec_004",
+      "text": "In these studies, full numerical datasets, which are available in real world data analysis settings, are often excluded from model inputs. Since LVLMs can perform statistical analyses, assessing their understanding of raw datasets in realistic contexts, especially in settings without data leakage issues, is under-explored [14].",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S2.SS0.SSS0.Px1.p2.1"
+    },
+    "para_0011": {
+      "kind": "paragraph",
+      "element_id": "para_0011",
+      "section_id": "sec_005",
+      "text": "Previous work has also investigated the visual literacy of LVLMs, including the impact of graphic design elements on their understanding of underlying datasets. [4] finds that LVLMs recognize plot titles, axes, and high-level trends, but are vulnerable to deceptive chart design or low-contrast color schemes. [16] shows that LVLMs perform poorly with stacked or stair plots; [18] describes how reducing space between points or words can lead to sharp drop-offs in LVLM visual understanding. [8] replicates a classic human visualization experiment judging chart proportions [5, 9], finding similarities between human and LVLM graphical perceptions for particular tasks and plot designs. These studies focus on understanding LVLM responses to visual representations without comparing them to data-only conditions.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S2.SS0.SSS0.Px2.p1.1"
+    },
+    "para_0012": {
+      "kind": "paragraph",
+      "element_id": "para_0012",
+      "section_id": "sec_007",
+      "text": "We base our experiments on synthetically generated data to easily vary key parameters and avoid data contamination. Our data represent three classic real-world tasks: cluster detection, identification of nonlinear trends, and outlier detection. Each task is split into four subtlety levels, and 100 datasets are independently sampled for each of the 12 task-subtlety combinations. Full reproduction code is provided in the supplemental materials.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:data-examples"
+      ],
+      "original_html_id": "S3.SS1.p1.1"
+    },
+    "fig_0001": {
+      "kind": "figure",
+      "element_id": "fig_0001",
+      "section_id": "sec_007",
+      "label": "Figure 1",
+      "caption": "The three dataset types and their subtlety spectrum. (1) Subtler cluster datasets exhibit more groupings, requiring precise identification. Misleading “wrong” visuals feature one Gaussian cluster. (2) Subtler parabola datasets contain fewer points beyond the vertex, while wrong visuals show linear best-fits. (3) Subtler outlier datasets have high vertical z -scores (distance from mean scaled by standard deviation), while wrong visuals remedy anomalous outliers.",
+      "caption_inline_assets": [],
+      "caption_format_spans": [],
+      "image_asset_id": "asset_0001",
+      "alt_text": "Refer to caption",
+      "original_html_id": "S3.F1"
+    },
+    "para_0013": {
+      "kind": "paragraph",
+      "element_id": "para_0013",
+      "section_id": "sec_008",
+      "text": "Datasets include 120 points evenly distributed among 2 to 5 cluster centers. Center coordinates are sampled uniformly from the range [0,10] , and, points around the centers are generated as Gaussians with standard deviation \\sigma=0.6 . To ensure distinct clusters, we discard datasets with points from different clusters less than 2 units apart. Dataset subtlety increases with more clusters.",
+      "format_spans": [],
+      "inline_math_spans": [
+        {
+          "start": 133,
+          "end": 139,
+          "mathml": "<math alttext=\"[0,10]\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px1.p1.m1\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">[</mo><mn>0</mn><mo>,</mo><mn>10</mn><mo stretchy=\"false\">]</mo></mrow><annotation encoding=\"application/x-tex\">[0,10]</annotation></semantics></math>",
+          "plain_text": "[0,10]"
+        },
+        {
+          "start": 224,
+          "end": 234,
+          "mathml": "<math alttext=\"\\sigma=0.6\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px1.p1.m2\" intent=\":literal\"><semantics><mrow><mi>σ</mi><mo>=</mo><mn>0.6</mn></mrow><annotation encoding=\"application/x-tex\">\\sigma=0.6</annotation></semantics></math>",
+          "plain_text": "\\sigma=0.6"
+        }
+      ],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px1.p1.1"
+    },
+    "para_0014": {
+      "kind": "paragraph",
+      "element_id": "para_0014",
+      "section_id": "sec_008",
+      "text": "Misleading visuals feature a single 120-point Gaussian cluster, centered at the mean of the original cluster centers, with \\sigma equal to half the maximum distance from this mean to those centers.",
+      "format_spans": [],
+      "inline_math_spans": [
+        {
+          "start": 123,
+          "end": 129,
+          "mathml": "<math alttext=\"\\sigma\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px1.p2.m1\" intent=\":literal\"><semantics><mi>σ</mi><annotation encoding=\"application/x-tex\">\\sigma</annotation></semantics></math>",
+          "plain_text": "\\sigma"
+        }
+      ],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px1.p2.1"
+    },
+    "para_0015": {
+      "kind": "paragraph",
+      "element_id": "para_0015",
+      "section_id": "sec_009",
+      "text": "These datasets contain 20 points generated along a parabolic curve defined as y=ax^{2}+bx . Coefficients a and b are uniformly drawn from [0,1] and [1,10] , respectively. We then randomly select a number n\\in{3,5,7,9} to determine how many points appear to the right of the parabola’s vertex. Points are evenly spaced along the x-axis. Gaussian noise and a random offset between 0 and 10 are added to both coordinates. Dataset subtlety increases as n decreases, making the parabolic trend less clear.",
+      "format_spans": [],
+      "inline_math_spans": [
+        {
+          "start": 78,
+          "end": 89,
+          "mathml": "<math alttext=\"y=ax^{2}+bx\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m1\" intent=\":literal\"><semantics><mrow><mi>y</mi><mo>=</mo><mrow><mrow><mi>a</mi><mo lspace=\"0em\" rspace=\"0em\">​</mo><msup><mi>x</mi><mn>2</mn></msup></mrow><mo>+</mo><mrow><mi>b</mi><mo lspace=\"0em\" rspace=\"0em\">​</mo><mi>x</mi></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">y=ax^{2}+bx</annotation></semantics></math>",
+          "plain_text": "y=ax^{2}+bx"
+        },
+        {
+          "start": 105,
+          "end": 106,
+          "mathml": "<math alttext=\"a\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m2\" intent=\":literal\"><semantics><mi>a</mi><annotation encoding=\"application/x-tex\">a</annotation></semantics></math>",
+          "plain_text": "a"
+        },
+        {
+          "start": 111,
+          "end": 112,
+          "mathml": "<math alttext=\"b\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m3\" intent=\":literal\"><semantics><mi>b</mi><annotation encoding=\"application/x-tex\">b</annotation></semantics></math>",
+          "plain_text": "b"
+        },
+        {
+          "start": 138,
+          "end": 143,
+          "mathml": "<math alttext=\"[0,1]\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m4\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy=\"false\">]</mo></mrow><annotation encoding=\"application/x-tex\">[0,1]</annotation></semantics></math>",
+          "plain_text": "[0,1]"
+        },
+        {
+          "start": 148,
+          "end": 154,
+          "mathml": "<math alttext=\"[1,10]\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m5\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">[</mo><mn>1</mn><mo>,</mo><mn>10</mn><mo stretchy=\"false\">]</mo></mrow><annotation encoding=\"application/x-tex\">[1,10]</annotation></semantics></math>",
+          "plain_text": "[1,10]"
+        },
+        {
+          "start": 204,
+          "end": 217,
+          "mathml": "<math alttext=\"n\\in{3,5,7,9}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m6\" intent=\":literal\"><semantics><mrow><mrow><mi>n</mi><mo>∈</mo><mn>3</mn></mrow><mo>,</mo><mn>5</mn><mo>,</mo><mn>7</mn><mo>,</mo><mn>9</mn></mrow><annotation encoding=\"application/x-tex\">n\\in{3,5,7,9}</annotation></semantics></math>",
+          "plain_text": "n\\in{3,5,7,9}"
+        },
+        {
+          "start": 449,
+          "end": 450,
+          "mathml": "<math alttext=\"n\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p1.m7\" intent=\":literal\"><semantics><mi>n</mi><annotation encoding=\"application/x-tex\">n</annotation></semantics></math>",
+          "plain_text": "n"
+        }
+      ],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px2.p1.1"
+    },
+    "para_0016": {
+      "kind": "paragraph",
+      "element_id": "para_0016",
+      "section_id": "sec_009",
+      "text": "Misleading visuals are the linear best-fit of the generated data, sampled at identical x values, with the same added Gaussian noise.",
+      "format_spans": [],
+      "inline_math_spans": [
+        {
+          "start": 87,
+          "end": 88,
+          "mathml": "<math alttext=\"x\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px2.p2.m1\" intent=\":literal\"><semantics><mi>x</mi><annotation encoding=\"application/x-tex\">x</annotation></semantics></math>",
+          "plain_text": "x"
+        }
+      ],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px2.p2.1"
+    },
+    "para_0017": {
+      "kind": "paragraph",
+      "element_id": "para_0017",
+      "section_id": "sec_010",
+      "text": "These datasets contain 50 points. Two endpoints (0,y_{1}) and (10,y_{2}) are randomly selected, with y_{1},y_{2} drawn from [0,10] . A line connecting these endpoints is then sampled at 20 equally spaced points along the x-axis before Gaussian noise proportional to the line’s slope is added to the y-coordinates, \\mathbf{y} . To create an outlier, one randomly selected point is vertically shifted to produce a jackknife residual greater than 2.5. Dataset subtlety increases as the outlier’s vertical z score, defined as (y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}} (where \\bar{y} and s_{\\mathbf{y}} are the mean and standard deviation of \\mathbf{y} , respectively), decreases.",
+      "format_spans": [],
+      "inline_math_spans": [
+        {
+          "start": 48,
+          "end": 57,
+          "mathml": "<math alttext=\"(0,y_{1})\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m1\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">(</mo><mn>0</mn><mo>,</mo><msub><mi>y</mi><mn>1</mn></msub><mo stretchy=\"false\">)</mo></mrow><annotation encoding=\"application/x-tex\">(0,y_{1})</annotation></semantics></math>",
+          "plain_text": "(0,y_{1})"
+        },
+        {
+          "start": 62,
+          "end": 72,
+          "mathml": "<math alttext=\"(10,y_{2})\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m2\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">(</mo><mn>10</mn><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo stretchy=\"false\">)</mo></mrow><annotation encoding=\"application/x-tex\">(10,y_{2})</annotation></semantics></math>",
+          "plain_text": "(10,y_{2})"
+        },
+        {
+          "start": 101,
+          "end": 112,
+          "mathml": "<math alttext=\"y_{1},y_{2}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m3\" intent=\":literal\"><semantics><mrow><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub></mrow><annotation encoding=\"application/x-tex\">y_{1},y_{2}</annotation></semantics></math>",
+          "plain_text": "y_{1},y_{2}"
+        },
+        {
+          "start": 124,
+          "end": 130,
+          "mathml": "<math alttext=\"[0,10]\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m4\" intent=\":literal\"><semantics><mrow><mo stretchy=\"false\">[</mo><mn>0</mn><mo>,</mo><mn>10</mn><mo stretchy=\"false\">]</mo></mrow><annotation encoding=\"application/x-tex\">[0,10]</annotation></semantics></math>",
+          "plain_text": "[0,10]"
+        },
+        {
+          "start": 314,
+          "end": 324,
+          "mathml": "<math alttext=\"\\mathbf{y}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m5\" intent=\":literal\"><semantics><mi>𝐲</mi><annotation encoding=\"application/x-tex\">\\mathbf{y}</annotation></semantics></math>",
+          "plain_text": "\\mathbf{y}"
+        },
+        {
+          "start": 502,
+          "end": 503,
+          "mathml": "<math alttext=\"z\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m6\" intent=\":literal\"><semantics><mi>z</mi><annotation encoding=\"application/x-tex\">z</annotation></semantics></math>",
+          "plain_text": "z"
+        },
+        {
+          "start": 522,
+          "end": 557,
+          "mathml": "<math alttext=\"(y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m7\" intent=\":literal\"><semantics><mrow><mrow><mo stretchy=\"false\">(</mo><mrow><mi>y</mi><mo>−</mo><mover accent=\"true\"><mi>𝐲</mi><mo>¯</mo></mover></mrow><mo stretchy=\"false\">)</mo></mrow><mo>/</mo><msub><mi>s</mi><mi>𝐲</mi></msub></mrow><annotation encoding=\"application/x-tex\">(y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}}</annotation></semantics></math>",
+          "plain_text": "(y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}}"
+        },
+        {
+          "start": 565,
+          "end": 572,
+          "mathml": "<math alttext=\"\\bar{y}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m8\" intent=\":literal\"><semantics><mover accent=\"true\"><mi>y</mi><mo>¯</mo></mover><annotation encoding=\"application/x-tex\">\\bar{y}</annotation></semantics></math>",
+          "plain_text": "\\bar{y}"
+        },
+        {
+          "start": 577,
+          "end": 591,
+          "mathml": "<math alttext=\"s_{\\mathbf{y}}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m9\" intent=\":literal\"><semantics><msub><mi>s</mi><mi>𝐲</mi></msub><annotation encoding=\"application/x-tex\">s_{\\mathbf{y}}</annotation></semantics></math>",
+          "plain_text": "s_{\\mathbf{y}}"
+        },
+        {
+          "start": 631,
+          "end": 641,
+          "mathml": "<math alttext=\"\\mathbf{y}\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS1.SSS0.Px3.p1.m10\" intent=\":literal\"><semantics><mi>𝐲</mi><annotation encoding=\"application/x-tex\">\\mathbf{y}</annotation></semantics></math>",
+          "plain_text": "\\mathbf{y}"
+        }
+      ],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px3.p1.1"
+    },
+    "para_0018": {
+      "kind": "paragraph",
+      "element_id": "para_0018",
+      "section_id": "sec_010",
+      "text": "Misleading visuals depict the data prior to outlier perturbation.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.SS1.SSS0.Px3.p2.1"
+    },
+    "para_0019": {
+      "kind": "paragraph",
+      "element_id": "para_0019",
+      "section_id": "sec_011",
+      "text": "We prompt two models to identify patterns, trends, and features of interest in data via their APIs: GPT 4.1 (gpt-4.1-2025-04-14) and Claude 3.5 (claude-3-5-sonnet-20241022) . Generated synthetic datasets are randomly shuffled and provided to the models as space-separated values rounded to four significant figures. All data visualizations are default Matplotlib scatterplots, 6.4 by 4.8 inches with blue points on automatically rescaled, unlabeled axes [10]. We encode plots at 300 dots-per-inch resolution in base64 for API input. For each model, setting, and subtlety level, we evaluate five experimental conditions:",
+      "format_spans": [
+        {
+          "start": 109,
+          "end": 127,
+          "mark": "code"
+        },
+        {
+          "start": 145,
+          "end": 171,
+          "mark": "code"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:vis-abstract",
+        "fig:data-examples"
+      ],
+      "original_html_id": "S3.SS2.p1.1"
+    },
+    "para_0020": {
+      "kind": "paragraph",
+      "element_id": "para_0020",
+      "section_id": "sec_011",
+      "text": "1.\nData Only: Just the raw dataset as a baseline condition.",
+      "format_spans": [
+        {
+          "start": 3,
+          "end": 13,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.I1.i1"
+    },
+    "para_0021": {
+      "kind": "paragraph",
+      "element_id": "para_0021",
+      "section_id": "sec_011",
+      "text": "2.\nData & Blank: An all-white image controlling for visual input itself separate from visual information impacting performance.",
+      "format_spans": [
+        {
+          "start": 3,
+          "end": 16,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.I1.i2"
+    },
+    "para_0022": {
+      "kind": "paragraph",
+      "element_id": "para_0022",
+      "section_id": "sec_011",
+      "text": "3.\nData & Wrong: Misleading visualization to test whether discrepant visual information degrades LVLM judgments.",
+      "format_spans": [
+        {
+          "start": 3,
+          "end": 16,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.I1.i3"
+    },
+    "para_0023": {
+      "kind": "paragraph",
+      "element_id": "para_0023",
+      "section_id": "sec_011",
+      "text": "4.\nData & Correct: Including the plot displaying the datapoints.",
+      "format_spans": [
+        {
+          "start": 3,
+          "end": 18,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.I1.i4"
+    },
+    "para_0024": {
+      "kind": "paragraph",
+      "element_id": "para_0024",
+      "section_id": "sec_011",
+      "text": "5.\nCorrect Only: Scatterplot alone to assess visual understanding.",
+      "format_spans": [
+        {
+          "start": 3,
+          "end": 16,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S3.I1.i5"
+    },
+    "table_0001": {
+      "kind": "table",
+      "element_id": "table_0001",
+      "section_id": "sec_011",
+      "label": "Table 1",
+      "caption": "Criteria for judging if an LVLM response is a “success.” We classify if responses (1) enumerate clusters, (2) detect a parabolic trend, and (3) identify the correct outlier.",
+      "representation": "structured",
+      "grid": {
+        "cells": [
+          {
+            "cell_id": "cell_0001_0001",
+            "original_html_id": "S3.T1.1.1.1",
+            "image_asset_id": null,
+            "row": 0,
+            "col": 0,
+            "text": "o X[2.11,l]—X[8,l] Setting",
+            "role": "column_header",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0002",
+            "original_html_id": "S3.T1.1.1.2",
+            "image_asset_id": null,
+            "row": 0,
+            "col": 1,
+            "text": "Response Classification",
+            "role": "column_header",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0003",
+            "original_html_id": "S3.T1.1.2.1",
+            "image_asset_id": null,
+            "row": 1,
+            "col": 0,
+            "text": "Clustering [LVLM Judge]",
+            "role": "column_header",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0004",
+            "original_html_id": "S3.T1.1.2.2",
+            "image_asset_id": null,
+            "row": 1,
+            "col": 1,
+            "text": "A Gemini judge determines how many clusters, if any, have been explicitly determined or enumerated.",
+            "role": "data",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0005",
+            "original_html_id": "S3.T1.1.3.1",
+            "image_asset_id": null,
+            "row": 2,
+            "col": 0,
+            "text": "Parabola [Keyword]",
+            "role": "column_header",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0006",
+            "original_html_id": "S3.T1.1.3.2",
+            "image_asset_id": null,
+            "row": 2,
+            "col": 1,
+            "text": "A string matcher looks only for ‘quadratic,’ ‘parabola,’ ‘parabolic,’ ‘concave,’ or ‘opens down.’ It excludes broader terms like ‘polynomial,’ ‘curved’ or ‘nonlinear.’",
+            "role": "data",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0007",
+            "original_html_id": "S3.T1.1.4.1",
+            "image_asset_id": null,
+            "row": 3,
+            "col": 0,
+            "text": "Outlier [LVLM Judge]",
+            "role": "column_header",
+            "rowspan": 1,
+            "colspan": 1
+          },
+          {
+            "cell_id": "cell_0001_0008",
+            "original_html_id": "S3.T1.1.4.2",
+            "image_asset_id": null,
+            "row": 3,
+            "col": 1,
+            "text": "A Gemini judge verifies that a provided correct anomalous point is explicitly flagged as an outlier.",
+            "role": "data",
+            "rowspan": 1,
+            "colspan": 1
+          }
+        ]
+      },
+      "image_asset_id": null,
+      "recognition_status": "not_needed",
+      "original_html_id": "S3.T1"
+    },
+    "para_0025": {
+      "kind": "paragraph",
+      "element_id": "para_0025",
+      "section_id": "sec_012",
+      "text": "We use keyword search-based evaluation for one task—parabola detection—because responses largely use specific terms to describe a trend as parabolic. In contrast, the other two tasks require more nuanced evaluation: determining the exact number of clusters mentioned and if a particular point was identified as an outlier. As a result, we use a third separately developed LVLM (gemini-2.5-flash-06-17) for output classification in the clustering and outlier tasks. {\\sim}10 % of evaluations were manually verified .",
+      "format_spans": [
+        {
+          "start": 378,
+          "end": 400,
+          "mark": "code"
+        }
+      ],
+      "inline_math_spans": [
+        {
+          "start": 465,
+          "end": 473,
+          "mathml": "<math alttext=\"{\\sim}10\" class=\"ltx_Math\" display=\"inline\" id=\"S3.SS2.SSS0.Px1.p1.m1\" intent=\":literal\"><semantics><mrow><mphantom></mphantom><mo>∼</mo><mn>10</mn></mrow><annotation encoding=\"application/x-tex\">{\\sim}10</annotation></semantics></math>",
+          "plain_text": "{\\sim}10"
+        }
+      ],
+      "unresolved_crossrefs": [
+        "tab:scoring-criteria"
+      ],
+      "original_html_id": "S3.SS2.SSS0.Px1.p1.1"
+    },
+    "para_0026": {
+      "kind": "paragraph",
+      "element_id": "para_0026",
+      "section_id": "sec_013",
+      "text": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding. Across settings, performance uplift grows with dataset subtlety.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.p1.1"
+    },
+    "fig_0002": {
+      "kind": "figure",
+      "element_id": "fig_0002",
+      "section_id": "sec_014",
+      "label": "Figure 2",
+      "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets . Success counts are shown for datasets containing two to five clusters. GPT consistently shows significant benefits from accurate visuals, while Claude benefits less when datasets are more subtle.",
+      "caption_inline_assets": [],
+      "caption_format_spans": [],
+      "image_asset_id": "asset_0002",
+      "alt_text": null,
+      "original_html_id": "S4.F2"
+    },
+    "para_0027": {
+      "kind": "paragraph",
+      "element_id": "para_0027",
+      "section_id": "sec_014",
+      "text": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets. Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:clustering_plot"
+      ],
+      "original_html_id": "S4.SS1.p1.1"
+    },
+    "para_0028": {
+      "kind": "paragraph",
+      "element_id": "para_0028",
+      "section_id": "sec_014",
+      "text": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision. With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS1.p2.1"
+    },
+    "para_0029": {
+      "kind": "paragraph",
+      "element_id": "para_0029",
+      "section_id": "sec_014",
+      "text": "This performance gap is driven by a sharp decline in cluster identification accuracy in the “Data Only,” “Data & Blank,” and “Data & Wrong” conditions between the 2- and 3-cluster dataset settings. This drop-off indicates LVLM dataset comprehension based solely on raw numerical inputs can be brittle. Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5. Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS1.p3.1"
+    },
+    "para_0030": {
+      "kind": "paragraph",
+      "element_id": "para_0030",
+      "section_id": "sec_014",
+      "text": "Across all conditions, both models almost always fail by underestimating the number of clusters in datasets. Moreover, when it fails, Claude misidentifies the number of clusters in 5-cluster datasets by more than one in 51% of responses with the data alone compared to 8% of responses with correct visuals, suggesting that even when absolute accuracy declines, visuals may benefit data analysis by reducing the magnitude of LVLM errors.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS1.p4.1"
+    },
+    "para_0031": {
+      "kind": "paragraph",
+      "element_id": "para_0031",
+      "section_id": "sec_014",
+      "text": "Conversely, including misleading visualizations consistently leads to the worst performance across conditions for both models. Although the incorrect visual displays one cluster, in this case, both models tend to output 2 regardless of subtlety level. Evaluating responses with an LVLM, we also classify if responses mention that the included visualization disagrees with the provided data. Combined, GPT and Claude only mention a discrepancy in 7 out of 800 deceptive trials, indicating that models may silently fail, impacted by both numeric and visual inputs, given mismatches in its prompt.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS1.p5.1"
+    },
+    "fig_0003": {
+      "kind": "figure",
+      "element_id": "fig_0003",
+      "section_id": "sec_015",
+      "label": "Figure 3",
+      "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in input datasets . Success counts are presented for scenarios with 3 to 9 points sampled beyond the vertex. At higher subtlety levels, providing only an accurate plot results in better performance for both models than providing the data and plot.",
+      "caption_inline_assets": [],
+      "caption_format_spans": [],
+      "image_asset_id": "asset_0003",
+      "alt_text": null,
+      "original_html_id": "S4.F3"
+    },
+    "para_0032": {
+      "kind": "paragraph",
+      "element_id": "para_0032",
+      "section_id": "sec_015",
+      "text": "Similar to the cluster counting task, Claude and GPT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases. Again, the “Data & Wrong” condition consistently induces the worst performance . This trend is particularly pronounced for parabola datasets: across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more than half compared to any other condition.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:clustering_plot",
+        "fig:nonlinearity_plot"
+      ],
+      "original_html_id": "S4.SS2.p1.1"
+    },
+    "para_0033": {
+      "kind": "paragraph",
+      "element_id": "para_0033",
+      "section_id": "sec_015",
+      "text": "Since this is a substantial effect, we further analyze the impact of misleading linear visualizations on parabolic datasets. Across models, broad trend descriptors like “nonlinear” or “curved” are common in the “Data Only” and “Data & Blank” conditions, but their frequency decreases up to eightfold with a misleading visual. This finding underscores the significant influence visualization could have on AI—including a graphic can override a model’s interpretation and discussion of raw data.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS2.p2.1"
+    },
+    "para_0034": {
+      "kind": "paragraph",
+      "element_id": "para_0034",
+      "section_id": "sec_015",
+      "text": "There are also notable differences between the clustering and parabolic settings. For all cluster datasets, models achieve non-zero success counts, but for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting. At this level, Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS2.p3.1"
+    },
+    "para_0035": {
+      "kind": "paragraph",
+      "element_id": "para_0035",
+      "section_id": "sec_015",
+      "text": "Moreover, while models showed minimal performance differences between the “Data & Correct” and “Correct Only” conditions for clustering datasets , for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others. For instance, when Claude is presented with datasets containing 5 points beyond a parabola’s vertex, including data alongside the correct scatterplot reduces performance by a factor of 3.7. GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex. Determining the scenarios where visualizations alone provide more useful input relative to raw data could guide better design of AI-assisted data analysis tools.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:clustering_plot"
+      ],
+      "original_html_id": "S4.SS2.p4.1"
+    },
+    "fig_0004": {
+      "kind": "figure",
+      "element_id": "fig_0004",
+      "section_id": "sec_016",
+      "label": "Figure 4",
+      "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier in input datasets . Success counts are presented for scenarios with binned {\\leq}1 to {>}3 vertical z -scores. As subtlety increases, both models’ performance gradually decline, especially without accurate visuals.",
+      "caption_inline_assets": [],
+      "caption_format_spans": [],
+      "image_asset_id": "asset_0004",
+      "alt_text": null,
+      "original_html_id": "S4.F4"
+    },
+    "para_0036": {
+      "kind": "paragraph",
+      "element_id": "para_0036",
+      "section_id": "sec_016",
+      "text": "Finally, visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety. The misleading “Data & Wrong” condition also remains worse than other conditions .",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:oulier-plt"
+      ],
+      "original_html_id": "S4.SS3.p1.1"
+    },
+    "para_0037": {
+      "kind": "paragraph",
+      "element_id": "para_0037",
+      "section_id": "sec_016",
+      "text": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot. This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parabolic trend).",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS3.p2.1"
+    },
+    "fig_0005": {
+      "kind": "figure",
+      "element_id": "fig_0005",
+      "section_id": "sec_017",
+      "label": "Figure 5",
+      "caption": "Representative output token counts in the outlier detection setting . Without a visual, GPT often outputs the entire dataset before analyzing it. For both GPT and Claude, providing only the correct visual leads to the most concise answers.",
+      "caption_inline_assets": [],
+      "caption_format_spans": [],
+      "image_asset_id": "asset_0005",
+      "alt_text": null,
+      "original_html_id": "S4.F5"
+    },
+    "para_0038": {
+      "kind": "paragraph",
+      "element_id": "para_0038",
+      "section_id": "sec_017",
+      "text": "We also summarize some overall observations across settings. First, model responses vary greatly in length. On average across all datasets and conditions, Claude responses are 288 tokens long while GPT responses are 884 tokens long. One reason for this discrepancy is that without an accurate visual, GPT often outputs the entire data table before any analysis. That said, GPT may use these tokens productively to reason about the data. Also, across all settings, more recently-released GPT-4.1’s performance generally matches and sometimes significantly exceeds Claude-3.5’s performance . This result agrees with existing findings on vision-language benchmarks like MMMU and Mathvista, and indicates visualization can help models across capability levels [17, 3].",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:clustering_plot",
+        "fig:nonlinearity_plot",
+        "fig:oulier-plt"
+      ],
+      "original_html_id": "S4.SS4.p1.1"
+    },
+    "para_0039": {
+      "kind": "paragraph",
+      "element_id": "para_0039",
+      "section_id": "sec_017",
+      "text": "Furthermore, both models generate the shortest responses when provided with a visual alone. Any visual input, including a blank image, decreases the length of GPT but not Claude’s output length. In the high performance scatterplot-only condition, both models generate brief responses focused on salient dataset features .",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [
+        "fig:token-counts"
+      ],
+      "original_html_id": "S4.SS4.p2.1"
+    },
+    "para_0040": {
+      "kind": "paragraph",
+      "element_id": "para_0040",
+      "section_id": "sec_017",
+      "text": "In contrast, models often compute summary statistics in their responses when provided with only data. We calculate the frequency of terms in responses referring to the domain, range, mean, min, max, and variance of the data. Across settings, these summary statistic terms appear two times more often on average in GPT responses with the data alone compared to visuals alone, and up to ten times more often on average in Claude responses.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S4.SS4.p3.1"
+    },
+    "para_0041": {
+      "kind": "paragraph",
+      "element_id": "para_0041",
+      "section_id": "sec_018",
+      "text": "Our findings provide evidence that visualization can help AI systems understand data. This fact raises tantalizing questions that lie beyond the scope of this short paper. How do graphical variations on our charts affect the results? After all, a large part of the field of visualization focuses on the efficacy of different charts and visual encodings—perhaps there is an entire parallel version of that body of scholarship for AI systems. If it turns out the same graphical ideas are best for both humans and AI, that raises the intriguing possibility that interpreting AI systems could shed light on human psychology; on the other hand, if there are systematic differences, we may need to build up a new field of AI-oriented visualization.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p1.1"
+    },
+    "para_0042": {
+      "kind": "paragraph",
+      "element_id": "para_0042",
+      "section_id": "sec_018",
+      "text": "Our results are primarily a proof-of-concept. We use simple tasks, only evaluate two models, and leverage fully synthetic datasets. This set up demands follow-up work with additional tasks, visualization types, and LVLMs to substantiate our findings. Nevertheless, the large effects we observe suggest our results may be generalizable across workflows and models, opening a new area of visualization research. We conclude by summarizing our findings organized around questions we hope will inspire follow-up work:",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p2.1"
+    },
+    "para_0043": {
+      "kind": "paragraph",
+      "element_id": "para_0043",
+      "section_id": "sec_018",
+      "text": "“Who” — which AI models benefit most from visualization in analytical tasks? We did not use AI with cutting-edge tool use or inference-time compute capabilities. Future work could confirm whether a larger sample of models with varied application scaffolding still benefits from visualization. Crucially, visualizations designed for AI should also consider the requirements of human users to ensure that AI-generated insights remain interpretable, transparent, and useful for practical decision-making.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 5,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p3.1"
+    },
+    "para_0044": {
+      "kind": "paragraph",
+      "element_id": "para_0044",
+      "section_id": "sec_018",
+      "text": "What are the best metrics to evaluate dataset understanding? While we do evaluate whether models complete our analytical tasks, there is significant room for additional validation, such as confirming the logical consistency of AI-generated insights. Employing LVLM judges similar to ours is one scalable method to characterize model responses. Future studies should also continue investigating how models handle misleading or inconsistent visuals, which we show can have a large effect on dataset analysis.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 4,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p4.1"
+    },
+    "para_0045": {
+      "kind": "paragraph",
+      "element_id": "para_0045",
+      "section_id": "sec_018",
+      "text": "When is visualization most beneficial? Across all three settings, visualization benefits models most when datasets are subtle and challenging to precisely interpret. Further research may test the boundaries of these findings, generalizing to new datasets or more nuanced analytical tasks.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 4,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p5.1"
+    },
+    "para_0046": {
+      "kind": "paragraph",
+      "element_id": "para_0046",
+      "section_id": "sec_018",
+      "text": "Where does AI currently struggle with visualization? We observed instances where Claude misinterprets parabolic plots as sinusoidal or logistic. Addressing this limitation could entail gaining deeper insights into how models internally reconcile visual and numerical information, which could also help better integrate them into data-processing pipelines.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 5,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p6.1"
+    },
+    "para_0047": {
+      "kind": "paragraph",
+      "element_id": "para_0047",
+      "section_id": "sec_018",
+      "text": "Why is visualization helpful? Visualization is essential for humans partly because our visual processing systems efficiently synthesize complex information. Advanced AI models, despite learning about our world through fundamentally different mechanisms, similarly benefit from visual aids. Exploring these parallels could deepen our understanding of the underlying principles by which visualizations effectively convey information, facilitate pattern recognition, and enable knowledge discovery.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 3,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p7.1"
+    },
+    "para_0048": {
+      "kind": "paragraph",
+      "element_id": "para_0048",
+      "section_id": "sec_018",
+      "text": "How can future research optimize visualizations for AIs? Given that AI models are abundant and testable, future work could explore methodologies tailored to AI model interpretation by systematically searching over optimal visualization parameters. These models can be prompted thousands of times at relatively low cost, potentially allowing for personalized visualization design.",
+      "format_spans": [
+        {
+          "start": 0,
+          "end": 3,
+          "mark": "bold"
+        }
+      ],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p8.1"
+    },
+    "para_0049": {
+      "kind": "paragraph",
+      "element_id": "para_0049",
+      "section_id": "sec_018",
+      "text": "Overall, our work lays groundwork for exciting avenues of research at the intersection of visualization and AI, suggesting that visualization could be a broad tool for emerging human, AI, and human-AI workflows.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S5.p9.1"
+    },
+    "para_0050": {
+      "kind": "paragraph",
+      "element_id": "para_0050",
+      "section_id": "sec_019",
+      "text": "The authors thank Fernanda Viégas, Catherine Yeh, Shivam Raval, and Andrew Zhang for helpful advice and insightful discussions. The authors also gratefully acknowledge API credit support from AISST, particularly Ryan Kaufman. MW is supported by the Effective Ventures Foundation, Effektiv Spenden Schweiz, a Superalignment grant from OpenAI, and the Open Philanthropy Project.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S6.p1.1"
+    },
+    "para_0051": {
+      "kind": "paragraph",
+      "element_id": "para_0051",
+      "section_id": "sec_020",
+      "text": "This work’s supplemental materials, including code and additional figures, are available at \\hrefhttps://github.com/johnathansun/lvlm-vis-data-understandinggithub.com/johnathansun/lvlm-vis-data-understanding.",
+      "format_spans": [],
+      "inline_math_spans": [],
+      "unresolved_crossrefs": [],
+      "original_html_id": "S6.SS1.p1.1"
+    }
+  },
+  "references": {
+    "ref_001": {
+      "reference_id": "ref_001",
+      "raw_text": "N. S. Agarwal and S. K. Sonbhadra. A review on large language models for visual analytics, 2025.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib1"
+    },
+    "ref_002": {
+      "reference_id": "ref_002",
+      "raw_text": "M. Akhtar, O. Cocarascu, and E. Simperl. Reading and reasoning over chart images for evidence-based automated fact-checking. In A. Vlachos and I. Augenstein, eds., Findings of the Association for Computational Linguistics: EACL 2023 , pp. 399–414. Association for Computational Linguistics, Dubrovnik, Croatia, May 2023. doi: 10.18653/v1/2023.findings-eacl.30",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib2"
+    },
+    "ref_003": {
+      "reference_id": "ref_003",
+      "raw_text": "Anthropic. Claude 3.5 sonnet model card addendum, June 2024. Accessed: 2025-06-29.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib3"
+    },
+    "ref_004": {
+      "reference_id": "ref_004",
+      "raw_text": "A. Bendeck and J. Stasko. An empirical evaluation of the gpt-4 multimodal language model on visualization literacy tasks. IEEE Transactions on Visualization and Computer Graphics , 31(1):1105–1115, 2025. doi: 10.1109/TVCG.2024.3456155",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib4"
+    },
+    "ref_005": {
+      "reference_id": "ref_005",
+      "raw_text": "W. S. Cleveland and R. McGill. Graphical perception: Theory, experimentation, and application to the development of graphical methods. Journal of the American Statistical Association , 79(387):531–554, 1984. doi: 10.2307/2288400",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib5"
+    },
+    "ref_006": {
+      "reference_id": "ref_006",
+      "raw_text": "X. Fang, W. Xu, F. A. Tan, J. Zhang, Z. Hu, Y. J. Qi, S. Nickleach, D. Socolinsky, S. Srinivasan Sengamedu, and C. Faloutsos. Large language models (llms) on tabular data: Prediction, generation, and understanding — a survey. Transactions on Machine Learning Research , 2024.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib6"
+    },
+    "ref_007": {
+      "reference_id": "ref_007",
+      "raw_text": "M. Gridach, J. Nanavati, K. Z. E. Abidine, L. Mendes, and C. Mack. Agentic ai for scientific discovery: A survey of progress, challenges, and future directions, 2025.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib7"
+    },
+    "ref_008": {
+      "reference_id": "ref_008",
+      "raw_text": "G. Guo, J. J. Kang, R. S. Shah, H. Pfister, and S. Varma. Understanding graphical perception in data visualization through zero-shot prompting of vision-language models, 2024.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib8"
+    },
+    "ref_009": {
+      "reference_id": "ref_009",
+      "raw_text": "J. Heer and M. Bostock. Crowdsourcing graphical perception: using mechanical turk to assess visualization design. In Proceedings of the SIGCHI Conference on Human Factors in Computing Systems , CHI ’10, p. 203–212. Association for Computing Machinery, New York, NY, USA, 2010. doi: 10.1145/1753326.1753357",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib9"
+    },
+    "ref_010": {
+      "reference_id": "ref_010",
+      "raw_text": "J. D. Hunter. Matplotlib: A 2d graphics environment. Computing in Science & Engineering , 9(3):90–95, 2007. doi: 10.1109/MCSE.2007.55",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib10"
+    },
+    "ref_011": {
+      "reference_id": "ref_011",
+      "raw_text": "J. P. Inala, C. Wang, S. Drucker, G. Ramos, V. Dibia, N. Riche, D. Brown, D. Marshall, and J. Gao. Data analysis in the era of generative ai, 2024.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib11"
+    },
+    "ref_012": {
+      "reference_id": "ref_012",
+      "raw_text": "M. S. Islam, R. Rahman, A. Masry, M. T. R. Laskar, M. T. Nayeem, and E. Hoque. Are large vision language models up to the challenge of chart comprehension and reasoning. In Y. Al-Onaizan, M. Bansal, and Y.-N. Chen, eds., Findings of the Association for Computational Linguistics: EMNLP 2024 , pp. 3334–3368. Association for Computational Linguistics, Miami, Florida, USA, Nov. 2024. doi: 10.18653/v1/2024.findings-emnlp.191",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib12"
+    },
+    "ref_013": {
+      "reference_id": "ref_013",
+      "raw_text": "S. Kantharaj, R. T. Leong, X. Lin, A. Masry, M. Thakkar, E. Hoque, and S. Joty. Chart-to-text: A large-scale benchmark for chart summarization. In S. Muresan, P. Nakov, and A. Villavicencio, eds., Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 4005–4023. Association for Computational Linguistics, Dublin, Ireland, May 2022. doi: 10.18653/v1/2022.acl-long.277",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib13"
+    },
+    "ref_014": {
+      "reference_id": "ref_014",
+      "raw_text": "X. Liu, Z. Wu, X. Wu, P. Lu, K.-W. Chang, and Y. Feng. Are LLMs capable of data-based statistical and causal reasoning? benchmarking advanced quantitative reasoning with data. In L.-W. Ku, A. Martins, and V. Srikumar, eds., Findings of the Association for Computational Linguistics ACL 2024 , pp. 9215–9235. Association for Computational Linguistics, Bangkok, Thailand and virtual meeting, Aug. 2024.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib14"
+    },
+    "ref_015": {
+      "reference_id": "ref_015",
+      "raw_text": "A. Masry, D. X. Long, J. Q. Tan, S. Joty, and E. Hoque. ChartQA: A benchmark for question answering about charts with visual and logical reasoning. In S. Muresan, P. Nakov, and A. Villavicencio, eds., Findings of the Association for Computational Linguistics: ACL 2022 , pp. 2263–2279. Association for Computational Linguistics, Dublin, Ireland, May 2022. doi: 10.18653/v1/2022.findings-acl.177",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib15"
+    },
+    "ref_016": {
+      "reference_id": "ref_016",
+      "raw_text": "S. Mukhopadhyay, A. Qidwai, A. Garimella, P. Ramu, V. Gupta, and D. Roth. Unraveling the truth: Do VLMs really understand charts? a deep dive into consistency and robustness. In Y. Al-Onaizan, M. Bansal, and Y.-N. Chen, eds., Findings of the Association for Computational Linguistics: EMNLP 2024 , pp. 16696–16717. Association for Computational Linguistics, Miami, Florida, USA, Nov. 2024. doi: 10.18653/v1/2024.findings-emnlp.973",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib16"
+    },
+    "ref_017": {
+      "reference_id": "ref_017",
+      "raw_text": "OpenAI. Gpt-4.1, 2025. Accessed: 2025-04-29.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib17"
+    },
+    "ref_018": {
+      "reference_id": "ref_018",
+      "raw_text": "P. Rahmanzadehgervi, L. Bolton, M. R. Taesiri, and A. T. Nguyen. Vision language models are blind. In Proceedings of the Asian Conference on Computer Vision (ACCV) , pp. 18–34, December 2024.",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib18"
+    },
+    "ref_019": {
+      "reference_id": "ref_019",
+      "raw_text": "B. Tang, A. Boggust, and A. Satyanarayan. VisText: A benchmark for semantically rich chart captioning. In A. Rogers, J. Boyd-Graber, and N. Okazaki, eds., Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 7268–7298. Association for Computational Linguistics, Toronto, Canada, July 2023. doi: 10.18653/v1/2023.acl-long.401",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib19"
+    },
+    "ref_020": {
+      "reference_id": "ref_020",
+      "raw_text": "J. van Wijk. The value of visualization. In VIS 05. IEEE Visualization, 2005. , pp. 79–86, 2005. doi: 10.1109/VISUAL.2005.1532781",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib20"
+    },
+    "ref_021": {
+      "reference_id": "ref_021",
+      "raw_text": "Z. Xu and E. Wall. Exploring the capability of llms in performing low-level visual analytic tasks on svg data visualizations. In 2024 IEEE Visualization and Visual Analytics (VIS) , pp. 126–130, 2024. doi: 10.1109/VIS55277.2024.00033",
+      "title": null,
+      "authors": [],
+      "year": null,
+      "doi": null,
+      "original_html_id": "bib.bib21"
+    }
+  },
+  "mentions": [
+    {
+      "mention_id": "mention_0001",
+      "source_anchor": {
+        "element_id": "para_0002",
+        "selector": {
+          "type": "text_span",
+          "start": 117,
+          "end": 119,
+          "exact": "20",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "20",
+      "target_kind": "reference",
+      "target_id": "ref_020",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0002",
+      "source_anchor": {
+        "element_id": "para_0002",
+        "selector": {
+          "type": "text_span",
+          "start": 303,
+          "end": 305,
+          "exact": "11",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "11",
+      "target_kind": "reference",
+      "target_id": "ref_011",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0003",
+      "source_anchor": {
+        "element_id": "para_0003",
+        "selector": {
+          "type": "text_span",
+          "start": 118,
+          "end": 119,
+          "exact": "6",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "6",
+      "target_kind": "reference",
+      "target_id": "ref_006",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0004",
+      "source_anchor": {
+        "element_id": "para_0003",
+        "selector": {
+          "type": "text_span",
+          "start": 253,
+          "end": 254,
+          "exact": "1",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "1",
+      "target_kind": "reference",
+      "target_id": "ref_001",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0005",
+      "source_anchor": {
+        "element_id": "para_0003",
+        "selector": {
+          "type": "text_span",
+          "start": 256,
+          "end": 258,
+          "exact": "11",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "11",
+      "target_kind": "reference",
+      "target_id": "ref_011",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0006",
+      "source_anchor": {
+        "element_id": "para_0003",
+        "selector": {
+          "type": "text_span",
+          "start": 260,
+          "end": 262,
+          "exact": "21",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "21",
+      "target_kind": "reference",
+      "target_id": "ref_021",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0007",
+      "source_anchor": {
+        "element_id": "para_0003",
+        "selector": {
+          "type": "text_span",
+          "start": 520,
+          "end": 521,
+          "exact": "7",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "7",
+      "target_kind": "reference",
+      "target_id": "ref_007",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0008",
+      "source_anchor": {
+        "element_id": "para_0005",
+        "selector": {
+          "type": "text_span",
+          "start": 235,
+          "end": 237,
+          "exact": "17",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "17",
+      "target_kind": "reference",
+      "target_id": "ref_017",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0009",
+      "source_anchor": {
+        "element_id": "para_0005",
+        "selector": {
+          "type": "text_span",
+          "start": 274,
+          "end": 275,
+          "exact": "3",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "3",
+      "target_kind": "reference",
+      "target_id": "ref_003",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0010",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 80,
+          "end": 81,
+          "exact": "2",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "2",
+      "target_kind": "reference",
+      "target_id": "ref_002",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0011",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 83,
+          "end": 85,
+          "exact": "13",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "13",
+      "target_kind": "reference",
+      "target_id": "ref_013",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0012",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 87,
+          "end": 89,
+          "exact": "15",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "15",
+      "target_kind": "reference",
+      "target_id": "ref_015",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0013",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 91,
+          "end": 93,
+          "exact": "19",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "19",
+      "target_kind": "reference",
+      "target_id": "ref_019",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0014",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 600,
+          "end": 601,
+          "exact": "3",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "3",
+      "target_kind": "reference",
+      "target_id": "ref_003",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0015",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 603,
+          "end": 605,
+          "exact": "12",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "12",
+      "target_kind": "reference",
+      "target_id": "ref_012",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0016",
+      "source_anchor": {
+        "element_id": "para_0009",
+        "selector": {
+          "type": "text_span",
+          "start": 607,
+          "end": 609,
+          "exact": "17",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "17",
+      "target_kind": "reference",
+      "target_id": "ref_017",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0017",
+      "source_anchor": {
+        "element_id": "para_0010",
+        "selector": {
+          "type": "text_span",
+          "start": 325,
+          "end": 327,
+          "exact": "14",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "14",
+      "target_kind": "reference",
+      "target_id": "ref_014",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0018",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 162,
+          "end": 163,
+          "exact": "4",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "4",
+      "target_kind": "reference",
+      "target_id": "ref_004",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0019",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 311,
+          "end": 313,
+          "exact": "16",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "16",
+      "target_kind": "reference",
+      "target_id": "ref_016",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0020",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 377,
+          "end": 379,
+          "exact": "18",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "18",
+      "target_kind": "reference",
+      "target_id": "ref_018",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0021",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 493,
+          "end": 494,
+          "exact": "8",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "8",
+      "target_kind": "reference",
+      "target_id": "ref_008",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0022",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 575,
+          "end": 576,
+          "exact": "5",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "5",
+      "target_kind": "reference",
+      "target_id": "ref_005",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0023",
+      "source_anchor": {
+        "element_id": "para_0011",
+        "selector": {
+          "type": "text_span",
+          "start": 578,
+          "end": 579,
+          "exact": "9",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "9",
+      "target_kind": "reference",
+      "target_id": "ref_009",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0024",
+      "source_anchor": {
+        "element_id": "para_0019",
+        "selector": {
+          "type": "text_span",
+          "start": 455,
+          "end": 457,
+          "exact": "10",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "10",
+      "target_kind": "reference",
+      "target_id": "ref_010",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0025",
+      "source_anchor": {
+        "element_id": "para_0038",
+        "selector": {
+          "type": "text_span",
+          "start": 757,
+          "end": 759,
+          "exact": "17",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "17",
+      "target_kind": "reference",
+      "target_id": "ref_017",
+      "resolution_status": "resolved"
+    },
+    {
+      "mention_id": "mention_0026",
+      "source_anchor": {
+        "element_id": "para_0038",
+        "selector": {
+          "type": "text_span",
+          "start": 761,
+          "end": 762,
+          "exact": "3",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "mention_text": "3",
+      "target_kind": "reference",
+      "target_id": "ref_003",
+      "resolution_status": "resolved"
+    }
+  ],
+  "assets": {
+    "asset_0001": {
+      "asset_id": "asset_0001",
+      "original_relative_path": "Does visualization help AI understand data__files/dataset_subtlety.png",
+      "normalized_relative_path": "assets/asset_0001.png",
+      "status": "available",
+      "media_type": "image/png"
+    },
+    "asset_0002": {
+      "asset_id": "asset_0002",
+      "original_relative_path": "__arxiv_render__/asset_0002.svg",
+      "normalized_relative_path": "assets/asset_0002.svg",
+      "status": "available",
+      "media_type": "image/svg+xml"
+    },
+    "asset_0003": {
+      "asset_id": "asset_0003",
+      "original_relative_path": "__arxiv_render__/asset_0003.svg",
+      "normalized_relative_path": "assets/asset_0003.svg",
+      "status": "available",
+      "media_type": "image/svg+xml"
+    },
+    "asset_0004": {
+      "asset_id": "asset_0004",
+      "original_relative_path": "__arxiv_render__/asset_0004.svg",
+      "normalized_relative_path": "assets/asset_0004.svg",
+      "status": "available",
+      "media_type": "image/svg+xml"
+    },
+    "asset_0005": {
+      "asset_id": "asset_0005",
+      "original_relative_path": "__arxiv_render__/asset_0005.svg",
+      "normalized_relative_path": "assets/asset_0005.svg",
+      "status": "available",
+      "media_type": "image/svg+xml"
+    }
+  },
+  "quality": {
+    "body": "complete",
+    "figures": "complete",
+    "tables": "complete",
+    "references": "complete",
+    "warnings": [
+      "18 broken LaTeXML reference labels were preserved as paragraph metadata."
+    ]
+  }
+}

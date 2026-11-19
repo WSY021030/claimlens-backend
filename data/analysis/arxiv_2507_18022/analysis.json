@@ -1,0 +1,3722 @@
+{
+  "schema_version": "reader.v3",
+  "paper_id": "arxiv_2507_18022",
+  "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+  "storage_policy": "current_state_v3_single_claim",
+  "id_counters": {
+    "mapping": 4,
+    "evidence": 55
+  },
+  "evidence_scan_batches": [
+    {
+      "stage": "evidence",
+      "model": "gpt-5.4-mini",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "scan_cache_policy": "source_scan_v1",
+      "claim_ids": [
+        "claim_000001",
+        "claim_000002"
+      ],
+      "chunk_chars": 6000,
+      "claim_batch_size": 6
+    },
+    {
+      "stage": "evidence",
+      "model": "gpt-5.4-mini",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "scan_cache_policy": "source_scan_v1",
+      "claim_ids": [
+        "claim_000003",
+        "claim_000004"
+      ],
+      "chunk_chars": 6000,
+      "claim_batch_size": 6
+    }
+  ],
+  "claim_pool": {
+    "claim_000001": {
+      "claim_id": "claim_000001",
+      "type": "result",
+      "scope": "this_study",
+      "source_element_id": "para_0036",
+      "model_quote": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety.",
+      "source_quote": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety.",
+      "source_anchor": {
+        "element_id": "para_0036",
+        "selector": {
+          "type": "text_span",
+          "start": 9,
+          "end": 153,
+          "exact": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety.",
+          "prefix": "Finally, ",
+          "suffix": " The misleading “Data & Wrong” condition"
+        }
+      },
+      "source_status": "located",
+      "alignment_note": "exact",
+      "created_run_id": "86f16951a7d4"
+    },
+    "claim_000002": {
+      "claim_id": "claim_000002",
+      "type": "result",
+      "scope": "this_study",
+      "source_element_id": "para_0036",
+      "model_quote": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+      "source_quote": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+      "source_anchor": {
+        "element_id": "para_0036",
+        "selector": {
+          "type": "text_span",
+          "start": 154,
+          "end": 236,
+          "exact": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+          "prefix": "lization increasing with task subtlety. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "alignment_note": "exact",
+      "created_run_id": "86f16951a7d4"
+    },
+    "claim_000003": {
+      "claim_id": "claim_000003",
+      "type": "result",
+      "scope": "this_study",
+      "source_element_id": "para_0026",
+      "model_quote": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+      "source_quote": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+      "source_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 124,
+          "exact": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+          "prefix": "",
+          "suffix": " Across settings, performance uplift gro"
+        }
+      },
+      "source_status": "located",
+      "alignment_note": "exact",
+      "created_run_id": "9414cd21787a"
+    },
+    "claim_000004": {
+      "claim_id": "claim_000004",
+      "type": "result",
+      "scope": "this_study",
+      "source_element_id": "para_0026",
+      "model_quote": "Across settings, performance uplift grows with dataset subtlety.",
+      "source_quote": "Across settings, performance uplift grows with dataset subtlety.",
+      "source_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 125,
+          "end": 189,
+          "exact": "Across settings, performance uplift grows with dataset subtlety.",
+          "prefix": "GPT and Claude’s dataset understanding. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "alignment_note": "exact",
+      "created_run_id": "9414cd21787a"
+    }
+  },
+  "evidence_pool": {
+    "evidence_000001": {
+      "evidence_id": "evidence_000001",
+      "kind": "figure",
+      "source_element_id": "fig_0001",
+      "source_anchor": {
+        "element_id": "fig_0001",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 1",
+        "caption": "The three dataset types and their subtlety spectrum. (1) Subtler cluster datasets exhibit more groupings, requiring precise identification. Misleading “wrong” visuals feature one Gaussian cluster. (2) Subtler parabola datasets contain fewer points beyond the vertex, while wrong visuals show linear best-fits. (3) Subtler outlier datasets have high vertical z -scores (distance from mean scaled by standard deviation), while wrong visuals remedy anomalous outliers.",
+        "alt_text": "Refer to caption",
+        "image_asset_id": "asset_0001",
+        "unverified_model_quote": "(3) Subtler outlier datasets have high vertical z -scores (distance from mean scaled by standard deviation), while wrong visuals remedy anomalous outliers."
+      },
+      "description": "Figure caption defines the outlier dataset setting and the misleading 'wrong' visuals for the outlier task.",
+      "observed_via": "caption_only",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000002": {
+      "evidence_id": "evidence_000002",
+      "kind": "paragraph",
+      "source_element_id": "para_0017",
+      "source_anchor": {
+        "element_id": "para_0017",
+        "selector": {
+          "type": "text_span",
+          "start": 34,
+          "end": 669,
+          "exact": "Two endpoints (0,y_{1}) and (10,y_{2}) are randomly selected, with y_{1},y_{2} drawn from [0,10] . A line connecting these endpoints is then sampled at 20 equally spaced points along the x-axis before Gaussian noise proportional to the line’s slope is added to the y-coordinates, \\mathbf{y} . To create an outlier, one randomly selected point is vertically shifted to produce a jackknife residual greater than 2.5. Dataset subtlety increases as the outlier’s vertical z score, defined as (y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}} (where \\bar{y} and s_{\\mathbf{y}} are the mean and standard deviation of \\mathbf{y} , respectively), decreases.",
+          "prefix": "These datasets contain 50 points. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Two endpoints (0,y_{1}) and (10,y_{2}) are randomly selected, with y_{1},y_{2} drawn from [0,10] . A line connecting these endpoints is then sampled at 20 equally spaced points along the x-axis before Gaussian noise proportional to the line’s slope is added to the y-coordinates, \\mathbf{y} . To create an outlier, one randomly selected point is vertically shifted to produce a jackknife residual greater than 2.5. Dataset subtlety increases as the outlier’s vertical z score, defined as (y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}} (where \\bar{y} and s_{\\mathbf{y}} are the mean and standard deviation of \\mathbf{y} , respectively), decreases.",
+      "source_content": {
+        "passage": "Two endpoints (0,y_{1}) and (10,y_{2}) are randomly selected, with y_{1},y_{2} drawn from [0,10] . A line connecting these endpoints is then sampled at 20 equally spaced points along the x-axis before Gaussian noise proportional to the line’s slope is added to the y-coordinates, \\mathbf{y} . To create an outlier, one randomly selected point is vertically shifted to produce a jackknife residual greater than 2.5. Dataset subtlety increases as the outlier’s vertical z score, defined as (y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}} (where \\bar{y} and s_{\\mathbf{y}} are the mean and standard deviation of \\mathbf{y} , respectively), decreases.",
+        "context": "These datasets contain 50 points. Two endpoints (0,y_{1}) and (10,y_{2}) are randomly selected, with y_{1},y_{2} drawn from [0,10] . A line connecting these endpoints is then sampled at 20 equally spaced points along the x-axis before Gaussian noise proportional to the line’s slope is added to the y-coordinates, \\mathbf{y} . To create an outlier, one randomly selected point is vertically shifted to produce a jackknife residual greater than 2.5. Dataset subtlety increases as the outlier’s vertical z score, defined as (y-\\bar{\\mathbf{y}})/s_{\\mathbf{y}} (where \\bar{y} and s_{\\mathbf{y}} are the mean and standard deviation of \\mathbf{y} , respectively), decreases.",
+        "start": 34,
+        "end": 669
+      },
+      "description": "Method and subtlety definition for the linear outlier dataset: 50 points are generated from a noisy line between two random endpoints, one point is vertically shifted to create an outlier, and lower vertical z-score indicates greater subtlety.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000003": {
+      "evidence_id": "evidence_000003",
+      "kind": "paragraph",
+      "source_element_id": "para_0018",
+      "source_anchor": {
+        "element_id": "para_0018",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 65,
+          "exact": "Misleading visuals depict the data prior to outlier perturbation.",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Misleading visuals depict the data prior to outlier perturbation.",
+      "source_content": {
+        "passage": "Misleading visuals depict the data prior to outlier perturbation.",
+        "context": "Misleading visuals depict the data prior to outlier perturbation.",
+        "start": 0,
+        "end": 65
+      },
+      "description": "Defines the misleading visual condition as showing the data before the outlier perturbation.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000004": {
+      "evidence_id": "evidence_000004",
+      "kind": "paragraph",
+      "source_element_id": "para_0022",
+      "source_anchor": {
+        "element_id": "para_0022",
+        "selector": {
+          "type": "text_span",
+          "start": 3,
+          "end": 112,
+          "exact": "Data & Wrong: Misleading visualization to test whether discrepant visual information degrades LVLM judgments.",
+          "prefix": "3.\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Data & Wrong: Misleading visualization to test whether discrepant visual information degrades LVLM judgments.",
+      "source_content": {
+        "passage": "Data & Wrong: Misleading visualization to test whether discrepant visual information degrades LVLM judgments.",
+        "context": "3.\nData & Wrong: Misleading visualization to test whether discrepant visual information degrades LVLM judgments.",
+        "start": 3,
+        "end": 112,
+        "merged_from_run_ids": [
+          "826b0f46eef0"
+        ],
+        "merged_from_evidence_ids": [
+          "evidence_000026"
+        ]
+      },
+      "description": "Defines the Data & Wrong input condition as a misleading visualization used to test whether discrepant visual information degrades LVLM judgments.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000005": {
+      "evidence_id": "evidence_000005",
+      "kind": "paragraph",
+      "source_element_id": "para_0023",
+      "source_anchor": {
+        "element_id": "para_0023",
+        "selector": {
+          "type": "text_span",
+          "start": 3,
+          "end": 64,
+          "exact": "Data & Correct: Including the plot displaying the datapoints.",
+          "prefix": "4.\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Data & Correct: Including the plot displaying the datapoints.",
+      "source_content": {
+        "passage": "Data & Correct: Including the plot displaying the datapoints.",
+        "context": "4.\nData & Correct: Including the plot displaying the datapoints.",
+        "start": 3,
+        "end": 64
+      },
+      "description": "Defines the Data & Correct input condition as including the plot with datapoints.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000006": {
+      "evidence_id": "evidence_000006",
+      "kind": "paragraph",
+      "source_element_id": "para_0026",
+      "source_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 124,
+          "exact": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+          "prefix": "",
+          "suffix": " Across settings, performance uplift gro"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+      "source_content": {
+        "passage": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+        "context": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding. Across settings, performance uplift grows with dataset subtlety.",
+        "start": 0,
+        "end": 124
+      },
+      "description": "States that a correct visualization improves GPT and Claude’s dataset understanding relative to full raw data baselines.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000007": {
+      "evidence_id": "evidence_000007",
+      "kind": "paragraph",
+      "source_element_id": "para_0026",
+      "source_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 125,
+          "end": 189,
+          "exact": "Across settings, performance uplift grows with dataset subtlety.",
+          "prefix": "GPT and Claude’s dataset understanding. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Across settings, performance uplift grows with dataset subtlety.",
+      "source_content": {
+        "passage": "Across settings, performance uplift grows with dataset subtlety.",
+        "context": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding. Across settings, performance uplift grows with dataset subtlety.",
+        "start": 125,
+        "end": 189
+      },
+      "description": "States that performance uplift increases as dataset subtlety increases across settings.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000008": {
+      "evidence_id": "evidence_000008",
+      "kind": "figure",
+      "source_element_id": "fig_0004",
+      "source_anchor": {
+        "element_id": "fig_0004",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 4",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier in input datasets . Success counts are presented for scenarios with binned {\\leq}1 to {>}3 vertical z -scores. As subtlety increases, both models’ performance gradually decline, especially without accurate visuals.",
+        "alt_text": null,
+        "image_asset_id": "asset_0004",
+        "unverified_model_quote": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier in input datasets . Success counts are presented for scenarios with binned {\\leq}1 to {>}3 vertical z -scores. As subtlety increases, both models’ performance gradually decline, especially without accurate visuals."
+      },
+      "description": "Figure caption reports that visualization improves both GPT 4.1 and Claude 3.5 on identifying the correct outlier in input datasets, and that performance declines as subtlety increases, especially without accurate visuals.",
+      "observed_via": "caption_only",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000009": {
+      "evidence_id": "evidence_000009",
+      "kind": "paragraph",
+      "source_element_id": "para_0037",
+      "source_anchor": {
+        "element_id": "para_0037",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 179,
+          "exact": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot.",
+          "prefix": "",
+          "suffix": " This trend may have to do with the char"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot.",
+      "source_content": {
+        "passage": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot.",
+        "context": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot. This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parab",
+        "start": 0,
+        "end": 179,
+        "merged_from_run_ids": [
+          "826b0f46eef0"
+        ],
+        "merged_from_evidence_ids": [
+          "evidence_000047"
+        ]
+      },
+      "description": "States that for the outlier detection setting, both GPT and Claude are generally comparable or better with dataset+correct plot than with only the correct plot.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000010": {
+      "evidence_id": "evidence_000010",
+      "kind": "paragraph",
+      "source_element_id": "para_0037",
+      "source_anchor": {
+        "element_id": "para_0037",
+        "selector": {
+          "type": "text_span",
+          "start": 180,
+          "end": 441,
+          "exact": "This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parabolic trend).",
+          "prefix": "plot compared to only the correct plot. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parabolic trend).",
+      "source_content": {
+        "passage": "This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parabolic trend).",
+        "context": "Unlike the previous two settings, both GPT and Claude generally perform comparably or better when provided both the dataset and the correct plot compared to only the correct plot. This trend may have to do with the characteristics of the task: outlier detection requires the retrieval and analysis of specific data values rather than a feature involving multiple datapoints (like clustering) or the entire dataset (like the parabolic trend).",
+        "start": 180,
+        "end": 441,
+        "merged_from_run_ids": [
+          "826b0f46eef0"
+        ],
+        "merged_from_evidence_ids": [
+          "evidence_000048"
+        ]
+      },
+      "description": "Explains the outlier task as requiring retrieval and analysis of specific data values, distinguishing it from clustering and parabolic-trend tasks.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000011": {
+      "evidence_id": "evidence_000011",
+      "kind": "figure",
+      "source_element_id": "fig_0001",
+      "source_anchor": {
+        "element_id": "fig_0001",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 1",
+        "caption": "The three dataset types and their subtlety spectrum. (1) Subtler cluster datasets exhibit more groupings, requiring precise identification. Misleading “wrong” visuals feature one Gaussian cluster. (2) Subtler parabola datasets contain fewer points beyond the vertex, while wrong visuals show linear best-fits. (3) Subtler outlier datasets have high vertical z -scores (distance from mean scaled by standard deviation), while wrong visuals remedy anomalous outliers.",
+        "alt_text": "Refer to caption",
+        "image_asset_id": "asset_0001",
+        "visual_observation": "Outlier row contains four subtlety cases labeled z > 3, z ∈ [2,3), z ∈ (1,2], and z ≤ 1; the rightmost misleading/wrong panel shows a linear scatter without an obvious outlier marker.\n\nDisplayed as a 3x5-style matrix of scatterplots with row labels Clusters, Parabola, Outlier; a horizontal arrow across the top labeled 'Subtlety Spectrum' points toward 'Misleading/Wrong'.\n\nThe rightmost column contains wrong/misleading versions of the datasets, while the left/middle columns show varying subtlety levels.",
+        "visual_observation_source": "model_reading_of_attached_image",
+        "visual_reading_verified": false,
+        "additional_image_receipts": [
+          {
+            "element_id": "fig_0001",
+            "asset_id": "asset_0001",
+            "source_path": "assets/asset_0001.png",
+            "source_sha256": "ac17297b09f29e252e0f0393462ec03981b691943bde82774dd530a86e8a4fe5",
+            "sent_sha256": "ac17297b09f29e252e0f0393462ec03981b691943bde82774dd530a86e8a4fe5",
+            "width": 1528,
+            "height": 811,
+            "cell_id": null,
+            "conversion": null,
+            "model": "gpt-5.4-mini-2026-03-17",
+            "response_id": "resp_027700ac09af54e0016afdf892181887d2a541058b1e8bdbac"
+          }
+        ],
+        "merged_from_run_ids": [
+          "826b0f46eef0"
+        ],
+        "merged_from_evidence_ids": [
+          "evidence_000052"
+        ]
+      },
+      "description": "Figure shows an outlier-dataset row under the 'Subtlety Spectrum' with panels labeled by z-score ranges and a separate 'Misleading/Wrong' example. In the outlier row, one panel is annotated 'z > 3', another 'z ∈ [2,3)', another 'z ∈ (1,2]', and another 'z ≤ 1', indicating increasing subtlety levels. The far-right green-framed 'Misleading/Wrong' column shows a linear-looking point pattern with no highlighted outlier. Figure shows three dataset types arranged along a labeled 'Subtlety Spectrum' toward 'Misleading/Wrong'. The cluster row is labeled with subtlety values 2, 3, 4, 5 and a wrong-visual example at the far right; the parabola row is labeled 9, 7, 5, 3 and a wrong-visual linear example at the far right; the outlier row is labeled with z categories 'z > 3', 'z ∈ [2,3)', 'z ∈ (1,2]', 'z ≤ 1' and a wrong-visual linear example at the far right. The graphic visually indicates increasing subtlety across the set of examples and separates correct versus misleading/wrong visuals.",
+      "observed_via": "image_input",
+      "source_asset_id": "asset_0001",
+      "image_receipt": {
+        "element_id": "fig_0001",
+        "asset_id": "asset_0001",
+        "source_path": "assets/asset_0001.png",
+        "source_sha256": "ac17297b09f29e252e0f0393462ec03981b691943bde82774dd530a86e8a4fe5",
+        "sent_sha256": "ac17297b09f29e252e0f0393462ec03981b691943bde82774dd530a86e8a4fe5",
+        "width": 1528,
+        "height": 811,
+        "cell_id": null,
+        "conversion": null,
+        "model": "gpt-5.4-mini-2026-03-17",
+        "response_id": "resp_0287b6bb739bde6c016afd4d778b3087d283fc15fdca5a15e8"
+      },
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000012": {
+      "evidence_id": "evidence_000012",
+      "kind": "figure",
+      "source_element_id": "fig_0004",
+      "source_anchor": {
+        "element_id": "fig_0004",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 4",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier in input datasets . Success counts are presented for scenarios with binned {\\leq}1 to {>}3 vertical z -scores. As subtlety increases, both models’ performance gradually decline, especially without accurate visuals.",
+        "alt_text": null,
+        "image_asset_id": "asset_0004",
+        "visual_observation": "In both model panels, the bars for Data & Correct and Correct Only are highest across most bins, and the Data & Wrong bars are lower than Data Only and Data & Blank in each vertical z-score group.\n\nPerformance is highest at >3 and generally declines as bins move toward ≤1, with the gap between accurate-visual conditions and the other conditions widening in subtler bins.\n\nTwo-panel bar chart.\n\nGPT 4.1 panel: Data & Correct is at about 100 across all bins; Data Only, Data & Blank, and Data & Wrong drop from the >3 bin to the ≤1 bin.\n\nClaude 3.5 panel: Data & Correct is about 100, 93, 94, 92 across the bins; Data Only, Data & Blank, and Data & Wrong also decline toward lower z-score bins.",
+        "visual_observation_source": "model_reading_of_attached_image",
+        "visual_reading_verified": false,
+        "additional_image_receipts": [
+          {
+            "element_id": "fig_0004",
+            "asset_id": "asset_0004",
+            "source_path": "assets/asset_0004.svg",
+            "source_sha256": "c57610da96bc75ea73ae5e32f1297599ebe77aa08ec7b7b7eecae378b28f2e1c",
+            "sent_sha256": "98bbf99c350f03bb642a716552031fd072f271ab906b21b5da7ea5f4a49087c9",
+            "width": 1056,
+            "height": 576,
+            "cell_id": null,
+            "conversion": "svg_to_png",
+            "model": "gpt-5.4-mini-2026-03-17",
+            "response_id": "resp_0dd486fa07ca64da016afdf8a0521c87d2b93a5956e75463f4"
+          }
+        ],
+        "merged_from_run_ids": [
+          "826b0f46eef0"
+        ],
+        "merged_from_evidence_ids": [
+          "evidence_000055"
+        ]
+      },
+      "description": "Figure shows success counts for GPT 4.1 and Claude 3.5 across vertical z-score bins (>3, (2,3], (1,2], ≤1) and conditions Data Only, Data & Blank, Data & Wrong, Data & Correct, Correct Only. The plotted bars indicate that as vertical z-score decreases toward ≤1, success generally drops for the Data Only / Data & Blank / Data & Wrong conditions, while Data & Correct and Correct Only stay near the top or around 100 in most bins; the Data & Wrong bars are consistently below the other non-correct conditions within each bin, especially at lower z-scores. Figure 4 shows success counts for GPT 4.1 and Claude 3.5 across vertical z-score bins (>3, (2,3], (1,2], ≤1) under five conditions: Data Only, Data & Blank, Data & Wrong, Data & Correct, and Correct Only. In both model panels, the bars for Data & Correct are higher than the corresponding Data Only, Data & Blank, and Data & Wrong bars across the bins, while performance generally declines as the vertical z-score bin moves from >3 toward ≤1 in the non-correct-visual conditions.",
+      "observed_via": "image_input",
+      "source_asset_id": "asset_0004",
+      "image_receipt": {
+        "element_id": "fig_0004",
+        "asset_id": "asset_0004",
+        "source_path": "assets/asset_0004.svg",
+        "source_sha256": "c57610da96bc75ea73ae5e32f1297599ebe77aa08ec7b7b7eecae378b28f2e1c",
+        "sent_sha256": "98bbf99c350f03bb642a716552031fd072f271ab906b21b5da7ea5f4a49087c9",
+        "width": 1056,
+        "height": 576,
+        "cell_id": null,
+        "conversion": "svg_to_png",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "response_id": "resp_01dc43d9a29f3b43016afd4d7ba47c87d2a2ff447b27e992d0"
+      },
+      "created_run_id": "417fdf98b104"
+    },
+    "evidence_000013": {
+      "evidence_id": "evidence_000013",
+      "kind": "paragraph",
+      "source_element_id": "para_0001",
+      "source_anchor": {
+        "element_id": "para_0001",
+        "selector": {
+          "type": "text_span",
+          "start": 220,
+          "end": 427,
+          "exact": "Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity.",
+          "prefix": "anguage models: GPT 4.1 and Claude 3.5. ",
+          "suffix": " Comparison with two baselines—providing"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity.",
+      "source_content": {
+        "passage": "Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity.",
+        "context": "Charts and graphs help people analyze data, but can they also be useful to AI systems? To investigate this question, we perform a series of experiments with two commercial vision-language models: GPT 4.1 and Claude 3.5. Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity. Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts. Our results are initial evidence that AI systems, like humans, can benefit from visualiza",
+        "start": 220,
+        "end": 427
+      },
+      "description": "Abstract states that GPT 4.1 and Claude 3.5 described synthetic datasets more precisely and accurately when raw data was accompanied by a scatterplot, with stronger benefit as datasets grew in complexity.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000014": {
+      "evidence_id": "evidence_000014",
+      "kind": "paragraph",
+      "source_element_id": "para_0001",
+      "source_anchor": {
+        "element_id": "para_0001",
+        "selector": {
+          "type": "text_span",
+          "start": 428,
+          "end": 587,
+          "exact": "Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts.",
+          "prefix": "ecially as datasets grow in complexity. ",
+          "suffix": " Our results are initial evidence that A"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts.",
+      "source_content": {
+        "passage": "Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts.",
+        "context": "-language models: GPT 4.1 and Claude 3.5. Across three representative analysis tasks, the two systems describe synthetic datasets more precisely and accurately when raw data is accompanied by a scatterplot, especially as datasets grow in complexity. Comparison with two baselines—providing a blank chart and a chart with mismatched data—shows that the improved performance is due to the content of the charts. Our results are initial evidence that AI systems, like humans, can benefit from visualization.",
+        "start": 428,
+        "end": 587
+      },
+      "description": "Abstract says the improvement is attributed to chart content by comparison with blank and mismatched-data chart baselines.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000015": {
+      "evidence_id": "evidence_000015",
+      "kind": "paragraph",
+      "source_element_id": "para_0005",
+      "source_anchor": {
+        "element_id": "para_0005",
+        "selector": {
+          "type": "text_span",
+          "start": 118,
+          "end": 333,
+          "exact": "Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions.",
+          "prefix": "ether visualization can aid AI systems. ",
+          "suffix": " For each task, we prompt models to iden"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions.",
+      "source_content": {
+        "passage": "Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions.",
+        "context": "This paper presents an initial empirical investigation into the question of whether visualization can aid AI systems. Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions. For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5)",
+        "start": 118,
+        "end": 333,
+        "merged_from_evidence_ids": [
+          "evidence_000016"
+        ]
+      },
+      "description": "Introduction states that, across three common data analysis tasks, adding visualization helped GPT 4.1 and Claude 3.5 Sonnet produce more accurate and specific dataset descriptions.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000017": {
+      "evidence_id": "evidence_000017",
+      "kind": "paragraph",
+      "source_element_id": "para_0005",
+      "source_anchor": {
+        "element_id": "para_0005",
+        "selector": {
+          "type": "text_span",
+          "start": 334,
+          "end": 617,
+          "exact": "For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone .",
+          "prefix": "rate and specific dataset descriptions. ",
+          "suffix": " Similarities in model behavior indicate"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone .",
+      "source_content": {
+        "passage": "For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone .",
+        "context": "visualization can aid AI systems. Across three common data analysis tasks, we find that visualization helps two widely adopted LVLMs—OpenAI’s GPT 4.1 [17] and Anthropic’s Claude 3.5 Sonnet [3]—develop more accurate and specific dataset descriptions. For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone . Similarities in model behavior indicate that certain settings are well-suited to visualization-aided AI data analysis, while differences emphasize that visual designs could accommodate model idiosyncrasies. We find:",
+        "start": 334,
+        "end": 617
+      },
+      "description": "Methods/context describing the comparison conditions, including numerical data alone, raw data with blank image, misleading visualization, correct data plot, and correct visualization alone.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000018": {
+      "evidence_id": "evidence_000018",
+      "kind": "paragraph",
+      "source_element_id": "para_0006",
+      "source_anchor": {
+        "element_id": "para_0006",
+        "selector": {
+          "type": "text_span",
+          "start": 2,
+          "end": 301,
+          "exact": "Providing a correct visualization, with or without raw data, helps GPT and Claude accurately identify (1) the number of clusters , (2) parabolic trend , and (3) potential outliers in datasets, outperforming conditions with data alone, data and a blank image, or data with an incorrect visualization.",
+          "prefix": "•\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Providing a correct visualization, with or without raw data, helps GPT and Claude accurately identify (1) the number of clusters , (2) parabolic trend , and (3) potential outliers in datasets, outperforming conditions with data alone, data and a blank image, or data with an incorrect visualization.",
+      "source_content": {
+        "passage": "Providing a correct visualization, with or without raw data, helps GPT and Claude accurately identify (1) the number of clusters , (2) parabolic trend , and (3) potential outliers in datasets, outperforming conditions with data alone, data and a blank image, or data with an incorrect visualization.",
+        "context": "•\nProviding a correct visualization, with or without raw data, helps GPT and Claude accurately identify (1) the number of clusters , (2) parabolic trend , and (3) potential outliers in datasets, outperforming conditions with data alone, data and a blank image, or data with an incorrect visualization.",
+        "start": 2,
+        "end": 301
+      },
+      "description": "States that a correct visualization improves GPT and Claude’s dataset understanding on identifying clusters, parabolic trend, and outliers, compared with data alone, blank image, or incorrect visualization.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000019": {
+      "evidence_id": "evidence_000019",
+      "kind": "paragraph",
+      "source_element_id": "para_0007",
+      "source_anchor": {
+        "element_id": "para_0007",
+        "selector": {
+          "type": "text_span",
+          "start": 2,
+          "end": 173,
+          "exact": "Models’ performance gain given a correct plot grows with subtler tasks requiring more precise analysis, while inaccurate visualizations consistently impair model accuracy.",
+          "prefix": "•\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Models’ performance gain given a correct plot grows with subtler tasks requiring more precise analysis, while inaccurate visualizations consistently impair model accuracy.",
+      "source_content": {
+        "passage": "Models’ performance gain given a correct plot grows with subtler tasks requiring more precise analysis, while inaccurate visualizations consistently impair model accuracy.",
+        "context": "•\nModels’ performance gain given a correct plot grows with subtler tasks requiring more precise analysis, while inaccurate visualizations consistently impair model accuracy.",
+        "start": 2,
+        "end": 173
+      },
+      "description": "States that performance gain from a correct plot increases for subtler tasks and that inaccurate visualizations impair accuracy.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000020": {
+      "evidence_id": "evidence_000020",
+      "kind": "paragraph",
+      "source_element_id": "para_0012",
+      "source_anchor": {
+        "element_id": "para_0012",
+        "selector": {
+          "type": "text_span",
+          "start": 116,
+          "end": 380,
+          "exact": "Our data represent three classic real-world tasks: cluster detection, identification of nonlinear trends, and outlier detection. Each task is split into four subtlety levels, and 100 datasets are independently sampled for each of the 12 task-subtlety combinations.",
+          "prefix": "arameters and avoid data contamination. ",
+          "suffix": " Full reproduction code is provided in t"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Our data represent three classic real-world tasks: cluster detection, identification of nonlinear trends, and outlier detection. Each task is split into four subtlety levels, and 100 datasets are independently sampled for each of the 12 task-subtlety combinations.",
+      "source_content": {
+        "passage": "Our data represent three classic real-world tasks: cluster detection, identification of nonlinear trends, and outlier detection. Each task is split into four subtlety levels, and 100 datasets are independently sampled for each of the 12 task-subtlety combinations.",
+        "context": "We base our experiments on synthetically generated data to easily vary key parameters and avoid data contamination. Our data represent three classic real-world tasks: cluster detection, identification of nonlinear trends, and outlier detection. Each task is split into four subtlety levels, and 100 datasets are independently sampled for each of the 12 task-subtlety combinations. Full reproduction code is provided in the supplemental materials.",
+        "start": 116,
+        "end": 380
+      },
+      "description": "Synthetic experiment design with three tasks and four subtlety levels, with 100 datasets sampled per task-subtlety combination.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000021": {
+      "evidence_id": "evidence_000021",
+      "kind": "paragraph",
+      "source_element_id": "para_0013",
+      "source_anchor": {
+        "element_id": "para_0013",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 393,
+          "exact": "Datasets include 120 points evenly distributed among 2 to 5 cluster centers. Center coordinates are sampled uniformly from the range [0,10] , and, points around the centers are generated as Gaussians with standard deviation \\sigma=0.6 . To ensure distinct clusters, we discard datasets with points from different clusters less than 2 units apart. Dataset subtlety increases with more clusters.",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Datasets include 120 points evenly distributed among 2 to 5 cluster centers. Center coordinates are sampled uniformly from the range [0,10] , and, points around the centers are generated as Gaussians with standard deviation \\sigma=0.6 . To ensure distinct clusters, we discard datasets with points from different clusters less than 2 units apart. Dataset subtlety increases with more clusters.",
+      "source_content": {
+        "passage": "Datasets include 120 points evenly distributed among 2 to 5 cluster centers. Center coordinates are sampled uniformly from the range [0,10] , and, points around the centers are generated as Gaussians with standard deviation \\sigma=0.6 . To ensure distinct clusters, we discard datasets with points from different clusters less than 2 units apart. Dataset subtlety increases with more clusters.",
+        "context": "Datasets include 120 points evenly distributed among 2 to 5 cluster centers. Center coordinates are sampled uniformly from the range [0,10] , and, points around the centers are generated as Gaussians with standard deviation \\sigma=0.6 . To ensure distinct clusters, we discard datasets with points from different clusters less than 2 units apart. Dataset subtlety increases with more clusters.",
+        "start": 0,
+        "end": 393
+      },
+      "description": "Defines the clustered datasets used in the study and notes that dataset subtlety increases with more cluster centers.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000022": {
+      "evidence_id": "evidence_000022",
+      "kind": "paragraph",
+      "source_element_id": "para_0015",
+      "source_anchor": {
+        "element_id": "para_0015",
+        "selector": {
+          "type": "text_span",
+          "start": 171,
+          "end": 500,
+          "exact": "We then randomly select a number n\\in{3,5,7,9} to determine how many points appear to the right of the parabola’s vertex. Points are evenly spaced along the x-axis. Gaussian noise and a random offset between 0 and 10 are added to both coordinates. Dataset subtlety increases as n decreases, making the parabolic trend less clear.",
+          "prefix": "n from [0,1] and [1,10] , respectively. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "We then randomly select a number n\\in{3,5,7,9} to determine how many points appear to the right of the parabola’s vertex. Points are evenly spaced along the x-axis. Gaussian noise and a random offset between 0 and 10 are added to both coordinates. Dataset subtlety increases as n decreases, making the parabolic trend less clear.",
+      "source_content": {
+        "passage": "We then randomly select a number n\\in{3,5,7,9} to determine how many points appear to the right of the parabola’s vertex. Points are evenly spaced along the x-axis. Gaussian noise and a random offset between 0 and 10 are added to both coordinates. Dataset subtlety increases as n decreases, making the parabolic trend less clear.",
+        "context": "These datasets contain 20 points generated along a parabolic curve defined as y=ax^{2}+bx . Coefficients a and b are uniformly drawn from [0,1] and [1,10] , respectively. We then randomly select a number n\\in{3,5,7,9} to determine how many points appear to the right of the parabola’s vertex. Points are evenly spaced along the x-axis. Gaussian noise and a random offset between 0 and 10 are added to both coordinates. Dataset subtlety increases as n decreases, making the parabolic trend less clear.",
+        "start": 171,
+        "end": 500
+      },
+      "description": "Parabola dataset construction and the statement that subtlety increases as n decreases, with fewer points to the right of the vertex making the trend less clear.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000023": {
+      "evidence_id": "evidence_000023",
+      "kind": "paragraph",
+      "source_element_id": "para_0016",
+      "source_anchor": {
+        "element_id": "para_0016",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 132,
+          "exact": "Misleading visuals are the linear best-fit of the generated data, sampled at identical x values, with the same added Gaussian noise.",
+          "prefix": "",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Misleading visuals are the linear best-fit of the generated data, sampled at identical x values, with the same added Gaussian noise.",
+      "source_content": {
+        "passage": "Misleading visuals are the linear best-fit of the generated data, sampled at identical x values, with the same added Gaussian noise.",
+        "context": "Misleading visuals are the linear best-fit of the generated data, sampled at identical x values, with the same added Gaussian noise.",
+        "start": 0,
+        "end": 132
+      },
+      "description": "Defines the misleading-visual condition for the Parabola setting: a linear best-fit is used, sampled at identical x values, with the same added Gaussian noise.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000024": {
+      "evidence_id": "evidence_000024",
+      "kind": "paragraph",
+      "source_element_id": "para_0020",
+      "source_anchor": {
+        "element_id": "para_0020",
+        "selector": {
+          "type": "text_span",
+          "start": 3,
+          "end": 59,
+          "exact": "Data Only: Just the raw dataset as a baseline condition.",
+          "prefix": "1.\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Data Only: Just the raw dataset as a baseline condition.",
+      "source_content": {
+        "passage": "Data Only: Just the raw dataset as a baseline condition.",
+        "context": "1.\nData Only: Just the raw dataset as a baseline condition.",
+        "start": 3,
+        "end": 59
+      },
+      "description": "Defines the baseline input condition as raw dataset only.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000025": {
+      "evidence_id": "evidence_000025",
+      "kind": "paragraph",
+      "source_element_id": "para_0021",
+      "source_anchor": {
+        "element_id": "para_0021",
+        "selector": {
+          "type": "text_span",
+          "start": 3,
+          "end": 127,
+          "exact": "Data & Blank: An all-white image controlling for visual input itself separate from visual information impacting performance.",
+          "prefix": "2.\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Data & Blank: An all-white image controlling for visual input itself separate from visual information impacting performance.",
+      "source_content": {
+        "passage": "Data & Blank: An all-white image controlling for visual input itself separate from visual information impacting performance.",
+        "context": "2.\nData & Blank: An all-white image controlling for visual input itself separate from visual information impacting performance.",
+        "start": 3,
+        "end": 127
+      },
+      "description": "Defines the Data & Blank input condition as using an all-white image to control for visual input separate from visual information.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000027": {
+      "evidence_id": "evidence_000027",
+      "kind": "paragraph",
+      "source_element_id": "para_0024",
+      "source_anchor": {
+        "element_id": "para_0024",
+        "selector": {
+          "type": "text_span",
+          "start": 3,
+          "end": 66,
+          "exact": "Correct Only: Scatterplot alone to assess visual understanding.",
+          "prefix": "5.\n",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Correct Only: Scatterplot alone to assess visual understanding.",
+      "source_content": {
+        "passage": "Correct Only: Scatterplot alone to assess visual understanding.",
+        "context": "5.\nCorrect Only: Scatterplot alone to assess visual understanding.",
+        "start": 3,
+        "end": 66
+      },
+      "description": "Defines the 'Correct Only' input condition as providing the scatterplot alone for assessing visual understanding.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000028": {
+      "evidence_id": "evidence_000028",
+      "kind": "figure",
+      "source_element_id": "fig_0002",
+      "source_anchor": {
+        "element_id": "fig_0002",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 2",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets . Success counts are shown for datasets containing two to five clusters. GPT consistently shows significant benefits from accurate visuals, while Claude benefits less when datasets are more subtle.",
+        "alt_text": null,
+        "image_asset_id": "asset_0002"
+      },
+      "description": "Figure 2 caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets, with success counts shown for datasets containing two to five clusters; it also notes that GPT consistently shows significant benefits from accurate visuals, while Claude benefits less when datasets are more subtle.",
+      "observed_via": "caption_only",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000029": {
+      "evidence_id": "evidence_000029",
+      "kind": "paragraph",
+      "source_element_id": "para_0027",
+      "source_anchor": {
+        "element_id": "para_0027",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 130,
+          "exact": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets.",
+          "prefix": "",
+          "suffix": " Since introducing blank or misleading v"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets.",
+      "source_content": {
+        "passage": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets.",
+        "context": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets. Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+        "start": 0,
+        "end": 130
+      },
+      "description": "States that accurate data visualizations improve GPT and Claude’s cluster-count identification on datasets.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000030": {
+      "evidence_id": "evidence_000030",
+      "kind": "paragraph",
+      "source_element_id": "para_0027",
+      "source_anchor": {
+        "element_id": "para_0027",
+        "selector": {
+          "type": "text_span",
+          "start": 131,
+          "end": 376,
+          "exact": "Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+          "prefix": "ify the number of clusters in datasets. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+      "source_content": {
+        "passage": "Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+        "context": "Providing accurate data visualizations improves GPT and Claude’s ability to correctly identify the number of clusters in datasets. Since introducing blank or misleading visuals does not improve performance relative to the baseline “Data Only” condition, performance gains in conditions with correct scatterplots are attributable to models recognizing clusters via the visual .",
+        "start": 131,
+        "end": 376
+      },
+      "description": "Notes that blank or misleading visuals do not improve over the Data Only baseline, and that gains with correct scatterplots are attributed to visual cluster recognition.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000031": {
+      "evidence_id": "evidence_000031",
+      "kind": "paragraph",
+      "source_element_id": "para_0028",
+      "source_anchor": {
+        "element_id": "para_0028",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 130,
+          "exact": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision.",
+          "prefix": "",
+          "suffix": " With 2-cluster data, GPT improves sligh"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision.",
+      "source_content": {
+        "passage": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision.",
+        "context": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision. With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least ",
+        "start": 0,
+        "end": 130
+      },
+      "description": "States that visualization benefits increase as datasets become more subtle and cluster identification requires more precision.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000032": {
+      "evidence_id": "evidence_000032",
+      "kind": "paragraph",
+      "source_element_id": "para_0028",
+      "source_anchor": {
+        "element_id": "para_0028",
+        "selector": {
+          "type": "text_span",
+          "start": 131,
+          "end": 257,
+          "exact": "With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+          "prefix": "identification requires more precision. ",
+          "suffix": " However, for 4- or 5-cluster datasets, "
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+      "source_content": {
+        "passage": "With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+        "context": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision. With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+        "start": 131,
+        "end": 257
+      },
+      "description": "Reports a smaller effect for 2-cluster data: GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000033": {
+      "evidence_id": "evidence_000033",
+      "kind": "paragraph",
+      "source_element_id": "para_0028",
+      "source_anchor": {
+        "element_id": "para_0028",
+        "selector": {
+          "type": "text_span",
+          "start": 258,
+          "end": 462,
+          "exact": "However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+          "prefix": "dentifies 2 clusters across conditions. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+      "source_content": {
+        "passage": "However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+        "context": "fit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision. With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+        "start": 258,
+        "end": 462
+      },
+      "description": "Reports larger gains for 4- or 5-cluster datasets, with GPT and Claude at least 2.3 and 1.7 times more accurate, respectively, with the correct scatterplot than without it.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000034": {
+      "evidence_id": "evidence_000034",
+      "kind": "paragraph",
+      "source_element_id": "para_0029",
+      "source_anchor": {
+        "element_id": "para_0029",
+        "selector": {
+          "type": "text_span",
+          "start": 302,
+          "end": 414,
+          "exact": "Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5.",
+          "prefix": "on raw numerical inputs can be brittle. ",
+          "suffix": " Performance in the “Data Only” conditio"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5.",
+      "source_content": {
+        "passage": "Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5.",
+        "context": " cluster identification accuracy in the “Data Only,” “Data & Blank,” and “Data & Wrong” conditions between the 2- and 3-cluster dataset settings. This drop-off indicates LVLM dataset comprehension based solely on raw numerical inputs can be brittle. Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5. Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+        "start": 302,
+        "end": 414
+      },
+      "description": "Claude’s performance with correct visuals declines from 3 to 5 clusters.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000035": {
+      "evidence_id": "evidence_000035",
+      "kind": "paragraph",
+      "source_element_id": "para_0029",
+      "source_anchor": {
+        "element_id": "para_0029",
+        "selector": {
+          "type": "text_span",
+          "start": 415,
+          "end": 627,
+          "exact": "Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+          "prefix": "dataset clusters increases from 3 to 5. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+      "source_content": {
+        "passage": "Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+        "context": " and 3-cluster dataset settings. This drop-off indicates LVLM dataset comprehension based solely on raw numerical inputs can be brittle. Claude’s performance with correct visuals also declines as the number of dataset clusters increases from 3 to 5. Performance in the “Data Only” condition largely plateaus in this interval, indicating that changes in numerical and visual dataset reasoning abilities may not be strongly correlated for certain tasks and models.",
+        "start": 415,
+        "end": 627
+      },
+      "description": "Data Only performance largely plateaus from 3 to 5 clusters, with a note that numerical and visual reasoning changes may not be strongly correlated for certain tasks and models.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000036": {
+      "evidence_id": "evidence_000036",
+      "kind": "paragraph",
+      "source_element_id": "para_0030",
+      "source_anchor": {
+        "element_id": "para_0030",
+        "selector": {
+          "type": "text_span",
+          "start": 119,
+          "end": 436,
+          "exact": "when it fails, Claude misidentifies the number of clusters in 5-cluster datasets by more than one in 51% of responses with the data alone compared to 8% of responses with correct visuals, suggesting that even when absolute accuracy declines, visuals may benefit data analysis by reducing the magnitude of LVLM errors.",
+          "prefix": "mber of clusters in datasets. Moreover, ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "when it fails, Claude misidentifies the number of clusters in 5-cluster datasets by more than one in 51% of responses with the data alone compared to 8% of responses with correct visuals, suggesting that even when absolute accuracy declines, visuals may benefit data analysis by reducing the magnitude of LVLM errors.",
+      "source_content": {
+        "passage": "when it fails, Claude misidentifies the number of clusters in 5-cluster datasets by more than one in 51% of responses with the data alone compared to 8% of responses with correct visuals, suggesting that even when absolute accuracy declines, visuals may benefit data analysis by reducing the magnitude of LVLM errors.",
+        "context": "Across all conditions, both models almost always fail by underestimating the number of clusters in datasets. Moreover, when it fails, Claude misidentifies the number of clusters in 5-cluster datasets by more than one in 51% of responses with the data alone compared to 8% of responses with correct visuals, suggesting that even when absolute accuracy declines, visuals may benefit data analysis by reducing the magnitude of LVLM errors.",
+        "start": 119,
+        "end": 436
+      },
+      "description": "In the clustering-pattern results, Claude’s error magnitude on 5-cluster datasets is reported to be lower with correct visuals than with data alone (51% vs 8% misidentifying by more than one).",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000037": {
+      "evidence_id": "evidence_000037",
+      "kind": "figure",
+      "source_element_id": "fig_0003",
+      "source_anchor": {
+        "element_id": "fig_0003",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 3",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in input datasets . Success counts are presented for scenarios with 3 to 9 points sampled beyond the vertex. At higher subtlety levels, providing only an accurate plot results in better performance for both models than providing the data and plot.",
+        "alt_text": null,
+        "image_asset_id": "asset_0003"
+      },
+      "description": "Figure caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in input datasets, with success counts for scenarios using 3 to 9 points sampled beyond the vertex; it also says that at higher subtlety levels, providing only an accurate plot performs better for both models than providing the data and plot.",
+      "observed_via": "caption_only",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000038": {
+      "evidence_id": "evidence_000038",
+      "kind": "paragraph",
+      "source_element_id": "para_0032",
+      "source_anchor": {
+        "element_id": "para_0032",
+        "selector": {
+          "type": "text_span",
+          "start": 38,
+          "end": 157,
+          "exact": "Claude and GPT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases.",
+          "prefix": "Similar to the cluster counting task, ",
+          "suffix": " Again, the “Data & Wrong” condition con"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Claude and GPT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases.",
+      "source_content": {
+        "passage": "Claude and GPT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases.",
+        "context": "Similar to the cluster counting task, Claude and GPT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases. Again, the “Data & Wrong” condition consistently induces the worst performance . This trend is particularly pronounced for parabola datasets: across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more t",
+        "start": 38,
+        "end": 157
+      },
+      "description": "States that, for parabola identification, Claude and GPT perform best when given an accurate plot, with the benefit becoming stronger at higher dataset subtlety.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000039": {
+      "evidence_id": "evidence_000039",
+      "kind": "paragraph",
+      "source_element_id": "para_0032",
+      "source_anchor": {
+        "element_id": "para_0032",
+        "selector": {
+          "type": "text_span",
+          "start": 300,
+          "end": 448,
+          "exact": "across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more than half compared to any other condition.",
+          "prefix": "larly pronounced for parabola datasets: ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more than half compared to any other condition.",
+      "source_content": {
+        "passage": "across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more than half compared to any other condition.",
+        "context": "PT perform best in parabola identification with an accurate plot, especially as dataset subtlety increases. Again, the “Data & Wrong” condition consistently induces the worst performance . This trend is particularly pronounced for parabola datasets: across subtlety levels, including a misleading best-fit linear scatterplot reduces success counts by more than half compared to any other condition.",
+        "start": 300,
+        "end": 448
+      },
+      "description": "Reports that a misleading best-fit linear scatterplot cuts parabola-identification success counts by more than half versus other conditions across subtlety levels.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000040": {
+      "evidence_id": "evidence_000040",
+      "kind": "paragraph",
+      "source_element_id": "para_0034",
+      "source_anchor": {
+        "element_id": "para_0034",
+        "selector": {
+          "type": "text_span",
+          "start": 152,
+          "end": 288,
+          "exact": "for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting.",
+          "prefix": "ls achieve non-zero success counts, but ",
+          "suffix": " At this level, Claude mentions “logarit"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting.",
+      "source_content": {
+        "passage": "for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting.",
+        "context": "There are also notable differences between the clustering and parabolic settings. For all cluster datasets, models achieve non-zero success counts, but for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting. At this level, Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+        "start": 152,
+        "end": 288
+      },
+      "description": "In the parabolic trend setting, Claude has no meaningful performance on the most subtle 3-points-beyond-the-vertex dataset setting.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000041": {
+      "evidence_id": "evidence_000041",
+      "kind": "paragraph",
+      "source_element_id": "para_0034",
+      "source_anchor": {
+        "element_id": "para_0034",
+        "selector": {
+          "type": "text_span",
+          "start": 304,
+          "end": 509,
+          "exact": "Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+          "prefix": "-vertex dataset setting. At this level, ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+      "source_content": {
+        "passage": "Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+        "context": "ing and parabolic settings. For all cluster datasets, models achieve non-zero success counts, but for parabolic trend identification, Claude has no meaningful performance for the most subtle 3-points-beyond-the-vertex dataset setting. At this level, Claude mentions “logarithmic,” “logistic,” or “sigmoid” in 25% of responses with the data alone but in 91% of responses with the correct visual, revealing that models can also misinterpret correct visuals.",
+        "start": 304,
+        "end": 509
+      },
+      "description": "For the parabolic trend task at the most subtle setting, Claude uses those terms in 25% of responses with data alone versus 91% with the correct visual.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000042": {
+      "evidence_id": "evidence_000042",
+      "kind": "paragraph",
+      "source_element_id": "para_0035",
+      "source_anchor": {
+        "element_id": "para_0035",
+        "selector": {
+          "type": "text_span",
+          "start": 147,
+          "end": 251,
+          "exact": "for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others.",
+          "prefix": "y” conditions for clustering datasets , ",
+          "suffix": " For instance, when Claude is presented "
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others.",
+      "source_content": {
+        "passage": "for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others.",
+        "context": "Moreover, while models showed minimal performance differences between the “Data & Correct” and “Correct Only” conditions for clustering datasets , for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others. For instance, when Claude is presented with datasets containing 5 points beyond a parabola’s vertex, including data alongside the correct scatterplot reduces performance by a factor of 3.7. GPT demonstrates a small effect in the same direction on da",
+        "start": 147,
+        "end": 251
+      },
+      "description": "States that in the most subtle parabolic datasets, the correct visualization-only condition outperforms all others.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000043": {
+      "evidence_id": "evidence_000043",
+      "kind": "paragraph",
+      "source_element_id": "para_0035",
+      "source_anchor": {
+        "element_id": "para_0035",
+        "selector": {
+          "type": "text_span",
+          "start": 353,
+          "end": 441,
+          "exact": "including data alongside the correct scatterplot reduces performance by a factor of 3.7.",
+          "prefix": "ng 5 points beyond a parabola’s vertex, ",
+          "suffix": " GPT demonstrates a small effect in the "
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "including data alongside the correct scatterplot reduces performance by a factor of 3.7.",
+      "source_content": {
+        "passage": "including data alongside the correct scatterplot reduces performance by a factor of 3.7.",
+        "context": " Only” conditions for clustering datasets , for the most subtle parabolic datasets, the correct visualization-only condition outperforms all others. For instance, when Claude is presented with datasets containing 5 points beyond a parabola’s vertex, including data alongside the correct scatterplot reduces performance by a factor of 3.7. GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex. Determining the scenarios where visualizations alone provide more useful input relative to raw data could guide better design of AI-assisted dat",
+        "start": 353,
+        "end": 441
+      },
+      "description": "Reports that for Claude on datasets containing 5 points beyond a parabola’s vertex, adding data alongside the correct scatterplot reduces performance by a factor of 3.7.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000044": {
+      "evidence_id": "evidence_000044",
+      "kind": "paragraph",
+      "source_element_id": "para_0035",
+      "source_anchor": {
+        "element_id": "para_0035",
+        "selector": {
+          "type": "text_span",
+          "start": 442,
+          "end": 546,
+          "exact": "GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex.",
+          "prefix": "reduces performance by a factor of 3.7. ",
+          "suffix": " Determining the scenarios where visuali"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex.",
+      "source_content": {
+        "passage": "GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex.",
+        "context": "orrect visualization-only condition outperforms all others. For instance, when Claude is presented with datasets containing 5 points beyond a parabola’s vertex, including data alongside the correct scatterplot reduces performance by a factor of 3.7. GPT demonstrates a small effect in the same direction on datasets containing 3 points beyond the vertex. Determining the scenarios where visualizations alone provide more useful input relative to raw data could guide better design of AI-assisted data analysis tools.",
+        "start": 442,
+        "end": 546
+      },
+      "description": "Reports that GPT shows a smaller effect in the same direction on datasets containing 3 points beyond the parabola’s vertex.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000045": {
+      "evidence_id": "evidence_000045",
+      "kind": "paragraph",
+      "source_element_id": "para_0036",
+      "source_anchor": {
+        "element_id": "para_0036",
+        "selector": {
+          "type": "text_span",
+          "start": 9,
+          "end": 152,
+          "exact": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety",
+          "prefix": "Finally, ",
+          "suffix": ". The misleading “Data & Wrong” conditio"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety",
+      "source_content": {
+        "passage": "visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety",
+        "context": "Finally, visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety. The misleading “Data & Wrong” condition also remains worse than other conditions .",
+        "start": 9,
+        "end": 152
+      },
+      "description": "States that visualization helps GPT and Claude identify a specific outlier in linear datasets and that the benefit increases with task subtlety.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000046": {
+      "evidence_id": "evidence_000046",
+      "kind": "paragraph",
+      "source_element_id": "para_0036",
+      "source_anchor": {
+        "element_id": "para_0036",
+        "selector": {
+          "type": "text_span",
+          "start": 154,
+          "end": 236,
+          "exact": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+          "prefix": "lization increasing with task subtlety. ",
+          "suffix": ""
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+      "source_content": {
+        "passage": "The misleading “Data & Wrong” condition also remains worse than other conditions .",
+        "context": "Finally, visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety. The misleading “Data & Wrong” condition also remains worse than other conditions .",
+        "start": 154,
+        "end": 236
+      },
+      "description": "Notes that the misleading 'Data & Wrong' condition remains worse than other conditions.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000049": {
+      "evidence_id": "evidence_000049",
+      "kind": "paragraph",
+      "source_element_id": "para_0038",
+      "source_anchor": {
+        "element_id": "para_0038",
+        "selector": {
+          "type": "text_span",
+          "start": 301,
+          "end": 436,
+          "exact": "GPT often outputs the entire data table before any analysis. That said, GPT may use these tokens productively to reason about the data.",
+          "prefix": "ncy is that without an accurate visual, ",
+          "suffix": " Also, across all settings, more recentl"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "GPT often outputs the entire data table before any analysis. That said, GPT may use these tokens productively to reason about the data.",
+      "source_content": {
+        "passage": "GPT often outputs the entire data table before any analysis. That said, GPT may use these tokens productively to reason about the data.",
+        "context": "settings. First, model responses vary greatly in length. On average across all datasets and conditions, Claude responses are 288 tokens long while GPT responses are 884 tokens long. One reason for this discrepancy is that without an accurate visual, GPT often outputs the entire data table before any analysis. That said, GPT may use these tokens productively to reason about the data. Also, across all settings, more recently-released GPT-4.1’s performance generally matches and sometimes significantly exceeds Claude-3.5’s performance . This result agrees with existing findings on vision-language benchmarks like MMMU and Mathvista,",
+        "start": 301,
+        "end": 436
+      },
+      "description": "General observation that, without an accurate visual, GPT tends to dump the full table first, but the added tokens may still be used productively for reasoning.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000050": {
+      "evidence_id": "evidence_000050",
+      "kind": "paragraph",
+      "source_element_id": "para_0041",
+      "source_anchor": {
+        "element_id": "para_0041",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 85,
+          "exact": "Our findings provide evidence that visualization can help AI systems understand data.",
+          "prefix": "",
+          "suffix": " This fact raises tantalizing questions "
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Our findings provide evidence that visualization can help AI systems understand data.",
+      "source_content": {
+        "passage": "Our findings provide evidence that visualization can help AI systems understand data.",
+        "context": "Our findings provide evidence that visualization can help AI systems understand data. This fact raises tantalizing questions that lie beyond the scope of this short paper. How do graphical variations on our charts affect the results? After all, a large part of the field of visualization focuses on the efficacy of different charts and",
+        "start": 0,
+        "end": 85
+      },
+      "description": "Discussion statement that visualization helps AI systems understand data.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000051": {
+      "evidence_id": "evidence_000051",
+      "kind": "paragraph",
+      "source_element_id": "para_0045",
+      "source_anchor": {
+        "element_id": "para_0045",
+        "selector": {
+          "type": "text_span",
+          "start": 39,
+          "end": 165,
+          "exact": "Across all three settings, visualization benefits models most when datasets are subtle and challenging to precisely interpret.",
+          "prefix": "When is visualization most beneficial? ",
+          "suffix": " Further research may test the boundarie"
+        }
+      },
+      "source_status": "located",
+      "source_note": "exact_source_quote_located",
+      "source_quote": "Across all three settings, visualization benefits models most when datasets are subtle and challenging to precisely interpret.",
+      "source_content": {
+        "passage": "Across all three settings, visualization benefits models most when datasets are subtle and challenging to precisely interpret.",
+        "context": "When is visualization most beneficial? Across all three settings, visualization benefits models most when datasets are subtle and challenging to precisely interpret. Further research may test the boundaries of these findings, generalizing to new datasets or more nuanced analytical tasks.",
+        "start": 39,
+        "end": 165
+      },
+      "description": "Discussion states that visualization is most beneficial when datasets are subtle and challenging to precisely interpret across all three settings.",
+      "observed_via": "text",
+      "source_asset_id": null,
+      "image_receipt": null,
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000053": {
+      "evidence_id": "evidence_000053",
+      "kind": "figure",
+      "source_element_id": "fig_0002",
+      "source_anchor": {
+        "element_id": "fig_0002",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 2",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets . Success counts are shown for datasets containing two to five clusters. GPT consistently shows significant benefits from accurate visuals, while Claude benefits less when datasets are more subtle.",
+        "alt_text": null,
+        "image_asset_id": "asset_0002",
+        "visual_observation": "Two-panel bar chart. Top panel GPT 4.1: for 3–5 clusters, Data & Correct and Correct Only bars are much higher than Data Only/Data & Blank/Data & Wrong; at 2 clusters all conditions are near ceiling. Bottom panel Claude 3.5: Data & Correct and Correct Only are higher than raw-data baselines for 3–5 clusters, but the separation is smaller for 4–5 clusters than for GPT. The figure caption explicitly notes 'Visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets' and 'GPT consistently shows significant benefits from accurate visuals, while Claude benefits less when datasets are more subtle.'",
+        "visual_observation_source": "model_reading_of_attached_image",
+        "visual_reading_verified": false
+      },
+      "description": "Figure titled 'Visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters in input datasets.' It shows success counts for datasets with 2 to 5 clusters, comparing conditions Data Only, Data & Blank, Data & Wrong, Data & Correct, and Correct Only for GPT 4.1 and Claude 3.5. Visually, the Data & Correct and Correct Only bars are generally higher than the raw-data baselines, and the caption states that GPT consistently shows significant benefits from accurate visuals while Claude benefits less when datasets are more subtle.",
+      "observed_via": "image_input",
+      "source_asset_id": "asset_0002",
+      "image_receipt": {
+        "element_id": "fig_0002",
+        "asset_id": "asset_0002",
+        "source_path": "assets/asset_0002.svg",
+        "source_sha256": "82148b2e0a6c63b2a1f8b8d9ab72272853534c10270aa881a7ef506e2bd86e6c",
+        "sent_sha256": "50cb94af9a3bb326f03ac71473492ce03866e04000d454b672c7470f66132f71",
+        "width": 1056,
+        "height": 576,
+        "cell_id": null,
+        "conversion": "svg_to_png",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "response_id": "resp_07e0ff1a983bd5d6016afdf8983a3c87d280cc06668302b5d1"
+      },
+      "created_run_id": "826b0f46eef0"
+    },
+    "evidence_000054": {
+      "evidence_id": "evidence_000054",
+      "kind": "figure",
+      "source_element_id": "fig_0003",
+      "source_anchor": {
+        "element_id": "fig_0003",
+        "selector": {
+          "type": "element"
+        }
+      },
+      "source_status": "located",
+      "source_note": "figure_element_located",
+      "source_quote": null,
+      "source_content": {
+        "label": "Figure 3",
+        "caption": "Visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in input datasets . Success counts are presented for scenarios with 3 to 9 points sampled beyond the vertex. At higher subtlety levels, providing only an accurate plot results in better performance for both models than providing the data and plot.",
+        "alt_text": null,
+        "image_asset_id": "asset_0003",
+        "visual_observation": "Two-panel bar chart with y-axis Success Count and x-axis Number of Points Beyond Vertex (9, 7, 5, 3). For both GPT 4.1 and Claude 3.5, teal Data & Correct and purple Correct Only bars are the tallest at 9 and 7 points; at 5 points GPT 4.1 still shows teal near the top and purple near the top, while Claude 3.5 shows purple near the top and teal much lower. At 3 points, GPT 4.1 teal is around mid-level and purple above it; Claude 3.5 bars are mostly near zero except a tiny Data & Blank bar.",
+        "visual_observation_source": "model_reading_of_attached_image",
+        "visual_reading_verified": false
+      },
+      "description": "Figure 3 shows success counts for GPT 4.1 and Claude 3.5 across 9, 7, 5, and 3 points beyond the vertex. The conditions in the legend are Data Only, Data & Blank, Data & Wrong, Data & Correct, and Correct Only. In the plotted bars, the Data & Correct condition is high and the Correct Only condition is also high across several settings, while Data Only, Data & Blank, and Data & Wrong are generally lower; at the 3-point setting, GPT 4.1 still shows a moderate Data & Correct bar and a higher Correct Only bar, whereas Claude 3.5 shows near-zero bars for most non-correct conditions at 3 points.",
+      "observed_via": "image_input",
+      "source_asset_id": "asset_0003",
+      "image_receipt": {
+        "element_id": "fig_0003",
+        "asset_id": "asset_0003",
+        "source_path": "assets/asset_0003.svg",
+        "source_sha256": "2ba9fbe8c8611f82322160b1c8914b418d8ebde482509b8c76acf2131ba7d18e",
+        "sent_sha256": "f49540d0dbdd246a717420bf6edf668207fcca70fa2b6a3a212fde9d224cdf1d",
+        "width": 1056,
+        "height": 576,
+        "cell_id": null,
+        "conversion": "svg_to_png",
+        "model": "gpt-5.4-mini-2026-03-17",
+        "response_id": "resp_0aa1e2f72100f26c016afdf89c537087d2837112302efd9fee"
+      },
+      "created_run_id": "826b0f46eef0"
+    }
+  },
+  "completed_claim_windows": {
+    "para_0036:0:236": "completed",
+    "para_0026:0:189": "completed"
+  },
+  "completed_evidence_scans": {
+    "5b1710448b08db88bc567854": "completed",
+    "52ee5a0cd392e62ac206ab59": "completed",
+    "abd0eb5899323c08a4b506ac": "completed",
+    "bd8f69f4b4ba4e18caffec64": "completed",
+    "5d9c5a30812edf12a489b390": "completed",
+    "e7b5af07ea93557180550371": "completed",
+    "bc11d55e64ce23e3f198bf8a": "completed",
+    "69108adb2610e17fdb9d91e6": "completed",
+    "4eb6d498e41580d0e54e8425": "completed",
+    "93794c28ee960262a924bd23": "completed",
+    "c28a5d4eec46e6c456b1823b": "completed",
+    "d8c9f2ca250cd3d82703e594": "completed",
+    "12071e9567e4bbc94d0aa2a9": "completed",
+    "d056bb0922a5fa7b386cef02": "completed",
+    "1375e156c41c50a52ffbfb76": "completed",
+    "a50246852c8bfa81d19f237f": "completed",
+    "78c197958a4bfd10bd3ae049": "completed",
+    "da8814750d6313f5a1da0253": "completed",
+    "faa661011bfcee09ae38ac24": "completed",
+    "cf11ea30cf2a0273252d0359": "completed",
+    "5f4c1433207d3bcd91623d7e": "completed",
+    "f129cbbaaa0d733e55cc41a7": "completed",
+    "007f816b29352206b6bdbb83": "completed",
+    "e87934f869da6e736b30a505": "completed",
+    "f383bafcab498f238009f0b5": "completed",
+    "944e09499b6fab8ee6ca4b7d": "completed",
+    "2e2d6732eb8f0ad3bde61ae1": "completed",
+    "9720e8b1b5a85248ccf38a99": "completed",
+    "8e054f91dd4d9692bd6ec56e": "completed",
+    "7385b662f49f3016ddc71a64": "completed",
+    "fce08e52569291002cf36083": "completed",
+    "3c392d83370300c5c4493e86": "completed",
+    "2bf562f75a3dab14e46a73a8": "completed",
+    "8bef34163acae1d83d599d9f": "completed",
+    "d2d22fdee175f4bc04fe176d": "completed",
+    "2659c1129619a097118a8d7a": "completed",
+    "61ca42efc16501b5b1bcc38e": "completed",
+    "72eb60dd7a7337cc338ba97e": "completed",
+    "421de9fcd624ef8148579390": "completed",
+    "6e98af43d0c02195a99d5830": "completed",
+    "38fb3c642664962031b6bdc2": "completed",
+    "286fe34e07d8f904853f9e23": "completed",
+    "dd69167495cf545b8052d143": "completed",
+    "dcbebec4d417a7bff5bc8d43": "completed",
+    "c88bf094aaf5cc0a7962fbd3": "completed",
+    "0379a81365227fa8a21f047b": "completed",
+    "531c5607f7b22ce1a2ae8fcb": "completed",
+    "6056fb02e6d5d55b81e801e6": "completed",
+    "89669b774dcbde3818e7bcb7": "completed",
+    "b43ca2f5c6814021ed601267": "completed",
+    "eef8a3f27b450c2ec025c411": "completed",
+    "99f580c13f1a03cd621a94d4": "completed",
+    "486cd6cfcb261df61be3b5a5": "completed",
+    "670dc81ecbf6b1c52a7c2741": "completed",
+    "2f8e007be9bec28211dfb66e": "completed",
+    "eb79bd89a091c519c52a045d": "completed",
+    "6054f3f955b0617dc31c483b": "completed",
+    "57e56aba96baabc0ece6d8ae": "completed",
+    "ede3e439dd0e259b331ddb04": "completed",
+    "03cba19038dd1999e6673780": "completed",
+    "99a0ba2fe5e488719c60565e": "completed",
+    "52f1bc9a18445e7b5cae12d2": "completed",
+    "d0937e35deb1b9ea1e2d5b51": "completed",
+    "12291e0c31ac1e4b6a0ea993": "completed",
+    "f36aca5e09f1b36edbee2e36": "completed",
+    "9e4314ee60fb72ed1b93cd15": "completed",
+    "49ef2a08f4599b6127902ddb": "completed",
+    "bba1e1854e434c0fcbc8d012": "completed",
+    "3ba6bee822dbd5113e431c9d": "completed",
+    "d480995e5b790bd87138c5c9": "completed",
+    "af7e92ed6c554a1bc1850ef3": "completed",
+    "bb860bae38fbdc1151c41c36": "completed",
+    "8acd938aea37b6c7240f7721": "completed",
+    "798a202b5e5b65bfa52db16e": "completed",
+    "cb18533828f5cf76606a17b1": "completed",
+    "78e94e24bcd4421614a4b33b": "completed",
+    "646739388b9b1952660d7053": "completed",
+    "3b8290e68a78d8ad0a41bfff": "completed",
+    "4de441d02373bc03100b62b1": "completed",
+    "868581132b657b6d27bdd349": "completed",
+    "7bf8ae26cacc94cc9aeaa627": "completed",
+    "5369938eba418c43b6c2141a": "completed",
+    "3707f827ae03b90c4e32c3a4": "completed",
+    "19e6fb286f46812754c1f90e": "completed",
+    "424f59b2b3aabad3a188d357": "completed",
+    "4af64ad1af106edc14cb48be": "completed",
+    "f468f6bbbdf118a92a013903": "completed",
+    "a7b608f92b7f5fe53637d338": "completed",
+    "d9f10559983a90e34e093f72": "completed",
+    "158165948d5c2bb62280b41c": "completed",
+    "f5594d4b725c96376894d805": "completed",
+    "c70bfb7a8079bc00e6b69f10": "completed",
+    "233c55a02e75c7071eacb3a2": "completed",
+    "67fd028ceb37e633814c1716": "completed",
+    "a217055d1ee3bad9f48cb757": "completed",
+    "0f3bfc4f26427a356b07c40f": "completed",
+    "3b6e79255f48b0d517b7baf4": "completed",
+    "8911b0b40478f6bcef3110c2": "completed",
+    "297a561370662441311d8ec3": "completed",
+    "21aab0a78e33b44e6bff0cbe": "completed",
+    "7c5f487f6f2b32c7ee448996": "completed",
+    "2bb2f7cc7c7180491aad6c22": "completed",
+    "416aa6460ae63054e214fc9b": "completed",
+    "3cca4c4e3db6dcdf43893340": "completed",
+    "3f381b7efff3e04986a8f365": "completed",
+    "e1f71666b27d97b56707b550": "completed",
+    "bcddd4f38811abaed3123a3c": "completed",
+    "4d46d320f340ba04966cc989": "completed",
+    "c4f8b85f9c97c0de64d6b714": "completed",
+    "454725f70d4ef531cc86fca9": "completed",
+    "0d21c054640a0a1caf308587": "completed",
+    "65b4ff09b6393556bb1ea294": "completed",
+    "3e5f3c1d6ed3b9dcd34fd154": "completed",
+    "b6841c97683b08bb4c372711": "completed",
+    "361b253cf84b047108366011": "completed",
+    "3f3cb8b3ef01b07e1151ba49": "completed",
+    "03c71ffed988bbba26ae2664": "completed",
+    "f800d504863d7453ef6c3af5": "completed",
+    "ff5bccc570e0c3efdfe48365": "completed",
+    "d7ffaa713b09989c76704d6d": "completed",
+    "cfdd8b8e4c63ebebce29a258": "completed",
+    "b42ea23dd73503b46312d427": "completed",
+    "0c6d597ec80ee23422759e84": "completed",
+    "dc2cb00d8fd1d2edbb8894c5": "completed",
+    "0f283191ee094977dd0fd49f": "completed",
+    "c39beb2056874c798b780b07": "completed",
+    "5f39fc8776f6c6dc21908dc5": "completed",
+    "d74b0b039cb85c3197f7efa9": "completed",
+    "29d7441ede66692dd172b028": "completed",
+    "1786d9fcd41905222d50f823": "completed",
+    "0f0b8e14247e766bed9ac1a8": "completed",
+    "d4710723952fd977aa01f22e": "completed",
+    "4372c54ba471c4eda41e934c": "completed",
+    "d2ad12ee3e7b9006c1bc588e": "completed",
+    "dbcd643749b41c8baefcd54f": "completed",
+    "f9b7394526f55f9d06dcf70f": "completed",
+    "c8e891262c854486aedfc2c6": "completed",
+    "221dbde183b8112dfea8da2a": "completed",
+    "7b1619c076685f2a8207e0ab": "completed",
+    "98f8c6356566947fdccd3e39": "completed",
+    "49672b157b4d2bb62c4b5f62": "completed",
+    "947c6230b80d609654dd17c8": "completed",
+    "de73aef1e5722cf2c75d12e7": "completed",
+    "7219c86fe5319c91f6506d94": "completed",
+    "19b6c3b32b426efbdd1196cd": "completed",
+    "ff4b5cee73bffa60501e79a7": "completed",
+    "50de65a47456a0780768921d": "completed",
+    "c1548b574eb2cf5abd433eb3": "completed",
+    "5e327bd125c783e9149510f4": "completed",
+    "6f22d79ab42d4ec29e2e4b64": "completed",
+    "5e4158bd0ba992e186baf232": "completed",
+    "be9aa7895da113df4005912a": "completed",
+    "61e051df4d2c3390eeeba097": "completed",
+    "4469d64716859ec30d272526": "completed",
+    "278b935ea378b9211cc0a3a6": "completed",
+    "a5945e855ccb376aa533577e": "completed",
+    "c5e7aa3fbda8e097498957ef": "completed",
+    "295b7c696b3a0318274ac090": "completed",
+    "d2bb61ba169405524368d496": "completed",
+    "a24f64ad1ceff800183b84d2": "completed",
+    "4b877c0f55fa8e391683c533": "completed",
+    "55236a91ebdc9cfb9e310a36": "completed",
+    "05ba1b56f0a5ff0370db15eb": "completed",
+    "93eddccc570142bb6a499de0": "completed",
+    "ee4573bb642d134b3d44ab3d": "completed",
+    "fc8cd4edb4c334b247cf7fa9": "completed",
+    "359614467430390811015f41": "completed",
+    "3a9aec878a20e9606ce0ea1e": "completed",
+    "4c39ae1c67dd5bf795f23755": "completed",
+    "47fa644e8fc543597520d923": "completed",
+    "b4fc2deb2be21bce11615c7a": "completed",
+    "f7e01575115ece3fa46b02ed": "completed",
+    "11d57bad02a3577f08a1087b": "completed",
+    "eeb5984b1fc4f7885cc4b0d8": "completed",
+    "da48c328a44c6d7dc0a483c9": "completed",
+    "9f9f316ed66fea37150f8a0a": "completed",
+    "5a3c778dd814412da6e40250": "completed",
+    "58d6e337aa0f738457317be3": "completed",
+    "fce1d7f766d0990d53c64871": "completed",
+    "6d242e5e55b0656b8aa25fe1": "completed"
+  },
+  "evidence_image_candidates": {
+    "bd8f69f4b4ba4e18caffec64": [
+      "fig_0001"
+    ],
+    "5d9c5a30812edf12a489b390": [
+      "fig_0001"
+    ],
+    "e7b5af07ea93557180550371": [
+      "fig_0001"
+    ],
+    "dd69167495cf545b8052d143": [
+      "fig_0004"
+    ],
+    "dcbebec4d417a7bff5bc8d43": [
+      "fig_0004"
+    ],
+    "c88bf094aaf5cc0a7962fbd3": [
+      "fig_0004"
+    ],
+    "78e94e24bcd4421614a4b33b": [
+      "fig_0001"
+    ],
+    "646739388b9b1952660d7053": [
+      "fig_0001"
+    ],
+    "3b8290e68a78d8ad0a41bfff": [
+      "fig_0001"
+    ],
+    "cfdd8b8e4c63ebebce29a258": [
+      "fig_0002"
+    ],
+    "b42ea23dd73503b46312d427": [
+      "fig_0002"
+    ],
+    "0c6d597ec80ee23422759e84": [
+      "fig_0002"
+    ],
+    "f9b7394526f55f9d06dcf70f": [
+      "fig_0003"
+    ],
+    "c8e891262c854486aedfc2c6": [
+      "fig_0003"
+    ],
+    "221dbde183b8112dfea8da2a": [
+      "fig_0003"
+    ],
+    "5e4158bd0ba992e186baf232": [
+      "fig_0004"
+    ],
+    "be9aa7895da113df4005912a": [
+      "fig_0004"
+    ],
+    "61e051df4d2c3390eeeba097": [
+      "fig_0004"
+    ]
+  },
+  "evidence_search_by_claim": {
+    "claim_000001": {
+      "status": "partial",
+      "scan_cache_policy": "source_scan_v1",
+      "discovery_policy": "claim_topic_element_coverage_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-mini",
+      "search_scope": "whole_paper",
+      "source_section_ids": [],
+      "source_element_ids": [],
+      "image_mode": "relevant",
+      "text_scan_complete": false,
+      "image_scan_complete": true,
+      "run_id": "417fdf98b104"
+    },
+    "claim_000002": {
+      "status": "partial",
+      "scan_cache_policy": "source_scan_v1",
+      "discovery_policy": "claim_topic_element_coverage_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-mini",
+      "search_scope": "whole_paper",
+      "source_section_ids": [],
+      "source_element_ids": [],
+      "image_mode": "relevant",
+      "text_scan_complete": false,
+      "image_scan_complete": true,
+      "run_id": "417fdf98b104"
+    },
+    "claim_000003": {
+      "status": "completed",
+      "scan_cache_policy": "source_scan_v1",
+      "discovery_policy": "claim_topic_element_coverage_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-mini",
+      "search_scope": "whole_paper",
+      "source_section_ids": [],
+      "source_element_ids": [],
+      "image_mode": "relevant",
+      "text_scan_complete": true,
+      "image_scan_complete": true,
+      "run_id": "826b0f46eef0"
+    },
+    "claim_000004": {
+      "status": "completed",
+      "scan_cache_policy": "source_scan_v1",
+      "discovery_policy": "claim_topic_element_coverage_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-mini",
+      "search_scope": "whole_paper",
+      "source_section_ids": [],
+      "source_element_ids": [],
+      "image_mode": "relevant",
+      "text_scan_complete": true,
+      "image_scan_complete": true,
+      "run_id": "826b0f46eef0"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "9ccfd6f5ede4",
+      "stage": "coordinator",
+      "mode": "ask_ai",
+      "workflow_policy": "unified_question_v1",
+      "budget_policy": "per_question_v1",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "user_question": "Analyze the evidence-to-claim reasoning for each of the two claims in the selected paragraph. Does the experimental evidence support that correct visualization becomes more beneficial as outlier detection gets subtler, and that misleading visualization consistently performs worse than other conditions? For each claim separately, explain the supporting or conflicting evidence, the strength of the reasoning, and any uncertainties or limitations. Do not merely summarize the experimental results.",
+      "model": "gpt-5.4-mini",
+      "language": "en",
+      "image_mode": "relevant",
+      "question_limit_usd": 0.5,
+      "status": "partial",
+      "answer_status": "unavailable",
+      "answer_available": false,
+      "started_at": "2026-11-18T06:53:46.270140+00:00",
+      "attempt_count": 1,
+      "current_phase": "scope_decision",
+      "task_states": {},
+      "stage_results": [],
+      "issues": [
+        "ValueError: Single-mode question must not contain answer_parts."
+      ],
+      "answer": null,
+      "used_mapping_ids": [],
+      "question_budget_id": "9ccfd6f5ede4",
+      "request_contract": {
+        "policy": "explicit_targets_saved_results_v1",
+        "origin": "structured_request",
+        "targets_locked": false,
+        "request": {
+          "schema_version": "reader.request.v1",
+          "paper_id": "arxiv_2507_18022",
+          "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+          "question": "Analyze the evidence-to-claim reasoning for each of the two claims in the selected paragraph. Does the experimental evidence support that correct visualization becomes more beneficial as outlier detection gets subtler, and that misleading visualization consistently performs worse than other conditions? For each claim separately, explain the supporting or conflicting evidence, the strength of the reasoning, and any uncertainties or limitations. Do not merely summarize the experimental results.",
+          "entry_mode": "ask_ai",
+          "operation": "auto",
+          "target_claim_ids": [],
+          "mapping_ids_by_claim": {},
+          "retrieval_scope": {
+            "mode": "whole_paper",
+            "section_ids": [],
+            "element_ids": []
+          },
+          "selection_context": {
+            "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+            "segments": [
+              {
+                "element_id": "para_0036",
+                "start": 0,
+                "end": 236,
+                "exact": "Finally, visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety. The misleading “Data & Wrong” condition also remains worse than other conditions ."
+              }
+            ]
+          },
+          "chat_history": []
+        }
+      },
+      "scope_policy": "ask_ai_selection_first_v1",
+      "answer_source_provenance": null,
+      "answer_mapping_trace": null,
+      "qa_answer_mode": null,
+      "qa_answer_mode_fallback_reason": null,
+      "qa_material_actions": [],
+      "qa_material_inventory": null,
+      "qa_material_gap": null,
+      "finished_at": "2026-11-18T06:53:49.401318+00:00",
+      "attempt_cost_reports": [
+        {
+          "llm_calls_recorded": 1,
+          "input_tokens": 2528,
+          "cached_input_tokens": 0,
+          "output_tokens": 208,
+          "reasoning_tokens": 0,
+          "failed_attempts": 0,
+          "input_images": 0,
+          "currency": "USD",
+          "estimate_only": true,
+          "complete": true,
+          "estimated_total_usd": 0.002832,
+          "known_cost_usd": 0.002832,
+          "by_agent": [
+            {
+              "agent": "AskAISelectionDecision",
+              "llm_calls": 1,
+              "input_tokens": 2528,
+              "cached_input_tokens": 0,
+              "output_tokens": 208
+            }
+          ]
+        }
+      ],
+      "budget_report": {
+        "paper_id": "arxiv_2507_18022",
+        "question_budget_id": "9ccfd6f5ede4",
+        "budget_policy": "per_question_v1",
+        "limit_usd": 0.5,
+        "operating_limit_usd": 0.45,
+        "safety_margin_usd": 0.05,
+        "committed_usd": 0.002832,
+        "remaining_usd": 0.447168,
+        "uncertain_entries": 0,
+        "blocked": false,
+        "stop_reason": null,
+        "estimate_only": true
+      },
+      "token_usage_report": {
+        "llm_calls_recorded": 1,
+        "input_tokens": 2528,
+        "cached_input_tokens": 0,
+        "output_tokens": 208,
+        "reasoning_tokens": 0,
+        "failed_attempts": 0,
+        "total_tokens": 2736,
+        "uncached_input_tokens": 2528,
+        "estimated_total_usd": 0.002832,
+        "token_usage_completeness": "complete",
+        "by_agent": {
+          "AskAISelectionDecision": {
+            "calls": 1,
+            "input_tokens": 2528,
+            "cached_input_tokens": 0,
+            "output_tokens": 208
+          }
+        }
+      }
+    },
+    {
+      "run_id": "e4319f8fecc0",
+      "stage": "coordinator",
+      "mode": "selected_analysis",
+      "workflow_policy": "unified_question_v1",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "user_question": "Analyze EVERY substantive author Claim in the selected passages. Locate relevant paper Evidence, explain each Claim, and provide a grounded synthesis of meaningful cross-Claim relationships.",
+      "model": "gpt-5.4-mini",
+      "language": "en",
+      "image_mode": "relevant",
+      "question_limit_usd": 0.5,
+      "budget_policy": "per_question_v1",
+      "status": "completed",
+      "started_at": "2026-11-18T19:10:57.704489+00:00",
+      "current_phase": "answer",
+      "task_states": {
+        "t1": {
+          "selected_claim_ids": [
+            "claim_000003",
+            "claim_000004"
+          ],
+          "claim_selection_policy": "all_substantive_claims_in_highlight",
+          "selected_evidence_ids": [
+            "evidence_000007",
+            "evidence_000029",
+            "evidence_000030",
+            "evidence_000054",
+            "evidence_000018",
+            "evidence_000053",
+            "evidence_000008",
+            "evidence_000032",
+            "evidence_000033",
+            "evidence_000014",
+            "evidence_000044",
+            "evidence_000043",
+            "evidence_000031",
+            "evidence_000035",
+            "evidence_000037",
+            "evidence_000017",
+            "evidence_000006"
+          ],
+          "missing_information": [],
+          "collection_ready": true,
+          "coverage": {
+            "selected_claim_count": 2,
+            "claim_extraction_complete": true,
+            "evidence_scan_complete": true,
+            "evidence_search_scope": "whole_paper",
+            "selected_evidence_count": 17,
+            "search_is_not_proof_of_absence": true
+          },
+          "mapping_ids": [
+            "mapping_000003",
+            "mapping_000004"
+          ],
+          "mapping_ids_by_claim": {
+            "claim_000003": "mapping_000003",
+            "claim_000004": "mapping_000004"
+          },
+          "mapping_errors": [],
+          "analyzed_claim_ids": [
+            "claim_000003",
+            "claim_000004"
+          ],
+          "deferred_claim_ids": [],
+          "mapping_diagnostics": [],
+          "mapping_input_policy": "bounded_no_links_v2"
+        }
+      },
+      "stage_results": [
+        {
+          "stage": "evidence",
+          "exit_code": 0,
+          "child_run_ids": [
+            "826b0f46eef0"
+          ],
+          "status": "completed",
+          "time": "2026-11-18T19:12:35.782201+00:00"
+        }
+      ],
+      "issues": [],
+      "created_mapping_ids": [
+        "mapping_000003",
+        "mapping_000004"
+      ],
+      "used_mapping_ids": [
+        "mapping_000003",
+        "mapping_000004"
+      ],
+      "answer": {
+        "answer": "# Analysis of selected author Claims\n\n\n\n## claim_000003\n\nRelative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.\n\n\n\n### mapping_000003\n\nThe claim is supported at the study scope used here. The paper’s comparison setup includes several full-raw-data conditions—data only, data plus a blank image, data plus a misleading visualization, and data plus the correct plot—so the relevant question is whether adding the correct visualization improves performance over the other full-data baselines. The supplied evidence indicates that it does for both GPT and Claude on the paper’s dataset-understanding tasks: cluster counting, parabolic-trend identification, and outlier identification. Figure 2 reports improved cluster detection for both models when accurate visuals are available; Figure 3 reports improved parabolic-trend identification; and Figure 4 reports improved outlier identification, especially as subtlety increases. This establishes the claimed directional result that including the correct visualization helps compared with raw-data baselines.\n\nThe support is best read as a general experimental finding, not as a statement that every single setting shows the same magnitude of gain. The cluster evidence includes an easy 2-cluster case where Claude performs similarly across conditions, and the parabolic-trend figure notes that at higher subtlety, plot-only can outperform data-plus-plot. Those points qualify how uniform the effect is, but they do not overturn the main claim that adding the correct visualization improves GPT and Claude’s dataset understanding relative to full-data baselines overall.\n\n- evidence_000017 [context; parts=source_text]: This paragraph defines the five evaluation conditions, including the full-raw-data baselines and the full-raw-data-plus-correct-visualization condition. It provides the comparison scope needed to interpret the claim’s phrase 'relative to baselines with full raw data.'\n\n- evidence_000053 [supports; parts=caption, visual_observation]: Figure 2 directly supports the claim for the cluster-identification task. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters, and the supplied visual reading indicates that the Data & Correct bars are generally above the raw-data baselines for 3- to 5-cluster datasets. This is direct evidence that adding the correct visualization helps both models relative to full-data baselines.\n\n- evidence_000037 [supports; parts=caption]: Figure 3 supports the claim for the parabolic-trend task. The caption explicitly says visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in datasets. Although it also notes that at higher subtlety the correct plot alone can outperform data-plus-plot, the caption still supports the narrower claim that correct visualization improves understanding relative to the baseline conditions without an accurate plot.\n\n- evidence_000008 [supports; parts=caption]: Figure 4 extends the same pattern to outlier identification. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier, with declines especially without accurate visuals as subtlety increases. This broadens support for the claim from one task to multiple dataset-understanding tasks.\n\n- evidence_000032 [qualifies; parts=source_text]: This paragraph qualifies the strength and uniformity of the effect in the cluster task: with 2-cluster data, GPT improves only slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. That means the claim is best interpreted as an overall study result rather than a strict every-setting improvement of large magnitude.\n\nQualification: The evidence supports a study-level trend, not a universal improvement in every individual setting.\n\nQualification: In the easy 2-cluster setting, Claude shows little or no gain across conditions, and in the parabolic-trend task the caption notes that correct-plot-only can outperform data-plus-correct-plot at higher subtlety.\n\n\n\n## claim_000004\n\nAcross settings, performance uplift grows with dataset subtlety.\n\n\n\n### mapping_000004\n\nThe supplied evidence supports this claim in a qualified way, but not as a fully quantified universal statement. The clearest support comes from the clustering setting: the paper explicitly says the visualization benefit becomes more dramatic as datasets become more subtle, and it contrasts low-subtlety 2-cluster data—where GPT improves only slightly and Claude succeeds across conditions—with higher-subtlety 4- or 5-cluster data, where accurate scatterplots make GPT and Claude at least 2.3 times and 1.7 times more accurate than without the correct plot. That is direct evidence that uplift grows with subtlety in that setting. The outlier setting points in the same direction: as subtlety increases, performance declines especially without accurate visuals, which is consistent with accurate visuals providing a larger relative advantage on subtler data. A parabolic-trend caption also suggests subtleity makes visual information more important, though the supplied comparison there is between plot-only and data-plus-plot rather than directly against the raw-data baseline. Overall, the evidence supports a cross-setting trend, but only partially: the support is strongest for clustering, inferential for outliers, and less directly aligned for the parabolic setting. In addition, one caption notes that Claude benefits less when cluster datasets are more subtle, which tempers any reading that uplift increases uniformly for every model and condition.\n\n- evidence_000031 [supports; parts=source_text]: This paragraph directly states that the benefit of visualization becomes more dramatic as datasets become more subtle in the cluster-identification setting.\n\n- evidence_000032 [supports; parts=source_text]: This gives the low-subtlety reference point: with 2-cluster data, GPT improves only slightly and Claude performs similarly across conditions, indicating little uplift when the task is less subtle.\n\n- evidence_000033 [supports; parts=source_text]: This provides the higher-subtlety contrast for clustering: for 4- or 5-cluster datasets, accurate scatterplots substantially increase accuracy, with GPT and Claude at least 2.3 times and 1.7 times more accurate than without the correct plot.\n\n- evidence_000008 [supports; parts=caption]: The Figure 4 caption says that as subtlety increases, both models' performance declines especially without accurate visuals. That supports the idea that accurate visuals confer greater relative benefit on subtler outlier-detection cases.\n\n- evidence_000037 [qualifies; parts=caption]: The Figure 3 caption indicates that at higher subtlety levels in the parabolic task, an accurate plot becomes especially important, but the stated comparison is plot-only versus data-plus-plot, not directly versus the raw-data baseline. So it is relevant but only partially aligned with the claim's 'uplift' framing.\n\n- evidence_000053 [qualifies; parts=caption]: This caption supports a visualization benefit in cluster detection overall, but its note that Claude benefits less when datasets are more subtle tempers a strong universal reading that uplift increases uniformly for every model as subtlety rises.\n\nQualification: The strongest direct support is for the clustering task; the other settings are supported more indirectly through captions rather than full numeric comparisons.\n\nQualification: The supplied parabolic-trend evidence does not directly compare uplift against the raw-data baseline at higher subtlety, so it only partially bears on the claim.\n\nQualification: The evidence supports a general trend, not a strict monotonic increase for every model in every setting.",
+        "used_source_ids": [
+          "claim_000003",
+          "mapping_000003",
+          "evidence_000017",
+          "evidence_000053",
+          "evidence_000037",
+          "evidence_000008",
+          "evidence_000032",
+          "claim_000004",
+          "mapping_000004",
+          "evidence_000031",
+          "evidence_000033"
+        ],
+        "limitations": [
+          "Material limitations are recorded for claim_000004"
+        ]
+      },
+      "answer_status": "generated",
+      "selection": {
+        "segments": [
+          {
+            "element_id": "para_0026",
+            "start": 0,
+            "end": 189
+          }
+        ],
+        "claim_ids": [
+          "claim_000003",
+          "claim_000004"
+        ],
+        "claim_complete": true
+      },
+      "task_plan": {
+        "paper_id": "arxiv_2507_18022",
+        "user_message": "Analyze EVERY substantive author Claim in the selected passages. Locate relevant paper Evidence, explain each Claim, and provide a grounded synthesis of meaningful cross-Claim relationships.",
+        "language": "en",
+        "tasks": [
+          {
+            "task_id": "t1",
+            "intent": "explain_argument",
+            "goal": "Analyze EVERY substantive author Claim in the selected passages. Locate relevant paper Evidence, explain each Claim, and provide a grounded synthesis of meaningful cross-Claim relationships.",
+            "scope": {
+              "mode": "selection",
+              "section_ids": [],
+              "element_ids": [
+                "para_0026"
+              ],
+              "claim_ids": [
+                "claim_000003",
+                "claim_000004"
+              ],
+              "user_locked": false
+            },
+            "evidence_scope": "whole_paper",
+            "mapping_focus": "claim_support",
+            "output_style": "structured"
+          }
+        ]
+      },
+      "question_budget_id": "e4319f8fecc0",
+      "mapping_model": "gpt-5.4-2026-03-05",
+      "mapping_reasoning_effort": "medium",
+      "execution_decisions": [
+        {
+          "stage": "mapping",
+          "action": "compute_or_exact_cache",
+          "claim_ids": [
+            "claim_000003",
+            "claim_000004"
+          ],
+          "mapping_model": "gpt-5.4-2026-03-05",
+          "reasoning_effort": "medium",
+          "reason": "Requested analysis, not a saved-result explanation.",
+          "analysis_focus": "claim_support"
+        }
+      ],
+      "mapping_grounding_attempts": {
+        "7f986d2841147286d007081ecd7bc79bf781ed06ab046f0e4ca10d1cd830defd": {
+          "calls": 1,
+          "errors": [],
+          "claim_id": "claim_000003"
+        },
+        "ada4551f1f28c8293afcc63087655910f64d2b69442caeab8b83869b57480871": {
+          "calls": 1,
+          "errors": [],
+          "claim_id": "claim_000004"
+        }
+      },
+      "mapping_diagnostics": [],
+      "display_policy": "per_claim_pinned_mapping_origin_guard_v2",
+      "display_evidence_ids_role": "aggregate_diagnostic_only_not_a_selected_claim_view",
+      "explicit_evidence_only_ids": [],
+      "unfinished_tasks": [],
+      "material_limitations_by_claim": {
+        "claim_000004": [
+          "The strongest direct support is for the clustering task; the other settings are supported more indirectly through captions rather than full numeric comparisons.",
+          "The supplied parabolic-trend evidence does not directly compare uplift against the raw-data baseline at higher subtlety, so it only partially bears on the claim.",
+          "The evidence supports a general trend, not a strict monotonic increase for every model in every setting."
+        ]
+      },
+      "answer_reused": false,
+      "answer_input_signature": "7f0078be371b7567d9711f8f2687084880cfae8a6a42be408cbca2ad40035407",
+      "answer_rendering_mode": "saved_results",
+      "answer_scope": "requested_operation",
+      "answer_available": true,
+      "processing_status": "completed",
+      "analysis_material_status": "limited",
+      "finished_at": "2026-11-18T19:14:26.132351+00:00",
+      "attempt_cost_reports": [
+        {
+          "llm_calls_recorded": 2,
+          "input_tokens": 9542,
+          "cached_input_tokens": 0,
+          "output_tokens": 6446,
+          "reasoning_tokens": 4649,
+          "failed_attempts": 0,
+          "input_images": 0,
+          "currency": "USD",
+          "estimate_only": true,
+          "complete": true,
+          "estimated_total_usd": 0.120545,
+          "known_cost_usd": 0.120545,
+          "by_agent": [
+            {
+              "agent": "Mapping",
+              "llm_calls": 2,
+              "input_tokens": 9542,
+              "cached_input_tokens": 0,
+              "output_tokens": 6446
+            }
+          ]
+        }
+      ],
+      "budget_report": {
+        "paper_id": "arxiv_2507_18022",
+        "question_budget_id": "e4319f8fecc0",
+        "budget_policy": "per_question_v1",
+        "limit_usd": 0.5,
+        "operating_limit_usd": 0.45,
+        "safety_margin_usd": 0.05,
+        "committed_usd": 0.2396195,
+        "remaining_usd": 0.2103805,
+        "uncertain_entries": 0,
+        "blocked": false,
+        "stop_reason": null,
+        "estimate_only": true
+      },
+      "token_usage_report": {
+        "llm_calls_recorded": 81,
+        "input_tokens": 123944,
+        "cached_input_tokens": 0,
+        "output_tokens": 13840,
+        "reasoning_tokens": 4649,
+        "failed_attempts": 0,
+        "total_tokens": 137784,
+        "uncached_input_tokens": 123944,
+        "estimated_total_usd": 0.2396195,
+        "token_usage_completeness": "complete",
+        "by_agent": {
+          "Evidence": {
+            "calls": 40,
+            "input_tokens": 72562,
+            "cached_input_tokens": 0,
+            "output_tokens": 6307
+          },
+          "EvidenceSourceSelection": {
+            "calls": 2,
+            "input_tokens": 7768,
+            "cached_input_tokens": 0,
+            "output_tokens": 208
+          },
+          "EvidenceTopicReview": {
+            "calls": 37,
+            "input_tokens": 34072,
+            "cached_input_tokens": 0,
+            "output_tokens": 879
+          },
+          "Mapping": {
+            "calls": 2,
+            "input_tokens": 9542,
+            "cached_input_tokens": 0,
+            "output_tokens": 6446
+          }
+        }
+      }
+    },
+    {
+      "run_id": "826b0f46eef0",
+      "stage": "evidence",
+      "model": "gpt-5.4-mini",
+      "discovery_policy": "claim_topic_element_coverage_v7",
+      "scan_cache_policy": "source_scan_v1",
+      "corrected_table_descriptions": 0,
+      "reused_source_chunks": 0,
+      "reused_image_assets": 0,
+      "rejected_findings": 0,
+      "finding_rejections": [],
+      "source_processing": [
+        {
+          "stage": "text_scan",
+          "scan_id": "11174fba4acd97d8e223007f",
+          "element_id": "para_0001",
+          "source_start": 0,
+          "source_end": 682,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000013",
+            "evidence_000014"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "d79de9bf576113d8bdd60f7e",
+          "element_id": "para_0005",
+          "source_start": 0,
+          "source_end": 833,
+          "raw_candidates": 3,
+          "topic_admitted": 3,
+          "evidence_ids": [
+            "evidence_000015",
+            "evidence_000017"
+          ],
+          "new_evidence": 3,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "3c915f453167bd723efb22ed",
+          "element_id": "para_0006",
+          "source_start": 0,
+          "source_end": 301,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000018"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "340b3ce9e3075c15cc359211",
+          "element_id": "para_0007",
+          "source_start": 0,
+          "source_end": 173,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000019"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "d205c754801ce70a2d76f5ab",
+          "element_id": "para_0012",
+          "source_start": 0,
+          "source_end": 446,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000020"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "133792d5f4c0c0ca85a4284b",
+          "element_id": "fig_0001",
+          "source_start": null,
+          "source_end": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000001"
+          ],
+          "new_evidence": 0,
+          "reused_evidence": 1,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "d53ffb1fafd86e62dd5008eb",
+          "element_id": "para_0013",
+          "source_start": 0,
+          "source_end": 393,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000021"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "c8b1fe338ecf1a456a5ac9a4",
+          "element_id": "para_0014",
+          "source_start": 0,
+          "source_end": 197,
+          "raw_candidates": 1,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "all_candidates_excluded_by_topic"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "18fc714b25fb838e34db929a",
+          "element_id": "para_0015",
+          "source_start": 0,
+          "source_end": 500,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000022"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "7064bb855a980825d2d08b53",
+          "element_id": "para_0016",
+          "source_start": 0,
+          "source_end": 132,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000023"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "0569124c7d10466f7d211c32",
+          "element_id": "para_0017",
+          "source_start": 0,
+          "source_end": 669,
+          "raw_candidates": 0,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "no_related_findings_returned"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "be1b9da8798fa64a7ddd92fd",
+          "element_id": "para_0018",
+          "source_start": 0,
+          "source_end": 65,
+          "raw_candidates": 1,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "all_candidates_excluded_by_topic"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "a97658d61a3a87b939a0315a",
+          "element_id": "para_0019",
+          "source_start": 0,
+          "source_end": 619,
+          "raw_candidates": 0,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "no_related_findings_returned"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "8f0b0906414b304dc585f54d",
+          "element_id": "para_0020",
+          "source_start": 0,
+          "source_end": 59,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000024"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "cd930f6165d5daf16c83e386",
+          "element_id": "para_0021",
+          "source_start": 0,
+          "source_end": 127,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000025"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "bb1488788676bc536175cf23",
+          "element_id": "para_0022",
+          "source_start": 0,
+          "source_end": 112,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000004"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "3514adc79bee8069de726910",
+          "element_id": "para_0023",
+          "source_start": 0,
+          "source_end": 64,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000005"
+          ],
+          "new_evidence": 0,
+          "reused_evidence": 1,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "6fcd3943484f93c0129574f1",
+          "element_id": "para_0024",
+          "source_start": 0,
+          "source_end": 66,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000027"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "f0f1c908cec81d65f879eac1",
+          "element_id": "para_0025",
+          "source_start": 0,
+          "source_end": 515,
+          "raw_candidates": 0,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "no_related_findings_returned"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "b6046cb14695929e38c7e70b",
+          "element_id": "para_0026",
+          "source_start": 0,
+          "source_end": 189,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 2,
+          "structural_rejections": 0,
+          "status": "claim_origin_only"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "85b3446e98f2d46ae39bf388",
+          "element_id": "fig_0002",
+          "source_start": null,
+          "source_end": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000028"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "45dce55dba98cebcf37eaf69",
+          "element_id": "para_0027",
+          "source_start": 0,
+          "source_end": 376,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000029",
+            "evidence_000030"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "6a96b85f92962258b37b128c",
+          "element_id": "para_0028",
+          "source_start": 0,
+          "source_end": 462,
+          "raw_candidates": 3,
+          "topic_admitted": 3,
+          "evidence_ids": [
+            "evidence_000031",
+            "evidence_000032",
+            "evidence_000033"
+          ],
+          "new_evidence": 3,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "c76c0bd799a4c020f078a776",
+          "element_id": "para_0029",
+          "source_start": 0,
+          "source_end": 627,
+          "raw_candidates": 3,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000034",
+            "evidence_000035"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "e9f86e3b27f7db9f7266c6c9",
+          "element_id": "para_0030",
+          "source_start": 0,
+          "source_end": 436,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000036"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "c0e40fde9a7a9715655a63f5",
+          "element_id": "fig_0003",
+          "source_start": null,
+          "source_end": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000037"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "9a39bdcb76eb8a124060f7e9",
+          "element_id": "para_0032",
+          "source_start": 0,
+          "source_end": 448,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000038",
+            "evidence_000039"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "0e1b4c1fdd349f9879477460",
+          "element_id": "para_0033",
+          "source_start": 0,
+          "source_end": 493,
+          "raw_candidates": 1,
+          "topic_admitted": 0,
+          "evidence_ids": [],
+          "new_evidence": 0,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "all_candidates_excluded_by_topic"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "8f040c44154eeaf4a141a631",
+          "element_id": "para_0034",
+          "source_start": 0,
+          "source_end": 509,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000040",
+            "evidence_000041"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "a247e6f7573eb9abc0c99155",
+          "element_id": "para_0035",
+          "source_start": 0,
+          "source_end": 708,
+          "raw_candidates": 3,
+          "topic_admitted": 3,
+          "evidence_ids": [
+            "evidence_000042",
+            "evidence_000043",
+            "evidence_000044"
+          ],
+          "new_evidence": 3,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "5cd2e59e9ed187dec4b2ee34",
+          "element_id": "fig_0004",
+          "source_start": null,
+          "source_end": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000008"
+          ],
+          "new_evidence": 0,
+          "reused_evidence": 1,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "96192a4483bf9753bb877b2a",
+          "element_id": "para_0036",
+          "source_start": 0,
+          "source_end": 236,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000045",
+            "evidence_000046"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "0b88ebe735c3fcec1c0926d1",
+          "element_id": "para_0037",
+          "source_start": 0,
+          "source_end": 441,
+          "raw_candidates": 2,
+          "topic_admitted": 2,
+          "evidence_ids": [
+            "evidence_000009",
+            "evidence_000010"
+          ],
+          "new_evidence": 2,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "6eff9a547acc9b117e4c3275",
+          "element_id": "para_0038",
+          "source_start": 0,
+          "source_end": 764,
+          "raw_candidates": 2,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000049"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "1ade97f84f6c43f6b5f31e1f",
+          "element_id": "para_0041",
+          "source_start": 0,
+          "source_end": 742,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000050"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "text_scan",
+          "scan_id": "1b733faec84d87b30fef160e",
+          "element_id": "para_0045",
+          "source_start": 0,
+          "source_end": 288,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000051"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "claim_origin_omitted": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "image_scan",
+          "scan_id": "4c39ae1c67dd5bf795f23755",
+          "element_id": "fig_0001",
+          "asset_id": "asset_0001",
+          "cell_id": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000011"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "image_scan",
+          "scan_id": "f7e01575115ece3fa46b02ed",
+          "element_id": "fig_0002",
+          "asset_id": "asset_0002",
+          "cell_id": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000053"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "image_scan",
+          "scan_id": "da48c328a44c6d7dc0a483c9",
+          "element_id": "fig_0003",
+          "asset_id": "asset_0003",
+          "cell_id": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000054"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        },
+        {
+          "stage": "image_scan",
+          "scan_id": "58d6e337aa0f738457317be3",
+          "element_id": "fig_0004",
+          "asset_id": "asset_0004",
+          "cell_id": null,
+          "raw_candidates": 1,
+          "topic_admitted": 1,
+          "evidence_ids": [
+            "evidence_000012"
+          ],
+          "new_evidence": 1,
+          "reused_evidence": 0,
+          "structural_rejections": 0,
+          "status": "evidence_saved_or_reused"
+        }
+      ],
+      "claim_origin_omitted": 2,
+      "topic_review": {
+        "calls": 37,
+        "candidate_findings": 53,
+        "accepted_findings": 48,
+        "excluded_findings": 5,
+        "excluded_source_element_ids": [
+          "para_0014",
+          "para_0018",
+          "para_0029",
+          "para_0033",
+          "para_0038"
+        ],
+        "reviewed_image_candidates": 8
+      },
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "claim_batch_size": 6,
+      "chunk_chars": 6000,
+      "claim_ids": [
+        "claim_000003",
+        "claim_000004"
+      ],
+      "search_scope": "whole_paper",
+      "source_section_ids": [],
+      "source_element_ids": [],
+      "image_mode": "relevant",
+      "status": "completed",
+      "started_at": "2026-11-18T19:10:58.036271+00:00",
+      "finished_at": "2026-11-18T19:12:35.519201+00:00",
+      "text_scans_completed": 36,
+      "image_scans_completed": 4,
+      "new_evidence": 43,
+      "unavailable_images": [],
+      "issues": [],
+      "source_selection": {
+        "policy": "claim_source_catalog_v2_context",
+        "index_fingerprint": "c8d17bcadd85e64a9bfc3667",
+        "catalog_elements": 57,
+        "catalog_batches_scanned": 2,
+        "model_selected_elements": 36,
+        "protected_context_elements": [
+          "para_0026"
+        ],
+        "selected_element_ids": [
+          "fig_0001",
+          "fig_0002",
+          "fig_0003",
+          "fig_0004",
+          "para_0001",
+          "para_0005",
+          "para_0006",
+          "para_0007",
+          "para_0012",
+          "para_0013",
+          "para_0014",
+          "para_0015",
+          "para_0016",
+          "para_0017",
+          "para_0018",
+          "para_0019",
+          "para_0020",
+          "para_0021",
+          "para_0022",
+          "para_0023",
+          "para_0024",
+          "para_0025",
+          "para_0026",
+          "para_0027",
+          "para_0028",
+          "para_0029",
+          "para_0030",
+          "para_0032",
+          "para_0033",
+          "para_0034",
+          "para_0035",
+          "para_0036",
+          "para_0037",
+          "para_0038",
+          "para_0041",
+          "para_0045"
+        ],
+        "excluded_catalog_elements": 21,
+        "note": "All catalog elements were screened. Extraction used selected originals only; this is not a guarantee of scientific completeness."
+      },
+      "planned_targeted_text_scans": 36,
+      "pending_text_source_windows": [],
+      "pending_text_scan_keys": [],
+      "pending_image_scan_keys": [],
+      "source_processing_summary": {
+        "attempted_or_reused_source_windows": 40,
+        "pending_text_scans": 0,
+        "pending_image_scans": 0,
+        "structural_rejections": 0,
+        "source_selection_completed": true
+      },
+      "coverage": {
+        "text_scan_complete": true,
+        "image_scan_complete": true,
+        "image_scope": "selected_candidates_only",
+        "planned_text_scans": 36,
+        "source_index_screened": true,
+        "all_paper_chunks_extracted": false,
+        "source_selection_complete": true,
+        "topic_review_policy": "candidate_subject_admission_v1",
+        "planned_image_scans": 4
+      },
+      "api_cost_report": {
+        "llm_calls_recorded": 79,
+        "input_tokens": 114402,
+        "cached_input_tokens": 0,
+        "output_tokens": 7394,
+        "reasoning_tokens": 0,
+        "failed_attempts": 0,
+        "input_images": 4,
+        "complete": true,
+        "estimated_total_usd": 0.1190745,
+        "known_cost_usd": 0.1190745,
+        "currency": "USD",
+        "estimate_only": true,
+        "by_agent": [
+          {
+            "agent": "Evidence",
+            "llm_calls": 40,
+            "input_tokens": 72562,
+            "cached_input_tokens": 0,
+            "output_tokens": 6307,
+            "estimated_cost_usd": 0.082803,
+            "known_cost_usd": 0.082803
+          },
+          {
+            "agent": "EvidenceSourceSelection",
+            "llm_calls": 2,
+            "input_tokens": 7768,
+            "cached_input_tokens": 0,
+            "output_tokens": 208,
+            "estimated_cost_usd": 0.006762,
+            "known_cost_usd": 0.006762
+          },
+          {
+            "agent": "EvidenceTopicReview",
+            "llm_calls": 37,
+            "input_tokens": 34072,
+            "cached_input_tokens": 0,
+            "output_tokens": 879,
+            "estimated_cost_usd": 0.0295095,
+            "known_cost_usd": 0.0295095
+          }
+        ]
+      },
+      "budget_report": {
+        "paper_id": "arxiv_2507_18022",
+        "question_budget_id": "e4319f8fecc0",
+        "budget_policy": "per_question_v1",
+        "limit_usd": 0.5,
+        "operating_limit_usd": 0.45,
+        "safety_margin_usd": 0.05,
+        "committed_usd": 0.1190745,
+        "remaining_usd": 0.3309255,
+        "uncertain_entries": 0,
+        "blocked": false,
+        "stop_reason": null,
+        "estimate_only": true
+      },
+      "token_usage_report": {
+        "llm_calls_recorded": 79,
+        "input_tokens": 114402,
+        "cached_input_tokens": 0,
+        "output_tokens": 7394,
+        "reasoning_tokens": 0,
+        "failed_attempts": 0,
+        "total_tokens": 121796,
+        "uncached_input_tokens": 114402,
+        "estimated_total_usd": 0.1190745,
+        "token_usage_completeness": "complete",
+        "by_agent": {
+          "Evidence": {
+            "calls": 40,
+            "input_tokens": 72562,
+            "cached_input_tokens": 0,
+            "output_tokens": 6307
+          },
+          "EvidenceSourceSelection": {
+            "calls": 2,
+            "input_tokens": 7768,
+            "cached_input_tokens": 0,
+            "output_tokens": 208
+          },
+          "EvidenceTopicReview": {
+            "calls": 37,
+            "input_tokens": 34072,
+            "cached_input_tokens": 0,
+            "output_tokens": 879
+          }
+        }
+      },
+      "stage_results": [],
+      "parent_workflow_id": "e4319f8fecc0",
+      "question_budget_id": "e4319f8fecc0"
+    }
+  ],
+  "summaries": {},
+  "mappings": {
+    "mapping_000001": {
+      "mapping_id": "mapping_000001",
+      "claim_id": "claim_000001",
+      "status": "completed",
+      "record_policy": "per_claim_single_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-2026-03-05",
+      "language": "en",
+      "analysis_focus": "claim_support",
+      "input_signature": "8c269df1d38aa72a600dfadbc1d7e1f5ab44c75be103adfba658ea6c55c76284",
+      "mapping_policy_signature": "a90b92ef6735c8f9a1a83ecab17f65fd70d83f01d0b79002393c6a34f5693fd2",
+      "target_claim_ids": [
+        "claim_000001"
+      ],
+      "claim_analysis": {
+        "claim_id": "claim_000001",
+        "explanation": "The supplied evidence supports this claim at a qualitative level. The task setup in the paper is a linear dataset with one injected outlier, and subtlety is defined by the outlier’s vertical z-score: lower z-scores are more subtle. Figure 4’s caption directly states that visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier, and that performance declines as subtlety increases, especially when accurate visuals are absent. The image-based reading of Figure 4 is consistent with that statement: for both model panels, the accurate-visual conditions (Data & Correct and Correct Only) are highest across most z-score bins, while performance drops toward the subtler bins, and the gap between accurate-visual conditions and the non-correct conditions is larger in those subtler bins. Additional text clarifies that the relevant visualization condition is a correct plot of the datapoints, and that outlier detection in this setting concerns identifying a specific datapoint rather than a whole-dataset pattern. Together, this is sufficient to support the claim that visualization helps both models identify the outlier in linear datasets, with a larger relative benefit as the task becomes subtler.",
+        "evidence_ids_used": [
+          "evidence_000008",
+          "evidence_000012",
+          "evidence_000002",
+          "evidence_000005",
+          "evidence_000010"
+        ],
+        "qualifications": [
+          "The 'benefit increasing with task subtlety' portion is supported qualitatively from the figure caption and visual trend, not by exact numeric bar values in the supplied packet.",
+          "Figure 4's image reading was supplied as a model-generated visual observation rather than independent manual verification, though it aligns with the figure caption."
+        ],
+        "evidence_relations": [
+          {
+            "evidence_id": "evidence_000008",
+            "relation": "supports",
+            "explanation": "The Figure 4 caption directly states that visualization improves GPT 4.1 and Claude 3.5's ability to identify the correct outlier, and adds that performance declines as subtlety increases, especially without accurate visuals. This is the most direct source-grounded support for both main parts of the claim.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000012",
+            "relation": "supports",
+            "explanation": "The supplied visual reading of Figure 4 reports that, in both model panels, Data & Correct and Correct Only are the highest conditions across most z-score bins, while Data Only / Blank / Wrong do worse, and that the gap favoring accurate visuals widens in the subtler bins. That observed pattern supports both 'visualization helps both models' and 'the benefit increases with subtlety.'",
+            "source_parts_used": [
+              "visual_observation"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000002",
+            "relation": "supports",
+            "explanation": "This paragraph defines the evaluated datasets as linear data with one randomly selected point shifted to create an outlier, and it states that dataset subtlety increases as the outlier's vertical z-score decreases. That grounds the claim's references to 'linear datasets,' a 'specific outlier,' and the subtlety ordering used in Figure 4.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000005",
+            "relation": "context",
+            "explanation": "This defines 'Data & Correct' as including the plot displaying the datapoints, clarifying what the beneficial visualization condition in Figure 4 actually is.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000010",
+            "relation": "context",
+            "explanation": "This text explains that outlier detection requires retrieval and analysis of specific data values, which clarifies why the claim is framed as identifying a specific outlier rather than a broader dataset pattern.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          }
+        ],
+        "material_status": "sufficient_for_scoped_analysis",
+        "grounding_validation": {
+          "policy": "mapping_readable_v2",
+          "status": "passed",
+          "scope": "Supplied Evidence IDs, source components and any explicit cell bindings.",
+          "numeric_semantics_verified": false
+        }
+      },
+      "missing_claim_ids": [],
+      "unexpected_claim_ids": [],
+      "unresolved_evidence_ids": [],
+      "validation_issues": [],
+      "created_run_id": "732c01d1b4a6",
+      "created_at": "2026-11-18T08:02:19.179801+00:00",
+      "cache_scope": "exact_bounded_packet",
+      "retrieval_receipt": {
+        "policy": "evidence_packet_grounded_tables_v6",
+        "claim_id": "claim_000001",
+        "expanded": false,
+        "packet_bytes": 13361,
+        "packet_byte_limit": 24000,
+        "pool_records_considered_locally": 12,
+        "complete_recall_guaranteed": false,
+        "scope_element_ids": null,
+        "missing_direct_source_ids": [],
+        "candidate_count": 12,
+        "priority_deferred_count": 0,
+        "deferred_for_size_count": 0,
+        "claim_origin_only_count": 0
+      },
+      "claim_snapshot_fingerprint": "194e9e5e583a8aec64e098ec2c823d511222d85246a3a08fb09fd94862d10594",
+      "used_evidence_fingerprints": {
+        "evidence_000008": "3c1676ae643f48b7158e6435ebefd096937febaf3da26d0e228792eb9c283687",
+        "evidence_000012": "f18a437e3643aec9854f71408a1cb59c04ac9ae72c97c2303ab085cd5d9686f0",
+        "evidence_000002": "16aaaab93a88f3f70dba606c83c8921e31beb0c66a29fb364de651d6106e600c",
+        "evidence_000005": "dd4765938912386ea02368b3e6e724a3061b2f20a8fcb92c0569000e9f93d245",
+        "evidence_000010": "7c9f6701d4a6e545c50f74af64a61aef1cdf64bce57ac858ad65a0cba795a053"
+      }
+    },
+    "mapping_000002": {
+      "mapping_id": "mapping_000002",
+      "claim_id": "claim_000002",
+      "status": "completed",
+      "record_policy": "per_claim_single_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-2026-03-05",
+      "language": "en",
+      "analysis_focus": "claim_support",
+      "input_signature": "07a9700cfe4cf1aea0646b7f26c56c58017ee0114b1c32ddfaa3a1c6ec7c8f10",
+      "mapping_policy_signature": "a90b92ef6735c8f9a1a83ecab17f65fd70d83f01d0b79002393c6a34f5693fd2",
+      "target_claim_ids": [
+        "claim_000002"
+      ],
+      "claim_analysis": {
+        "claim_id": "claim_000002",
+        "explanation": "Within the outlier-identification experiment shown in Figure 4, the evidence supports the claim that the misleading \"Data & Wrong\" condition is worse than the other plotted conditions. The figure’s visual reading indicates that for both GPT 4.1 and Claude 3.5, the \"Data & Wrong\" bars are below \"Data Only\" and \"Data & Blank\" in each vertical z-score bin, while \"Data & Correct\" and \"Correct Only\" are higher still. That makes \"Data & Wrong\" the lowest-performing condition in the displayed comparisons for this task. The support is scoped to the plotted Figure 4 setting and relies on a supplied visual observation rather than exact tabulated values.",
+        "evidence_ids_used": [
+          "evidence_000012",
+          "evidence_000004"
+        ],
+        "qualifications": [
+          "This conclusion is limited to the outlier-detection setting shown in Figure 4, where the compared conditions are Data Only, Data & Blank, Data & Wrong, Data & Correct, and Correct Only.",
+          "The comparison is based on a provided visual reading of the figure, not on exact numeric values from a table."
+        ],
+        "evidence_relations": [
+          {
+            "evidence_id": "evidence_000012",
+            "relation": "supports",
+            "explanation": "The supplied visual observation for Figure 4 states that in both model panels, the \"Data & Wrong\" bars are lower than \"Data Only\" and \"Data & Blank\" in each vertical z-score group, while \"Data & Correct\" and \"Correct Only\" are highest across most bins. This directly supports the claim that \"Data & Wrong\" remains worse than the other conditions in the displayed outlier task.",
+            "source_parts_used": [
+              "caption",
+              "visual_observation"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000004",
+            "relation": "context",
+            "explanation": "This paragraph defines \"Data & Wrong\" as a misleading visualization condition intended to test whether discrepant visual information degrades judgments. It helps identify what condition is being compared, but does not itself establish the performance ranking.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          }
+        ],
+        "material_status": "sufficient_for_scoped_analysis",
+        "grounding_validation": {
+          "policy": "mapping_readable_v2",
+          "status": "passed",
+          "scope": "Supplied Evidence IDs, source components and any explicit cell bindings.",
+          "numeric_semantics_verified": false
+        }
+      },
+      "missing_claim_ids": [],
+      "unexpected_claim_ids": [],
+      "unresolved_evidence_ids": [],
+      "validation_issues": [],
+      "created_run_id": "732c01d1b4a6",
+      "created_at": "2026-11-18T08:02:38.013812+00:00",
+      "cache_scope": "exact_bounded_packet",
+      "retrieval_receipt": {
+        "policy": "evidence_packet_grounded_tables_v6",
+        "claim_id": "claim_000002",
+        "expanded": false,
+        "packet_bytes": 13305,
+        "packet_byte_limit": 24000,
+        "pool_records_considered_locally": 12,
+        "complete_recall_guaranteed": false,
+        "scope_element_ids": null,
+        "missing_direct_source_ids": [],
+        "candidate_count": 12,
+        "priority_deferred_count": 0,
+        "deferred_for_size_count": 0,
+        "claim_origin_only_count": 0
+      },
+      "claim_snapshot_fingerprint": "755918f3a53703ddfe90a30e3c951cbedad03c7189b9f4dda9c414df13b7c8db",
+      "used_evidence_fingerprints": {
+        "evidence_000012": "f18a437e3643aec9854f71408a1cb59c04ac9ae72c97c2303ab085cd5d9686f0",
+        "evidence_000004": "7afdca390fdba03136d82409577ab8cee2e441ae87681236807d2502e73dfa8e"
+      }
+    },
+    "mapping_000003": {
+      "mapping_id": "mapping_000003",
+      "claim_id": "claim_000003",
+      "status": "completed",
+      "record_policy": "per_claim_single_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-2026-03-05",
+      "language": "en",
+      "analysis_focus": "claim_support",
+      "input_signature": "459d0387f81437ece2c77591a476e9bf067c0e297e1b8b698358eb27055580a8",
+      "mapping_policy_signature": "a90b92ef6735c8f9a1a83ecab17f65fd70d83f01d0b79002393c6a34f5693fd2",
+      "target_claim_ids": [
+        "claim_000003"
+      ],
+      "claim_analysis": {
+        "claim_id": "claim_000003",
+        "explanation": "The claim is supported at the study scope used here. The paper’s comparison setup includes several full-raw-data conditions—data only, data plus a blank image, data plus a misleading visualization, and data plus the correct plot—so the relevant question is whether adding the correct visualization improves performance over the other full-data baselines. The supplied evidence indicates that it does for both GPT and Claude on the paper’s dataset-understanding tasks: cluster counting, parabolic-trend identification, and outlier identification. Figure 2 reports improved cluster detection for both models when accurate visuals are available; Figure 3 reports improved parabolic-trend identification; and Figure 4 reports improved outlier identification, especially as subtlety increases. This establishes the claimed directional result that including the correct visualization helps compared with raw-data baselines.\n\nThe support is best read as a general experimental finding, not as a statement that every single setting shows the same magnitude of gain. The cluster evidence includes an easy 2-cluster case where Claude performs similarly across conditions, and the parabolic-trend figure notes that at higher subtlety, plot-only can outperform data-plus-plot. Those points qualify how uniform the effect is, but they do not overturn the main claim that adding the correct visualization improves GPT and Claude’s dataset understanding relative to full-data baselines overall.",
+        "evidence_ids_used": [
+          "evidence_000017",
+          "evidence_000053",
+          "evidence_000037",
+          "evidence_000008",
+          "evidence_000032"
+        ],
+        "qualifications": [
+          "The evidence supports a study-level trend, not a universal improvement in every individual setting.",
+          "In the easy 2-cluster setting, Claude shows little or no gain across conditions, and in the parabolic-trend task the caption notes that correct-plot-only can outperform data-plus-correct-plot at higher subtlety."
+        ],
+        "evidence_relations": [
+          {
+            "evidence_id": "evidence_000017",
+            "relation": "context",
+            "explanation": "This paragraph defines the five evaluation conditions, including the full-raw-data baselines and the full-raw-data-plus-correct-visualization condition. It provides the comparison scope needed to interpret the claim’s phrase 'relative to baselines with full raw data.'",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000053",
+            "relation": "supports",
+            "explanation": "Figure 2 directly supports the claim for the cluster-identification task. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters, and the supplied visual reading indicates that the Data & Correct bars are generally above the raw-data baselines for 3- to 5-cluster datasets. This is direct evidence that adding the correct visualization helps both models relative to full-data baselines.",
+            "source_parts_used": [
+              "caption",
+              "visual_observation"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000037",
+            "relation": "supports",
+            "explanation": "Figure 3 supports the claim for the parabolic-trend task. The caption explicitly says visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in datasets. Although it also notes that at higher subtlety the correct plot alone can outperform data-plus-plot, the caption still supports the narrower claim that correct visualization improves understanding relative to the baseline conditions without an accurate plot.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000008",
+            "relation": "supports",
+            "explanation": "Figure 4 extends the same pattern to outlier identification. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier, with declines especially without accurate visuals as subtlety increases. This broadens support for the claim from one task to multiple dataset-understanding tasks.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000032",
+            "relation": "qualifies",
+            "explanation": "This paragraph qualifies the strength and uniformity of the effect in the cluster task: with 2-cluster data, GPT improves only slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. That means the claim is best interpreted as an overall study result rather than a strict every-setting improvement of large magnitude.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          }
+        ],
+        "material_status": "sufficient_for_scoped_analysis",
+        "grounding_validation": {
+          "policy": "mapping_readable_v2",
+          "status": "passed",
+          "scope": "Supplied Evidence IDs, source components and any explicit cell bindings.",
+          "numeric_semantics_verified": false
+        }
+      },
+      "missing_claim_ids": [],
+      "unexpected_claim_ids": [],
+      "unresolved_evidence_ids": [],
+      "validation_issues": [],
+      "created_run_id": "e4319f8fecc0",
+      "created_at": "2026-11-18T19:13:31.384462+00:00",
+      "cache_scope": "exact_bounded_packet",
+      "retrieval_receipt": {
+        "policy": "evidence_packet_grounded_tables_v6",
+        "claim_id": "claim_000003",
+        "expanded": false,
+        "packet_bytes": 16088,
+        "packet_byte_limit": 24000,
+        "pool_records_considered_locally": 55,
+        "complete_recall_guaranteed": false,
+        "scope_element_ids": null,
+        "missing_direct_source_ids": [],
+        "candidate_count": 16,
+        "priority_deferred_count": 0,
+        "deferred_for_size_count": 0,
+        "claim_origin_only_count": 1
+      },
+      "claim_snapshot_fingerprint": "f9bbdd1166afdc8ee122bd291f9456f6e0698911a5a4722deb00c04dd85a7d0c",
+      "used_evidence_fingerprints": {
+        "evidence_000017": "8462b2046ab4ab04f82876d8502e18c354c4bdf6627c3aef400a04bda2b955b3",
+        "evidence_000053": "d39edec4200f50870627f9871eb97ea352c8744db6facbf616ce7c43b1732d9b",
+        "evidence_000037": "4c54bc9a5d5d8f972090c60f1a137ac4f1302f0706f2873e022226ddd6fd0704",
+        "evidence_000008": "3c1676ae643f48b7158e6435ebefd096937febaf3da26d0e228792eb9c283687",
+        "evidence_000032": "899838264eaae001becb9d9c449b703552d2b155687be2cde1d2927d54427070"
+      }
+    },
+    "mapping_000004": {
+      "mapping_id": "mapping_000004",
+      "claim_id": "claim_000004",
+      "status": "completed",
+      "record_policy": "per_claim_single_v7",
+      "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+      "model": "gpt-5.4-2026-03-05",
+      "language": "en",
+      "analysis_focus": "claim_support",
+      "input_signature": "0510f3967bcae34b653fdf11a91f60feca2086a576768a66b7a0d58cf67b9fd8",
+      "mapping_policy_signature": "a90b92ef6735c8f9a1a83ecab17f65fd70d83f01d0b79002393c6a34f5693fd2",
+      "target_claim_ids": [
+        "claim_000004"
+      ],
+      "claim_analysis": {
+        "claim_id": "claim_000004",
+        "explanation": "The supplied evidence supports this claim in a qualified way, but not as a fully quantified universal statement. The clearest support comes from the clustering setting: the paper explicitly says the visualization benefit becomes more dramatic as datasets become more subtle, and it contrasts low-subtlety 2-cluster data—where GPT improves only slightly and Claude succeeds across conditions—with higher-subtlety 4- or 5-cluster data, where accurate scatterplots make GPT and Claude at least 2.3 times and 1.7 times more accurate than without the correct plot. That is direct evidence that uplift grows with subtlety in that setting. The outlier setting points in the same direction: as subtlety increases, performance declines especially without accurate visuals, which is consistent with accurate visuals providing a larger relative advantage on subtler data. A parabolic-trend caption also suggests subtleity makes visual information more important, though the supplied comparison there is between plot-only and data-plus-plot rather than directly against the raw-data baseline. Overall, the evidence supports a cross-setting trend, but only partially: the support is strongest for clustering, inferential for outliers, and less directly aligned for the parabolic setting. In addition, one caption notes that Claude benefits less when cluster datasets are more subtle, which tempers any reading that uplift increases uniformly for every model and condition.",
+        "evidence_ids_used": [
+          "evidence_000031",
+          "evidence_000032",
+          "evidence_000033",
+          "evidence_000008",
+          "evidence_000037",
+          "evidence_000053"
+        ],
+        "qualifications": [
+          "The strongest direct support is for the clustering task; the other settings are supported more indirectly through captions rather than full numeric comparisons.",
+          "The supplied parabolic-trend evidence does not directly compare uplift against the raw-data baseline at higher subtlety, so it only partially bears on the claim.",
+          "The evidence supports a general trend, not a strict monotonic increase for every model in every setting."
+        ],
+        "evidence_relations": [
+          {
+            "evidence_id": "evidence_000031",
+            "relation": "supports",
+            "explanation": "This paragraph directly states that the benefit of visualization becomes more dramatic as datasets become more subtle in the cluster-identification setting.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000032",
+            "relation": "supports",
+            "explanation": "This gives the low-subtlety reference point: with 2-cluster data, GPT improves only slightly and Claude performs similarly across conditions, indicating little uplift when the task is less subtle.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000033",
+            "relation": "supports",
+            "explanation": "This provides the higher-subtlety contrast for clustering: for 4- or 5-cluster datasets, accurate scatterplots substantially increase accuracy, with GPT and Claude at least 2.3 times and 1.7 times more accurate than without the correct plot.",
+            "source_parts_used": [
+              "source_text"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000008",
+            "relation": "supports",
+            "explanation": "The Figure 4 caption says that as subtlety increases, both models' performance declines especially without accurate visuals. That supports the idea that accurate visuals confer greater relative benefit on subtler outlier-detection cases.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000037",
+            "relation": "qualifies",
+            "explanation": "The Figure 3 caption indicates that at higher subtlety levels in the parabolic task, an accurate plot becomes especially important, but the stated comparison is plot-only versus data-plus-plot, not directly versus the raw-data baseline. So it is relevant but only partially aligned with the claim's 'uplift' framing.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          },
+          {
+            "evidence_id": "evidence_000053",
+            "relation": "qualifies",
+            "explanation": "This caption supports a visualization benefit in cluster detection overall, but its note that Claude benefits less when datasets are more subtle tempers a strong universal reading that uplift increases uniformly for every model as subtlety rises.",
+            "source_parts_used": [
+              "caption"
+            ],
+            "cell_ids_used": []
+          }
+        ],
+        "material_status": "limited",
+        "grounding_validation": {
+          "policy": "mapping_readable_v2",
+          "status": "passed",
+          "scope": "Supplied Evidence IDs, source components and any explicit cell bindings.",
+          "numeric_semantics_verified": false
+        }
+      },
+      "missing_claim_ids": [],
+      "unexpected_claim_ids": [],
+      "unresolved_evidence_ids": [],
+      "validation_issues": [],
+      "created_run_id": "e4319f8fecc0",
+      "created_at": "2026-11-18T19:14:25.946577+00:00",
+      "cache_scope": "exact_bounded_packet",
+      "retrieval_receipt": {
+        "policy": "evidence_packet_grounded_tables_v6",
+        "claim_id": "claim_000004",
+        "expanded": false,
+        "packet_bytes": 16088,
+        "packet_byte_limit": 24000,
+        "pool_records_considered_locally": 55,
+        "complete_recall_guaranteed": false,
+        "scope_element_ids": null,
+        "missing_direct_source_ids": [],
+        "candidate_count": 16,
+        "priority_deferred_count": 0,
+        "deferred_for_size_count": 0,
+        "claim_origin_only_count": 1
+      },
+      "claim_snapshot_fingerprint": "6fa4bd4b5942319e35d63db48df319841823ba93f9d1da88a369114a80f8022c",
+      "used_evidence_fingerprints": {
+        "evidence_000031": "e4215da3a7ae0bdc3a6990dd45eb726c5093167da1dea557b8dee58dab0dbd45",
+        "evidence_000032": "899838264eaae001becb9d9c449b703552d2b155687be2cde1d2927d54427070",
+        "evidence_000033": "68ce2f406dbf4cb8dd3a786dfc5d93f8d73a1f5636756dd91f90378813709335",
+        "evidence_000008": "3c1676ae643f48b7158e6435ebefd096937febaf3da26d0e228792eb9c283687",
+        "evidence_000037": "4c54bc9a5d5d8f972090c60f1a137ac4f1302f0706f2873e022226ddd6fd0704",
+        "evidence_000053": "d39edec4200f50870627f9871eb97ea352c8744db6facbf616ce7c43b1732d9b"
+      }
+    }
+  },
+  "mapping_by_claim": {
+    "claim_000001": "mapping_000001",
+    "claim_000002": "mapping_000002",
+    "claim_000003": "mapping_000003",
+    "claim_000004": "mapping_000004"
+  },
+  "snapshot_id": "c1bbcbbabb7a8c6fa3f25e2188b12f7d05687a6cd05531f6bbec5e3f6325dc92"
+}

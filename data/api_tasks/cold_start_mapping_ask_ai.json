@@ -1,0 +1,18 @@
+{
+  "schema_version": "reader.request.v1",
+  "paper_id": "arxiv_2507_18022",
+  "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+  "entry_mode": "ask_ai",
+  "question": "Analyze the evidence-to-claim reasoning for each of the two claims in the selected paragraph. Does the experimental evidence support that correct visualization becomes more beneficial as outlier detection gets subtler, and that misleading visualization consistently performs worse than other conditions? For each claim separately, explain the supporting or conflicting evidence, the strength of the reasoning, and any uncertainties or limitations. Do not merely summarize the experimental results.",
+  "selection_context": {
+    "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+    "segments": [
+      {
+        "element_id": "para_0036",
+        "start": 0,
+        "end": 236,
+        "exact": "Finally, visualization helps both models identify a specific outlier in linear datasets, with the benefit of visualization increasing with task subtlety. The misleading “Data & Wrong” condition also remains worse than other conditions ."
+      }
+    ]
+  }
+}

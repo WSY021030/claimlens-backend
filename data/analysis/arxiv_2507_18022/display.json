@@ -1,0 +1,498 @@
+{
+  "paper_id": "arxiv_2507_18022",
+  "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+  "snapshot_id": "c1bbcbbabb7a8c6fa3f25e2188b12f7d05687a6cd05531f6bbec5e3f6325dc92",
+  "workflow_id": "e4319f8fecc0",
+  "display_policy": "current_per_claim_origin_guard_v1",
+  "display_by_claim": {
+    "claim_000001": {
+      "claim_id": "claim_000001",
+      "mapping_id": "mapping_000001",
+      "status": "unavailable",
+      "evidence_ids": [],
+      "edges": [],
+      "issues": [
+        "Adopted Evidence changed after analysis: evidence_000012.",
+        "Adopted Evidence changed after analysis: evidence_000010."
+      ]
+    },
+    "claim_000002": {
+      "claim_id": "claim_000002",
+      "mapping_id": "mapping_000002",
+      "status": "unavailable",
+      "evidence_ids": [],
+      "edges": [],
+      "issues": [
+        "Adopted Evidence changed after analysis: evidence_000012.",
+        "Adopted Evidence changed after analysis: evidence_000004."
+      ]
+    },
+    "claim_000003": {
+      "claim_id": "claim_000003",
+      "mapping_id": "mapping_000003",
+      "status": "available",
+      "material_status": "sufficient_for_scoped_analysis",
+      "claim_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 0,
+          "end": 124,
+          "exact": "Relative to baselines with full raw data, including a correct visualization improves GPT and Claude’s dataset understanding.",
+          "prefix": "",
+          "suffix": " Across settings, performance uplift gro"
+        }
+      },
+      "evidence_ids": [
+        "evidence_000017",
+        "evidence_000053",
+        "evidence_000037",
+        "evidence_000008",
+        "evidence_000032"
+      ],
+      "evidence_highlights": [
+        {
+          "evidence_id": "evidence_000017",
+          "kind": "paragraph",
+          "source_element_id": "para_0005",
+          "source_anchor": {
+            "element_id": "para_0005",
+            "selector": {
+              "type": "text_span",
+              "start": 334,
+              "end": 617,
+              "exact": "For each task, we prompt models to identify trends, patterns, or features of interest in a synthetic setting under five conditions: (1) numerical data alone, (2–4) raw data with a blank image, misleading visualization, and correct data plot, and (5) the correct visualization alone .",
+              "prefix": "rate and specific dataset descriptions. ",
+              "suffix": " Similarities in model behavior indicate"
+            }
+          },
+          "source_parts_used": [
+            "source_text"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000053",
+          "kind": "figure",
+          "source_element_id": "fig_0002",
+          "source_anchor": {
+            "element_id": "fig_0002",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption",
+            "visual_observation"
+          ],
+          "source_asset_id": "asset_0002",
+          "image_receipt_available": true
+        },
+        {
+          "evidence_id": "evidence_000037",
+          "kind": "figure",
+          "source_element_id": "fig_0003",
+          "source_anchor": {
+            "element_id": "fig_0003",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000008",
+          "kind": "figure",
+          "source_element_id": "fig_0004",
+          "source_anchor": {
+            "element_id": "fig_0004",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000032",
+          "kind": "paragraph",
+          "source_element_id": "para_0028",
+          "source_anchor": {
+            "element_id": "para_0028",
+            "selector": {
+              "type": "text_span",
+              "start": 131,
+              "end": 257,
+              "exact": "With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+              "prefix": "identification requires more precision. ",
+              "suffix": " However, for 4- or 5-cluster datasets, "
+            }
+          },
+          "source_parts_used": [
+            "source_text"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        }
+      ],
+      "nodes": [
+        {
+          "id": "claim_000003",
+          "kind": "claim"
+        },
+        {
+          "id": "evidence_000017",
+          "kind": "paragraph",
+          "source_element_id": "para_0005"
+        },
+        {
+          "id": "evidence_000053",
+          "kind": "figure",
+          "source_element_id": "fig_0002"
+        },
+        {
+          "id": "evidence_000037",
+          "kind": "figure",
+          "source_element_id": "fig_0003"
+        },
+        {
+          "id": "evidence_000008",
+          "kind": "figure",
+          "source_element_id": "fig_0004"
+        },
+        {
+          "id": "evidence_000032",
+          "kind": "paragraph",
+          "source_element_id": "para_0028"
+        }
+      ],
+      "edges": [
+        {
+          "from": "evidence_000017",
+          "to": "claim_000003",
+          "mapping_id": "mapping_000003",
+          "relation": "context",
+          "explanation": "This paragraph defines the five evaluation conditions, including the full-raw-data baselines and the full-raw-data-plus-correct-visualization condition. It provides the comparison scope needed to interpret the claim’s phrase 'relative to baselines with full raw data.'",
+          "source_parts_used": [
+            "source_text"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000053",
+          "to": "claim_000003",
+          "mapping_id": "mapping_000003",
+          "relation": "supports",
+          "explanation": "Figure 2 directly supports the claim for the cluster-identification task. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to detect the number of clusters, and the supplied visual reading indicates that the Data & Correct bars are generally above the raw-data baselines for 3- to 5-cluster datasets. This is direct evidence that adding the correct visualization helps both models relative to full-data baselines.",
+          "source_parts_used": [
+            "caption",
+            "visual_observation"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000037",
+          "to": "claim_000003",
+          "mapping_id": "mapping_000003",
+          "relation": "supports",
+          "explanation": "Figure 3 supports the claim for the parabolic-trend task. The caption explicitly says visualization improves GPT 4.1 and Claude 3.5’s ability to identify parabolic trends in datasets. Although it also notes that at higher subtlety the correct plot alone can outperform data-plus-plot, the caption still supports the narrower claim that correct visualization improves understanding relative to the baseline conditions without an accurate plot.",
+          "source_parts_used": [
+            "caption"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000008",
+          "to": "claim_000003",
+          "mapping_id": "mapping_000003",
+          "relation": "supports",
+          "explanation": "Figure 4 extends the same pattern to outlier identification. Its caption states that visualization improves GPT 4.1 and Claude 3.5’s ability to identify the correct outlier, with declines especially without accurate visuals as subtlety increases. This broadens support for the claim from one task to multiple dataset-understanding tasks.",
+          "source_parts_used": [
+            "caption"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000032",
+          "to": "claim_000003",
+          "mapping_id": "mapping_000003",
+          "relation": "qualifies",
+          "explanation": "This paragraph qualifies the strength and uniformity of the effect in the cluster task: with 2-cluster data, GPT improves only slightly with accurate visualizations, while Claude identifies 2 clusters across conditions. That means the claim is best interpreted as an overall study result rather than a strict every-setting improvement of large magnitude.",
+          "source_parts_used": [
+            "source_text"
+          ],
+          "relation_status": "recorded"
+        }
+      ],
+      "qualifications": [
+        "The evidence supports a study-level trend, not a universal improvement in every individual setting.",
+        "In the easy 2-cluster setting, Claude shows little or no gain across conditions, and in the parabolic-trend task the caption notes that correct-plot-only can outperform data-plus-correct-plot at higher subtlety."
+      ],
+      "provenance_warnings": [],
+      "presentation_policy": "origin_guard_read_view_v1",
+      "relation_review_required": false
+    },
+    "claim_000004": {
+      "claim_id": "claim_000004",
+      "mapping_id": "mapping_000004",
+      "status": "available",
+      "material_status": "limited",
+      "claim_anchor": {
+        "element_id": "para_0026",
+        "selector": {
+          "type": "text_span",
+          "start": 125,
+          "end": 189,
+          "exact": "Across settings, performance uplift grows with dataset subtlety.",
+          "prefix": "GPT and Claude’s dataset understanding. ",
+          "suffix": ""
+        }
+      },
+      "evidence_ids": [
+        "evidence_000031",
+        "evidence_000032",
+        "evidence_000033",
+        "evidence_000008",
+        "evidence_000037",
+        "evidence_000053"
+      ],
+      "evidence_highlights": [
+        {
+          "evidence_id": "evidence_000031",
+          "kind": "paragraph",
+          "source_element_id": "para_0028",
+          "source_anchor": {
+            "element_id": "para_0028",
+            "selector": {
+              "type": "text_span",
+              "start": 0,
+              "end": 130,
+              "exact": "The benefit of visualization is more dramatic when datasets become more subtle and cluster identification requires more precision.",
+              "prefix": "",
+              "suffix": " With 2-cluster data, GPT improves sligh"
+            }
+          },
+          "source_parts_used": [
+            "source_text"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000032",
+          "kind": "paragraph",
+          "source_element_id": "para_0028",
+          "source_anchor": {
+            "element_id": "para_0028",
+            "selector": {
+              "type": "text_span",
+              "start": 131,
+              "end": 257,
+              "exact": "With 2-cluster data, GPT improves slightly with accurate visualizations, while Claude identifies 2 clusters across conditions.",
+              "prefix": "identification requires more precision. ",
+              "suffix": " However, for 4- or 5-cluster datasets, "
+            }
+          },
+          "source_parts_used": [
+            "source_text"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000033",
+          "kind": "paragraph",
+          "source_element_id": "para_0028",
+          "source_anchor": {
+            "element_id": "para_0028",
+            "selector": {
+              "type": "text_span",
+              "start": 258,
+              "end": 462,
+              "exact": "However, for 4- or 5-cluster datasets, accurate scatterplots substantially boost performance: GPT and Claude are at least 2.3 and 1.7 times more accurate, respectively, with than without the correct plot.",
+              "prefix": "dentifies 2 clusters across conditions. ",
+              "suffix": ""
+            }
+          },
+          "source_parts_used": [
+            "source_text"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000008",
+          "kind": "figure",
+          "source_element_id": "fig_0004",
+          "source_anchor": {
+            "element_id": "fig_0004",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000037",
+          "kind": "figure",
+          "source_element_id": "fig_0003",
+          "source_anchor": {
+            "element_id": "fig_0003",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption"
+          ],
+          "source_asset_id": null,
+          "image_receipt_available": false
+        },
+        {
+          "evidence_id": "evidence_000053",
+          "kind": "figure",
+          "source_element_id": "fig_0002",
+          "source_anchor": {
+            "element_id": "fig_0002",
+            "selector": {
+              "type": "element"
+            }
+          },
+          "source_parts_used": [
+            "caption"
+          ],
+          "source_asset_id": "asset_0002",
+          "image_receipt_available": true
+        }
+      ],
+      "nodes": [
+        {
+          "id": "claim_000004",
+          "kind": "claim"
+        },
+        {
+          "id": "evidence_000031",
+          "kind": "paragraph",
+          "source_element_id": "para_0028"
+        },
+        {
+          "id": "evidence_000032",
+          "kind": "paragraph",
+          "source_element_id": "para_0028"
+        },
+        {
+          "id": "evidence_000033",
+          "kind": "paragraph",
+          "source_element_id": "para_0028"
+        },
+        {
+          "id": "evidence_000008",
+          "kind": "figure",
+          "source_element_id": "fig_0004"
+        },
+        {
+          "id": "evidence_000037",
+          "kind": "figure",
+          "source_element_id": "fig_0003"
+        },
+        {
+          "id": "evidence_000053",
+          "kind": "figure",
+          "source_element_id": "fig_0002"
+        }
+      ],
+      "edges": [
+        {
+          "from": "evidence_000031",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "supports",
+          "explanation": "This paragraph directly states that the benefit of visualization becomes more dramatic as datasets become more subtle in the cluster-identification setting.",
+          "source_parts_used": [
+            "source_text"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000032",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "supports",
+          "explanation": "This gives the low-subtlety reference point: with 2-cluster data, GPT improves only slightly and Claude performs similarly across conditions, indicating little uplift when the task is less subtle.",
+          "source_parts_used": [
+            "source_text"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000033",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "supports",
+          "explanation": "This provides the higher-subtlety contrast for clustering: for 4- or 5-cluster datasets, accurate scatterplots substantially increase accuracy, with GPT and Claude at least 2.3 times and 1.7 times more accurate than without the correct plot.",
+          "source_parts_used": [
+            "source_text"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000008",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "supports",
+          "explanation": "The Figure 4 caption says that as subtlety increases, both models' performance declines especially without accurate visuals. That supports the idea that accurate visuals confer greater relative benefit on subtler outlier-detection cases.",
+          "source_parts_used": [
+            "caption"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000037",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "qualifies",
+          "explanation": "The Figure 3 caption indicates that at higher subtlety levels in the parabolic task, an accurate plot becomes especially important, but the stated comparison is plot-only versus data-plus-plot, not directly versus the raw-data baseline. So it is relevant but only partially aligned with the claim's 'uplift' framing.",
+          "source_parts_used": [
+            "caption"
+          ],
+          "relation_status": "recorded"
+        },
+        {
+          "from": "evidence_000053",
+          "to": "claim_000004",
+          "mapping_id": "mapping_000004",
+          "relation": "qualifies",
+          "explanation": "This caption supports a visualization benefit in cluster detection overall, but its note that Claude benefits less when datasets are more subtle tempers a strong universal reading that uplift increases uniformly for every model as subtlety rises.",
+          "source_parts_used": [
+            "caption"
+          ],
+          "relation_status": "recorded"
+        }
+      ],
+      "qualifications": [
+        "The strongest direct support is for the clustering task; the other settings are supported more indirectly through captions rather than full numeric comparisons.",
+        "The supplied parabolic-trend evidence does not directly compare uplift against the raw-data baseline at higher subtlety, so it only partially bears on the claim.",
+        "The evidence supports a general trend, not a strict monotonic increase for every model in every setting."
+      ],
+      "provenance_warnings": [
+        "The saved Mapping reports material limitations; do not present it as exhaustive verification."
+      ],
+      "presentation_policy": "origin_guard_read_view_v1",
+      "relation_review_required": false
+    }
+  },
+  "explicit_evidence_only_ids": [],
+  "note": "Use per-Claim bindings. Null relations are not support. Require snapshot_id to match analysis.json."
+}

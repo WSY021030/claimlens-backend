@@ -1,0 +1,30 @@
+{
+  "export_schema": "paper-export.v1",
+  "paper_id": "arxiv_2507_18022",
+  "paper_revision": "sha256:a6559c08ee796e2a4b45b9094854b999541c64adce1288ccfebc09f6cc578505",
+  "source_url": "https://arxiv.org/html/2507.18022v1?utm_source=chatgpt.com",
+  "source_html_sha256": "sha256:cecd5ec310fee22a48b7384ffb9177db497728b1ba05d93238a6956e56a9df94",
+  "paper_json_sha256": "sha256:207b216a279737ec91b9a5bd17e099faa91f679d9b3cb32c34d76d1ab1d2676a",
+  "normalized_html_sha256": "sha256:d9c618b3eb57e3435c4189d1ddb8070403926f44d2268d9fe187b6550fb68f9a",
+  "asset_counts": {
+    "total": 5,
+    "copied": 5,
+    "missing": 0,
+    "skipped_unsafe_or_unsupported": 0
+  },
+  "equation_rendering": {
+    "total": 0,
+    "rendered": 0,
+    "native_mathml": 0,
+    "fallback": 0
+  },
+  "quality": {
+    "body": "complete",
+    "figures": "complete",
+    "tables": "complete",
+    "references": "complete",
+    "warnings": [
+      "18 broken LaTeXML reference labels were preserved as paragraph metadata."
+    ]
+  }
+}
